@@ -629,6 +629,113 @@
     .job-form-grid .full { grid-column: 1; }
   }
 
+
+  /* ─── LINE EDITS DIFF STYLE ─── */
+  .edit-block {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 1.2rem;
+    overflow: hidden;
+    font-size: 0.84rem;
+  }
+  .edit-block-header {
+    background: var(--cream);
+    padding: 0.5rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .edit-section-label {
+    background: var(--ink);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    letter-spacing: 0.08em;
+  }
+  .edit-row-before {
+    background: #fff5f5;
+    border-left: 3px solid #e08080;
+    padding: 0.7rem 1rem;
+    color: #7a3030;
+    line-height: 1.6;
+    border-bottom: 1px solid #ffd6d6;
+  }
+  .edit-row-after {
+    background: #f0f7f2;
+    border-left: 3px solid var(--success);
+    padding: 0.7rem 1rem;
+    color: #1e4a2a;
+    line-height: 1.6;
+    border-bottom: 1px solid #c8e6d0;
+  }
+  .edit-row-why {
+    background: var(--panel);
+    padding: 0.6rem 1rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .edit-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-right: 0.5rem;
+    opacity: 0.6;
+  }
+  .edits-summary-bar {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1rem 1.2rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .edits-summary-bar .summary-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .edits-summary-bar .summary-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: #a09890;
+    letter-spacing: 0.06em;
+    line-height: 1.5;
+  }
+  .projected-score {
+    margin-left: auto;
+    text-align: right;
+  }
+  .projected-score .score-big {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: var(--success);
+    line-height: 1;
+  }
+  .projected-score .score-tiny {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    color: #605a52;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
 </style>
 </head>
 <body>
@@ -705,7 +812,8 @@
     <div class="nav-section">Analysis</div>
     <ul>
       <li><a href="#" data-panel="ats-check"><span class="num">02</span> ATS Check</a></li>
-      <li><a href="#" data-panel="resume-update"><span class="num">03</span> Revised Resume</a></li>
+      <li><a href="#" data-panel="line-edits"><span class="num">03</span> Line-by-Line Edits</a></li>
+      <li><a href="#" data-panel="resume-update"><span class="num">04</span> Revised Resume Check</a></li>
     </ul>
     <div class="nav-section">Application</div>
     <ul>
@@ -778,6 +886,54 @@
         <h3>ATS Score Summary</h3>
         <div class="score-cards" id="score-cards-container"></div>
         <div id="ats-detail-output" class="stream-output"></div>
+      </div>
+    </div>
+
+
+    <!-- ── PANEL 3: LINE-BY-LINE EDITS ── -->
+    <div class="panel" id="panel-line-edits">
+      <div class="panel-title">Line-by-Line <em>Edits</em></div>
+      <div class="divider"></div>
+      <div class="panel-desc">Takes the highest-scoring resume from your ATS analysis and gives you exact, line-by-line rewrites — every change needed to push your score above 95%. Each edit shows the original line, the rewritten version, and why it improves your ATS match.</div>
+
+      <div class="step-hint">Run the ATS Analysis first (Step 02) so this tool knows which resume scored highest. It will automatically use that resume as the base.</div>
+
+      <label>Which resume to edit</label>
+      <div class="resume-pills" id="le-resume-pills">
+        <div class="pill selected" data-resume="principal_ds">Principal Design Strategist</div>
+        <div class="pill" data-resume="principal_ds_brief">Design Strategist (Brief)</div>
+        <div class="pill" data-resume="service_designer">Principal Service Designer</div>
+        <div class="pill" data-resume="product_designer">Lead Product Designer</div>
+        <div class="pill" data-resume="chief_of_staff">Chief of Staff</div>
+      </div>
+
+      <div class="step-hint" id="le-auto-hint" style="display:none; border-color: var(--success); background: #f0f7f2;">
+        ✓ Auto-selected <strong id="le-auto-resume-name"></strong> — the highest scorer from your ATS analysis.
+      </div>
+
+      <label>Edit focus</label>
+      <div class="tab-row" id="le-focus-tabs">
+        <div class="tab active" data-lefocus="full">Full Resume</div>
+        <div class="tab" data-lefocus="summary">Synopsis Only</div>
+        <div class="tab" data-lefocus="competencies">Competencies Only</div>
+        <div class="tab" data-lefocus="bullets">Experience Bullets Only</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" id="gen-edits-btn">Generate Line-by-Line Edits</button>
+      </div>
+
+      <div class="loading" id="le-loading"><div class="spinner"></div>Analyzing and rewriting for maximum ATS score…</div>
+      <div class="error-msg" id="le-error"></div>
+
+      <div class="result-box" id="le-result">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h3 style="margin:0;">Edits to Apply</h3>
+          <div style="display:flex;gap:0.5rem;">
+            <button class="copy-btn" style="float:none;margin:0;" onclick="copyResult('le-output')">Copy All</button>
+          </div>
+        </div>
+        <div class="stream-output" id="le-output"></div>
       </div>
     </div>
 
@@ -1567,6 +1723,16 @@ Be thorough and specific. Quote exact phrases from the JD when suggesting additi
       document.getElementById('score-cards-container').innerHTML = '';
       const scoreMatches = [...text.matchAll(/SCORE:\s*(.+?)\s*=\s*(\d+)%/g)];
       if (scoreMatches.length > 0) {
+        let highestPct = 0;
+        let highestKey = null;
+        let highestLabel = null;
+        const resumeKeyMap = {
+          'Principal Design Strategist': 'principal_ds',
+          'Design Strategist (Brief)': 'principal_ds_brief',
+          'Principal Service Designer': 'service_designer',
+          'Lead Product Designer': 'product_designer',
+          'Chief of Staff': 'chief_of_staff'
+        };
         scoreMatches.forEach(match => {
           const name = match[1].trim();
           const pct = parseInt(match[2]);
@@ -1576,7 +1742,17 @@ Be thorough and specific. Quote exact phrases from the JD when suggesting additi
               <div class="score-num ${colorClass}">${pct}%</div>
               <div class="score-label">${name}</div>
             </div>`;
+          if (pct > highestPct) {
+            highestPct = pct;
+            highestLabel = name;
+            // Find matching resume key
+            for (const [label, key] of Object.entries(resumeKeyMap)) {
+              if (name.includes(label) || label.includes(name)) { highestKey = key; break; }
+            }
+          }
         });
+        // Auto-select best resume for line edits panel
+        if (highestKey) autoSelectBestResume(highestKey, highestLabel);
       }
       // Show full text minus score lines in the detail output
       const cleanText = text.replace(/SCORE:.*=.*%\n?/g, '').trim();
@@ -2072,6 +2248,177 @@ document.getElementById('add-job-btn').addEventListener('click', () => {
 
 // Init tracker on load
 renderJobs();
+
+
+// ─── LINE-BY-LINE EDITS ──────────────────────────────────────────────────────
+let selectedLeResume = 'principal_ds';
+let selectedLeFocus = 'full';
+let atsHighestResume = null; // set by ATS check when it runs
+
+document.querySelectorAll('#le-resume-pills .pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('#le-resume-pills .pill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+    selectedLeResume = pill.dataset.resume;
+    // Hide the auto-hint if user manually picks
+    document.getElementById('le-auto-hint').style.display = 'none';
+  });
+});
+
+document.querySelectorAll('#le-focus-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#le-focus-tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedLeFocus = tab.dataset.lefocus;
+  });
+});
+
+function autoSelectBestResume(resumeKey, resumeLabel) {
+  atsHighestResume = resumeKey;
+  // Update pills
+  document.querySelectorAll('#le-resume-pills .pill').forEach(p => {
+    p.classList.toggle('selected', p.dataset.resume === resumeKey);
+  });
+  selectedLeResume = resumeKey;
+  // Show hint
+  document.getElementById('le-auto-resume-name').textContent = resumeLabel;
+  document.getElementById('le-auto-hint').style.display = 'block';
+}
+
+document.getElementById('gen-edits-btn').addEventListener('click', async () => {
+  const jd = savedJD || document.getElementById('jd-text').value.trim();
+  if (!jd) { showError('le-error', 'Please save a job description in Step 01 first.'); return; }
+
+  const resume = RESUMES[selectedLeResume];
+  const focusMap = {
+    full: 'every section of the resume — synopsis, core competencies, and all experience bullets',
+    summary: 'only the Synopsis / professional summary section at the top',
+    competencies: 'only the Core Competencies / Skills sections',
+    bullets: 'only the experience bullet points under each role'
+  };
+
+  showLoading('le-loading');
+  hideError('le-error');
+  document.getElementById('le-result').classList.remove('visible');
+
+  const systemPrompt = `You are a senior resume editor and ATS optimization specialist. You produce precise, surgical edits — showing the exact original text, the exact replacement text, and a clear one-line reason for each change. You never give vague advice. Every edit is a specific, copyable rewrite that directly improves ATS keyword matching and relevance scoring for the target job description.`;
+
+  const userMsg = `Perform a line-by-line ATS edit of the following resume against this job description. Focus on: ${focusMap[selectedLeFocus]}.
+
+JOB DESCRIPTION:
+${jd}
+${savedRoleName ? `Role: ${savedRoleName}` : ''}
+
+RESUME TO EDIT (${resume.label}):
+${resume.text}
+
+YOUR TASK:
+1. First, output a one-line SUMMARY like this (required, exact format):
+EDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+
+
+2. Then produce line-by-line edits. For EVERY line or bullet that needs changing, output a block in this EXACT format:
+
+SECTION: [e.g., Synopsis / Core Competencies / Kroger Bullets / Education]
+BEFORE: [exact original text, copied verbatim]
+AFTER: [your rewritten version — complete, ready to paste]
+WHY: [one sentence explaining the specific ATS improvement this makes]
+
+RULES:
+- Only output edits for lines that ACTUALLY need changing — do not include lines that are already strong
+- AFTER text must be complete and ready to paste — no [brackets], no placeholders
+- Each AFTER rewrite must naturally incorporate missing JD keywords without sounding forced
+- Preserve Cara's voice, first-person implied bullet style, and quantified metrics
+- Do not invent accomplishments — only reframe existing ones using JD language
+- Prioritize: (1) missing hard keywords, (2) missing soft skills the JD emphasizes, (3) title/seniority alignment, (4) verb choice
+- If a bullet needs a keyword added, work it in naturally at the start or end
+- For competencies, add missing keyword clusters as new pipe-separated entries
+
+Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.`;
+
+  try {
+    const output = document.getElementById('le-output');
+    output.textContent = '';
+    document.getElementById('le-result').classList.add('visible');
+
+    let fullText = '';
+    await callClaude(systemPrompt, userMsg, (text) => {
+      fullText = text;
+      // Render structured diff view as it streams
+      renderEditBlocks(text, output);
+    });
+
+  } catch (err) {
+    showError('le-error', 'Something went wrong: ' + err.message);
+    document.getElementById('le-result').classList.remove('visible');
+  } finally {
+    hideLoading('le-loading');
+  }
+});
+
+function renderEditBlocks(rawText, container) {
+  // Parse the summary line
+  const summaryMatch = rawText.match(/EDIT_SUMMARY:\s*(.+)/);
+  const editsMatch = summaryMatch ? summaryMatch[1].match(/(\d+)\s*edits/) : null;
+  const projMatch = summaryMatch ? summaryMatch[1].match(/(\d+)%\s*→\s*([\d+%]+)/) : null;
+
+  let html = '';
+
+  // Summary bar
+  if (summaryMatch) {
+    const numEdits = editsMatch ? editsMatch[1] : '?';
+    const fromScore = projMatch ? projMatch[1] + '%' : '—';
+    const toScore = projMatch ? projMatch[2] : '96%+';
+    html += `<div class="edits-summary-bar">
+      <div>
+        <div class="summary-num">${numEdits}</div>
+        <div class="summary-text">edits to apply<br>to reach target score</div>
+      </div>
+      <div class="projected-score">
+        <div class="score-big">${toScore}</div>
+        <div class="score-tiny">Projected ATS score<br>(from ${fromScore})</div>
+      </div>
+    </div>`;
+  }
+
+  // Parse edit blocks
+  const blocks = rawText.split(/(?=
+SECTION:|^SECTION:)/m).filter(b => b.includes('BEFORE:') && b.includes('AFTER:'));
+
+  blocks.forEach((block, i) => {
+    const sectionMatch = block.match(/SECTION:\s*(.+)/);
+    const beforeMatch = block.match(/BEFORE:\s*([\s\S]+?)(?=
+AFTER:)/);
+    const afterMatch = block.match(/AFTER:\s*([\s\S]+?)(?=
+WHY:)/);
+    const whyMatch = block.match(/WHY:\s*([\s\S]+?)(?=
+(?:SECTION:|BEFORE:|$))/);
+
+    if (!beforeMatch || !afterMatch) return;
+
+    const section = sectionMatch ? sectionMatch[1].trim() : '';
+    const before = beforeMatch[1].trim();
+    const after = afterMatch[1].trim();
+    const why = whyMatch ? whyMatch[1].trim() : '';
+
+    html += `<div class="edit-block">
+      <div class="edit-block-header">
+        <span>Edit ${i + 1}</span>
+        ${section ? `<span class="edit-section-label">${escHtml(section)}</span>` : ''}
+      </div>
+      <div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>
+      <div class="edit-row-after"><span class="edit-label">Replace with</span>${escHtml(after)}</div>
+      ${why ? `<div class="edit-row-why">💡 ${escHtml(why)}</div>` : ''}
+    </div>`;
+  });
+
+  // If still streaming and no blocks parsed yet, show raw text
+  if (blocks.length === 0 && !summaryMatch) {
+    container.textContent = rawText;
+    return;
+  }
+
+  container.innerHTML = html || rawText;
+}
 
 // ─── COMPANY RESEARCH ────────────────────────────────────────────────────────
 let selectedResearchDepth = 'standard';
