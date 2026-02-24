@@ -413,8 +413,10 @@
     border: 1px solid var(--gold);
     border-radius: 8px;
     padding: 2.5rem;
-    width: 480px;
+    width: 540px;
     max-width: 92vw;
+    max-height: 88vh;
+    overflow-y: auto;
   }
   .modal-box h2 {
     font-family: 'Cormorant Garamond', serif;
@@ -645,7 +647,8 @@
     <button class="modal-close" id="settings-close-btn">✕</button>
     <h2>API <em>Settings</em></h2>
     <p>This toolkit calls the Anthropic API directly. Paste your API key below — it's saved only in your browser's local storage and never sent anywhere except Anthropic.<br><br>
-    Get your key at <a href="https://console.anthropic.com/api-keys" target="_blank">console.anthropic.com/api-keys</a>. Usage is billed to your Anthropic account.</p>
+    Get your key at <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com/settings/keys</a>. Log in, click <strong>API Keys</strong> in the left sidebar, then <strong>Create Key</strong>. Usage is billed to your Anthropic account at very low cost (~$0.01–0.05 per use).</p>
+
     <label>Anthropic API Key</label>
     <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." style="margin-bottom:1rem;">
     <div class="btn-row">
@@ -653,6 +656,42 @@
       <button class="btn btn-ghost" id="clear-key-btn">Clear Key</button>
     </div>
     <div id="key-status-msg" class="key-status unset" style="margin-top:1rem;">No API key saved</div>
+
+    <hr style="border:none;border-top:1px solid var(--border);margin:1.8rem 0;">
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;margin-bottom:0.3rem;">Resume <em style="font-style:italic;color:var(--gold);">Links</em></h2>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6;">Save your GoDaddy resume URLs here so you can copy and paste them instantly when applications ask you to link or upload a resume. These are stored in your browser.</p>
+
+    <div id="resume-links-form">
+      <label>Principal Design Strategist</label>
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.8rem;">
+        <input type="url" id="rl-principal-ds" placeholder="https://caraabrown.com/Resumes/..." style="margin-bottom:0;">
+        <button class="copy-btn" style="white-space:nowrap;margin:0;" onclick="copyResumeLink('rl-principal-ds')">Copy</button>
+      </div>
+      <label>Design Strategist (Brief)</label>
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.8rem;">
+        <input type="url" id="rl-principal-ds-brief" placeholder="https://caraabrown.com/Resumes/..." style="margin-bottom:0;">
+        <button class="copy-btn" style="white-space:nowrap;margin:0;" onclick="copyResumeLink('rl-principal-ds-brief')">Copy</button>
+      </div>
+      <label>Principal Service Designer</label>
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.8rem;">
+        <input type="url" id="rl-service-designer" placeholder="https://caraabrown.com/Resumes/..." style="margin-bottom:0;">
+        <button class="copy-btn" style="white-space:nowrap;margin:0;" onclick="copyResumeLink('rl-service-designer')">Copy</button>
+      </div>
+      <label>Lead Product Designer</label>
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.8rem;">
+        <input type="url" id="rl-product-designer" placeholder="https://caraabrown.com/Resumes/..." style="margin-bottom:0;">
+        <button class="copy-btn" style="white-space:nowrap;margin:0;" onclick="copyResumeLink('rl-product-designer')">Copy</button>
+      </div>
+      <label>Chief of Staff</label>
+      <div style="display:flex;gap:0.5rem;margin-bottom:1.2rem;">
+        <input type="url" id="rl-chief-of-staff" placeholder="https://caraabrown.com/Resumes/..." style="margin-bottom:0;">
+        <button class="copy-btn" style="white-space:nowrap;margin:0;" onclick="copyResumeLink('rl-chief-of-staff')">Copy</button>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="save-resume-links-btn">Save Resume Links</button>
+    </div>
+    <div id="resume-links-saved-msg" style="display:none;margin-top:0.8rem;color:var(--success);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;">✓ LINKS SAVED</div>
   </div>
 </div>
 
@@ -1811,6 +1850,54 @@ document.getElementById('clear-key-btn').addEventListener('click', () => {
 
 // Init key status on load
 updateKeyStatus();
+
+// ─── RESUME LINKS ────────────────────────────────────────────────────────────
+const RESUME_LINK_KEYS = {
+  'rl-principal-ds': 'rl_principal_ds',
+  'rl-principal-ds-brief': 'rl_principal_ds_brief',
+  'rl-service-designer': 'rl_service_designer',
+  'rl-product-designer': 'rl_product_designer',
+  'rl-chief-of-staff': 'rl_chief_of_staff'
+};
+
+function loadResumeLinks() {
+  Object.entries(RESUME_LINK_KEYS).forEach(([inputId, storageKey]) => {
+    const val = localStorage.getItem(storageKey) || '';
+    const el = document.getElementById(inputId);
+    if (el) el.value = val;
+  });
+}
+
+function copyResumeLink(inputId) {
+  const el = document.getElementById(inputId);
+  if (!el || !el.value.trim()) {
+    alert('No link saved for this resume yet. Paste the URL and click Save Resume Links first.');
+    return;
+  }
+  navigator.clipboard.writeText(el.value.trim()).then(() => {
+    // Find the button next to this input and flash it
+    const btn = el.nextElementSibling;
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
+  });
+}
+
+document.getElementById('save-resume-links-btn').addEventListener('click', () => {
+  Object.entries(RESUME_LINK_KEYS).forEach(([inputId, storageKey]) => {
+    const el = document.getElementById(inputId);
+    if (el) localStorage.setItem(storageKey, el.value.trim());
+  });
+  const msg = document.getElementById('resume-links-saved-msg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 2500);
+});
+
+// Load saved links when settings modal opens
+document.getElementById('settings-open-btn').addEventListener('click', loadResumeLinks, { capture: true });
+
+// Init on page load too
+loadResumeLinks();
+
+
 
 // ─── JOB TRACKER ──────────────────────────────────────────────────────────────
 let jobs = JSON.parse(localStorage.getItem('cara_jobs') || '[]');
