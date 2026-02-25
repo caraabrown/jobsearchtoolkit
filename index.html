@@ -2359,7 +2359,7 @@ function renderEditBlocks(rawText, container) {
   // Parse the summary line
   const summaryMatch = rawText.match(/EDIT_SUMMARY:\s*(.+)/);
   const editsMatch = summaryMatch ? summaryMatch[1].match(/(\d+)\s*edits/) : null;
-  const projMatch = summaryMatch ? summaryMatch[1].match(/(\d+)%\s*→\s*([\d+%]+)/) : null;
+  const projMatch = summaryMatch ? summaryMatch[1].match(/(\d+)%\s*[→-]\s*([\d+%]+)/) : null;
 
   let html = '';
 
@@ -2380,25 +2380,48 @@ function renderEditBlocks(rawText, container) {
     </div>`;
   }
 
-  // Parse edit blocks
-  const blocks = rawText.split(/(?=
-SECTION:|^SECTION:)/m).filter(b => b.includes('BEFORE:') && b.includes('AFTER:'));
+  // Split into blocks by splitting on lines that start with SECTION: or BEFORE:
+  // Use string splitting instead of regex to avoid newline-in-regex issues
+  const lines = rawText.split('\n');
+  let blocks = [];
+  let currentBlock = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if ((trimmed.startsWith('SECTION:') || trimmed.startsWith('BEFORE:')) && currentBlock.length > 0) {
+      // Check if currentBlock has a BEFORE: — if so it's a real block
+      if (currentBlock.some(l => l.trim().startsWith('BEFORE:'))) {
+        blocks.push(currentBlock.join('\n'));
+      }
+      currentBlock = [line];
+    } else {
+      currentBlock.push(line);
+    }
+  }
+  if (currentBlock.some(l => l.trim().startsWith('BEFORE:'))) {
+    blocks.push(currentBlock.join('\n'));
+  }
 
   blocks.forEach((block, i) => {
-    const sectionMatch = block.match(/SECTION:\s*(.+)/);
-    const beforeMatch = block.match(/BEFORE:\s*([\s\S]+?)(?=
-AFTER:)/);
-    const afterMatch = block.match(/AFTER:\s*([\s\S]+?)(?=
-WHY:)/);
-    const whyMatch = block.match(/WHY:\s*([\s\S]+?)(?=
-(?:SECTION:|BEFORE:|$))/);
+    // Parse each field using indexOf-based extraction
+    function extractField(text, fieldName, nextFields) {
+      const marker = fieldName + ':';
+      const start = text.indexOf(marker);
+      if (start < 0) return '';
+      let end = text.length;
+      for (const next of nextFields) {
+        const ni = text.indexOf(next + ':', start + marker.length);
+        if (ni > 0 && ni < end) end = ni;
+      }
+      return text.substring(start + marker.length, end).trim();
+    }
 
-    if (!beforeMatch || !afterMatch) return;
+    const section = extractField(block, 'SECTION', ['BEFORE','AFTER','WHY']);
+    const before  = extractField(block, 'BEFORE',  ['AFTER','WHY','SECTION']);
+    const after   = extractField(block, 'AFTER',   ['WHY','SECTION','BEFORE']);
+    const why     = extractField(block, 'WHY',     ['SECTION','BEFORE','AFTER']);
 
-    const section = sectionMatch ? sectionMatch[1].trim() : '';
-    const before = beforeMatch[1].trim();
-    const after = afterMatch[1].trim();
-    const why = whyMatch ? whyMatch[1].trim() : '';
+    if (!before && !after) return;
 
     html += `<div class="edit-block">
       <div class="edit-block-header">
@@ -2411,387 +2434,16 @@ WHY:)/);
     </div>`;
   });
 
-  // If still streaming and no blocks parsed yet, show raw text
   if (blocks.length === 0 && !summaryMatch) {
     container.textContent = rawText;
     return;
   }
 
-  container.innerHTML = html || rawText;
+  container.innerHTML = html || `<div style="white-space:pre-wrap;font-size:0.85rem;">${escHtml(rawText)}</div>`;
 }
 
-// ─── COMPANY RESEARCH ────────────────────────────────────────────────────────
-let selectedResearchDepth = 'standard';
-document.querySelectorAll('#research-depth-tabs .tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('#research-depth-tabs .tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    selectedResearchDepth = tab.dataset.depth;
-  });
-});
 
-document.getElementById('gen-research-btn').addEventListener('click', async () => {
-  const companyName = document.getElementById('company-name').value.trim();
-  if (!companyName) { showError('research-error', 'Please enter a company name.'); return; }
-
-  const companyUrl = document.getElementById('company-url').value.trim();
-  const companyNotes = document.getElementById('company-notes').value.trim();
-  const jd = savedJD;
-
-  const depthMap = {
-    standard: 'a focused 1-page brief with the most critical intelligence — mission/values, strategic priorities, culture signals, and how Cara maps to their needs',
-    deep: 'a comprehensive deep-dive — mission/values, leadership philosophy, business model, recent news/initiatives, known challenges, competitive positioning, culture signals, employee sentiment, and a detailed Cara-fit analysis',
-    interview: 'a pre-interview brief optimized for walking into a conversation with confidence — key talking points, smart questions to ask them, culture red flags to watch for, and what they are likely evaluating for in this stage'
-  };
-
-  showLoading('research-loading');
-  hideError('research-error');
-  document.getElementById('research-result').classList.remove('visible');
-
-  const systemPrompt = `You are an expert corporate intelligence analyst and career strategist. You synthesize company research into actionable briefs that help senior professionals walk into interviews and conversations with deep preparation. You think like a management consultant: structured, insight-driven, and always connecting company context to the candidate's positioning.`;
-
-  const userMsg = `Build ${depthMap[selectedResearchDepth]} for Cara Brown on the following company.
-
-COMPANY: ${companyName}
-${companyUrl ? `WEBSITE/URL: ${companyUrl}` : ''}
-${companyNotes ? `\nWHAT CARA ALREADY KNOWS:\n${companyNotes}` : ''}
-${jd ? `\nJOB DESCRIPTION SHE'S APPLYING FOR:\n${jd}` : ''}
-
-CARA'S BACKGROUND FOR FIT ANALYSIS:
-${CARA_BIO}
-
-Please structure the brief with these sections (use clear headers):
-
-1. **COMPANY SNAPSHOT** — What they do, size, sector, business model in 3-4 sentences
-
-2. **MISSION, VALUES & CULTURE SIGNALS** — Stated values, how they actually show up (culture), what kind of person thrives there. Note any signals about DEI, innovation, hierarchy, or pace. Reference any public statements, leadership interviews, or Glassdoor patterns if known.
-
-3. **STRATEGIC PRIORITIES & CURRENT INITIATIVES** — What are they focused on right now? What problems are they trying to solve? Any recent news, acquisitions, contracts, pivots, or investments worth knowing?
-
-4. **WHAT THEY'RE REALLY LOOKING FOR** — Based on the JD and company context, what does this role actually need to solve? What's the underlying organizational problem?
-
-5. **HOW CARA MAPS TO THEIR WORLD** — Specific, direct connections between Cara's background and this company's needs. Which of her stories and metrics will land hardest here?
-
-6. **SMART QUESTIONS TO ASK THEM** — 4-5 questions that signal deep preparation and strategic thinking (not "what does success look like" — better than that)
-
-7. **WATCH-OUTS** — Any culture, structure, or role red flags worth noting before committing
-
-Be specific and insightful. Avoid generic statements. This should feel like a brief a consultant prepared, not a Wikipedia summary.`;
-
-  try {
-    const output = document.getElementById('research-output');
-    output.textContent = '';
-    document.getElementById('research-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
-  } catch (err) {
-    showError('research-error', 'Something went wrong: ' + err.message);
-    document.getElementById('research-result').classList.remove('visible');
-  } finally {
-    hideLoading('research-loading');
-  }
-});
-
-// ─── INTERVIEW PREP ───────────────────────────────────────────────────────────
-let selectedInterviewStage = 'phone';
-let selectedInterviewResume = 'principal_ds';
-
-document.querySelectorAll('#interview-stage-tabs .tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('#interview-stage-tabs .tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    selectedInterviewStage = tab.dataset.stage;
-  });
-});
-
-document.querySelectorAll('#interview-resume-pills .pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('#interview-resume-pills .pill').forEach(p => p.classList.remove('selected'));
-    pill.classList.add('selected');
-    selectedInterviewResume = pill.dataset.resume;
-  });
-});
-
-document.getElementById('gen-interview-btn').addEventListener('click', async () => {
-  const jd = savedJD || document.getElementById('jd-text').value.trim();
-  if (!jd) { showError('interview-error', 'Please save a job description in Step 01 first.'); return; }
-
-  const focus = document.getElementById('interview-focus').value.trim();
-  const resume = RESUMES[selectedInterviewResume];
-
-  const stageMap = {
-    phone: 'a recruiter or HR phone screen (typically 20-30 min, covers background, fit, compensation expectations, and basic behavioral questions)',
-    hiring: 'a hiring manager interview (typically 45-60 min, goes deep on how you work, your approach, specific projects, leadership style)',
-    panel: 'a panel or final-round interview (multiple interviewers, may include case studies, presentations, cross-functional stakeholders, or a design exercise)'
-  };
-
-  showLoading('interview-loading');
-  hideError('interview-error');
-  document.getElementById('interview-result').classList.remove('visible');
-
-  const systemPrompt = `You are a world-class interview coach specializing in senior design strategy and service design roles. You prepare candidates with specific, story-based answers — never generic advice. Every answer you craft is grounded in the candidate's real experience and directly responsive to what the interviewer is actually evaluating.`;
-
-  const userMsg = `Build a complete interview prep guide for Cara Brown for the following role and stage.
-
-INTERVIEW STAGE: ${stageMap[selectedInterviewStage]}
-
-JOB DESCRIPTION:
-${jd}
-${savedRoleName ? `Role: ${savedRoleName}` : ''}
-
-CARA'S RESUME (source of truth for stories):
-${resume.text}
-
-${focus ? `\nCARA'S SPECIFIC FOCUS / CONCERNS:\n${focus}` : ''}
-
-Please generate the following:
-
-**PART 1 — YOUR 60-SECOND OPENER**
-Write Cara's "Tell me about yourself" answer for this specific role. Should be 4-5 sentences, end pointing toward why she's here.
-
-**PART 2 — THE 10 MOST LIKELY QUESTIONS + PREPARED ANSWERS**
-For each question:
-- Write the question exactly as an interviewer would ask it
-- Provide a complete STAR-method answer (Situation, Task, Action, Result) drawn from Cara's actual experience
-- Bold the result/metric so it's easy to find when scanning
-- Note which story this draws from (e.g., "Kroger NPS story" or "RealReal backlog story")
-
-Select questions that are genuinely likely for this stage and role — behavioral, situational, and role-specific. Include at least one question about:
-- Leading without authority / influencing up
-- Ambiguity or a time they had to define the problem themselves
-- Measuring impact / using data
-- Working cross-functionally with engineering/product/ops
-- Career narrative (why leaving, why this role)
-${selectedInterviewStage !== 'phone' ? '- A challenge or failure and what you learned' : ''}
-${selectedInterviewStage === 'panel' ? '- A specific design/strategy methodology deep dive' : ''}
-
-**PART 3 — LANDMINES TO WATCH FOR**
-2-3 tricky questions or moments that could trip Cara up in this interview, and how to handle them with confidence.
-
-Be specific, grounded, and story-based throughout. Do not give generic advice.`;
-
-  try {
-    const output = document.getElementById('interview-output');
-    output.textContent = '';
-    document.getElementById('interview-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
-  } catch (err) {
-    showError('interview-error', 'Something went wrong: ' + err.message);
-    document.getElementById('interview-result').classList.remove('visible');
-  } finally {
-    hideLoading('interview-loading');
-  }
-});
-
-// ─── LINKEDIN OUTREACH ────────────────────────────────────────────────────────
-let selectedLIType = 'connect';
-
-document.querySelectorAll('#li-type-tabs .tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('#li-type-tabs .tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    selectedLIType = tab.dataset.litype;
-  });
-});
-
-document.getElementById('gen-li-btn').addEventListener('click', async () => {
-  const liName = document.getElementById('li-name').value.trim();
-  const liTitle = document.getElementById('li-title').value.trim();
-  if (!liName || !liTitle) { showError('li-error', 'Please enter the person\'s name and title.'); return; }
-
-  const liContext = document.getElementById('li-context').value.trim();
-  const liGoal = document.getElementById('li-goal').value.trim();
-  const jd = savedJD;
-
-  const typeMap = {
-    connect: 'a LinkedIn connection request (300 character limit — must be tight, specific, and earn the accept)',
-    info: 'an informational interview request (sent via LinkedIn message or InMail, ~150 words max, goal is a 20-minute call)',
-    referral: 'a referral request (respectful, specific, makes it easy for them to say yes or pass along)',
-    followup: 'a follow-up message after applying online (shows initiative, differentiates from the pile, not desperate)'
-  };
-
-  showLoading('li-loading');
-  hideError('li-error');
-  document.getElementById('li-result').classList.remove('visible');
-
-  const systemPrompt = `You are an expert at writing LinkedIn outreach that actually gets replies. You write messages that feel human, specific, and worth responding to — never templates, never generic flattery. You understand that senior professionals receive dozens of messages and only reply to the ones that signal real thought and mutual value.`;
-
-  const userMsg = `Write ${typeMap[selectedLIType]} for Cara Brown to send to the following person.
-
-RECIPIENT: ${liName}, ${liTitle}
-${liContext ? `\nWHAT CARA KNOWS ABOUT THEM:\n${liContext}` : ''}
-${liGoal ? `\nCARA'S GOAL:\n${liGoal}` : ''}
-${jd ? `\nROLE CONTEXT:\n${savedRoleName || 'See JD'}\n${jd.substring(0, 500)}` : ''}
-
-CARA'S BACKGROUND:
-${CARA_BIO}
-
-REQUIREMENTS:
-- Write in Cara's voice — confident, warm, human, not stiff
-- Be specific to THIS person — reference something real about them if context was provided
-- State the ask clearly and make it easy to respond to
-- Do NOT use these phrases: "I came across your profile," "I hope this message finds you well," "I'd love to pick your brain," "I'm a huge fan"
-- For connection requests: stay under 300 characters, make every word count
-- For other types: keep it under 150 words unless a referral request which can be slightly longer
-- End with a clear, low-friction ask
-
-Write the message directly, ready to copy and send. Then add 1-2 sentence note on why this approach works.`;
-
-  try {
-    const output = document.getElementById('li-output');
-    output.textContent = '';
-    document.getElementById('li-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
-  } catch (err) {
-    showError('li-error', 'Something went wrong: ' + err.message);
-    document.getElementById('li-result').classList.remove('visible');
-  } finally {
-    hideLoading('li-loading');
-  }
-});
-
-// ─── SALARY & RECRUITER INTEL ─────────────────────────────────────────────────
-let salaryMode = 'salary';
-
-document.querySelectorAll('#salary-mode-tabs .tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('#salary-mode-tabs .tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    salaryMode = tab.dataset.salmode;
-    document.getElementById('salary-sub').style.display = salaryMode === 'salary' ? 'block' : 'none';
-    document.getElementById('recruiter-sub').style.display = salaryMode === 'recruiter' ? 'block' : 'none';
-  });
-});
-
-document.getElementById('gen-salary-btn').addEventListener('click', async () => {
-  const role = document.getElementById('sal-role').value.trim();
-  if (!role) { showError('salary-error', 'Please enter the role title.'); return; }
-
-  const location = document.getElementById('sal-location').value.trim();
-  const companyType = document.getElementById('sal-company-type').value.trim();
-  const offered = document.getElementById('sal-offered').value.trim();
-  const situation = document.getElementById('sal-situation').value.trim();
-  const jd = savedJD;
-
-  showLoading('salary-loading');
-  hideError('salary-error');
-  document.getElementById('salary-result').classList.remove('visible');
-
-  const systemPrompt = `You are an expert salary negotiation coach and compensation analyst with deep knowledge of design, strategy, UX, and consulting markets. You give candidates the specific intelligence and language they need to negotiate from a position of strength, not desperation.`;
-
-  const userMsg = `Build a salary research brief and negotiation strategy for Cara Brown.
-
-ROLE: ${role}
-${location ? `LOCATION: ${location}` : ''}
-${companyType ? `COMPANY TYPE: ${companyType}` : ''}
-${offered ? `WHAT'S BEEN OFFERED OR MENTIONED: ${offered}` : ''}
-${situation ? `\nCARA'S SITUATION:\n${situation}` : ''}
-${jd ? `\nJOB DESCRIPTION:\n${jd.substring(0, 800)}` : ''}
-
-CARA'S PROFILE:
-${CARA_BIO}
-15+ years experience, MBA, Principal-level, enterprise impact including $270M risk quantification, multiple C-suite partnerships.
-
-Please provide:
-
-**1. MARKET RATE RESEARCH**
-Based on your knowledge of compensation data (Levels.fyi, LinkedIn Salary, Glassdoor, Payscale, industry surveys), provide realistic salary ranges for this role by:
-- Level (Senior, Principal, Director, VP equivalent)
-- Sector (consulting/agency vs in-house vs federal contractor vs tech)
-- Location (if provided)
-- Total compensation breakdown (base, bonus, equity if applicable)
-
-**2. CARA'S ANCHOR NUMBER**
-Given her experience, impact, and credentials, what should her target number be? What's her walk-away floor? What's her stretch ask? Be direct.
-
-**3. NEGOTIATION SCRIPT**
-Write exact language Cara can use to:
-- Respond when asked "what are your salary expectations?" (before an offer)
-- Counter a lowball offer confidently
-- Ask for time to consider without losing momentum
-- Negotiate total comp beyond base (bonus, remote flexibility, title, PTO, start date)
-
-**4. COMMON TRAPS & HOW TO AVOID THEM**
-3-4 specific mistakes senior candidates make in this type of negotiation and how Cara should handle them.
-
-${offered && offered.toLowerCase().includes('recruiter') ? `**5. RECRUITER CONTEXT**
-Notes on how recruiter-sourced roles affect negotiation leverage and what to watch for when a recruiter quotes a range.` : ''}
-
-Be specific, direct, and practical. Give Cara real numbers and real language, not platitudes.`;
-
-  try {
-    const output = document.getElementById('salary-output');
-    output.textContent = '';
-    document.getElementById('salary-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
-  } catch (err) {
-    showError('salary-error', 'Something went wrong: ' + err.message);
-    document.getElementById('salary-result').classList.remove('visible');
-  } finally {
-    hideLoading('salary-loading');
-  }
-});
-
-document.getElementById('gen-recruiter-btn').addEventListener('click', async () => {
-  const recRole = document.getElementById('rec-role').value.trim();
-  const recInfo = document.getElementById('rec-info').value.trim();
-  if (!recRole || !recInfo) { showError('recruiter-error', 'Please enter the role and recruiter details.'); return; }
-
-  const recJD = document.getElementById('rec-jd').value.trim();
-
-  showLoading('recruiter-loading');
-  hideError('recruiter-error');
-  document.getElementById('recruiter-result').classList.remove('visible');
-
-  const systemPrompt = `You are an expert in recruiting industry practices, staffing agency dynamics, and candidate protection strategies. You help senior professionals navigate complex recruiter situations — identifying primary vs. secondary agencies, spotting fake or fraudulent recruiters, avoiding duplicate submissions, and protecting their candidacy. You are direct, specific, and give actionable guidance.`;
-
-  const userMsg = `Help Cara Brown analyze and vet the following recruiter situation.
-
-ROLE IN QUESTION: ${recRole}
-
-RECRUITER DETAILS:
-${recInfo}
-
-${recJD ? `\nJOB DESCRIPTION / DETAILS SHARED:\n${recJD}` : ''}
-
-Please provide a thorough analysis:
-
-**1. SITUATION ASSESSMENT**
-What is likely happening here? Is this the same role posted through multiple agencies? Is one of these a "body shop" using another firm's listing? What are the red flags and green flags for each recruiter?
-
-**2. RECRUITER LEGITIMACY CHECK**
-For each recruiter mentioned, assess:
-- Signals of legitimacy (direct employer relationship vs. secondary/tertiary agency)
-- Red flags (vague company name, no req number, pressure tactics, salary inconsistency, generic job description)
-- Likely agency tier (Tier 1: direct employer relationship / preferred vendor | Tier 2: secondary agency | Tier 3: resume farmer / body shop)
-
-**3. THE DUPLICATE SUBMISSION RISK**
-Explain clearly: what happens if multiple agencies submit Cara for the same role? What are her risks? What does "owns the candidate" mean in practice and how can she protect herself?
-
-**4. WHO TO RESPOND TO (AND HOW)**
-Specific recommendation on which recruiter(s) to engage with and in what order. What to say to the others to protect herself without burning bridges.
-
-**5. QUESTIONS TO ASK EACH RECRUITER BEFORE GIVING CONSENT**
-Exact questions Cara should ask to verify the recruiter is legitimate and has a direct relationship with the employer before authorizing them to submit her resume. Include: how to ask for the employer name, job req number, and submission consent confirmation.
-
-**6. PROTECTING YOURSELF GOING FORWARD**
-Best practices for Cara to use any time multiple recruiters reach out — standard protocol to never get caught in this situation again.
-
-Be direct and specific. Name the signals clearly. This is high-stakes.`;
-
-  try {
-    const output = document.getElementById('recruiter-output');
-    output.textContent = '';
-    document.getElementById('recruiter-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
-  } catch (err) {
-    showError('recruiter-error', 'Something went wrong: ' + err.message);
-    document.getElementById('recruiter-result').classList.remove('visible');
-  } finally {
-    hideLoading('recruiter-loading');
-  }
-});
-
-
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
 function showLoading(id) { document.getElementById(id).classList.add('visible'); }
 function hideLoading(id) { document.getElementById(id).classList.remove('visible'); }
 function showError(id, msg) {
@@ -2799,14 +2451,20 @@ function showError(id, msg) {
   el.textContent = msg;
   el.classList.add('visible');
 }
-function hideError(id) { document.getElementById(id).classList.remove('visible'); }
+function hideError(id) { 
+  const el = document.getElementById(id);
+  el.textContent = '';
+  el.classList.remove('visible');
+}
 
 function copyResult(id) {
-  const text = document.getElementById(id).textContent;
+  const el = document.getElementById(id);
+  if (!el) return;
+  const text = el.textContent || el.innerText;
   navigator.clipboard.writeText(text).then(() => {
-    const btn = event.target;
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy', 2000);
+    // find the copy button near this element
+    const btn = el.closest('.result-box')?.querySelector('.copy-btn');
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
   });
 }
 </script>
