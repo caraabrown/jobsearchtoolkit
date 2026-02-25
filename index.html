@@ -1625,7 +1625,7 @@ async function callClaude(systemPrompt, userMessage, onChunk) {
       "anthropic-dangerous-direct-browser-access": "true"
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: 4000,
       stream: true,
       system: systemPrompt,
@@ -2343,9 +2343,11 @@ Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.`
     let fullText = '';
     await callClaude(systemPrompt, userMsg, (text) => {
       fullText = text;
-      // Render structured diff view as it streams
-      renderEditBlocks(text, output);
+      // Show raw text while streaming, render structured view only when done
+      output.textContent = text;
     });
+    // Now render the full structured diff view
+    renderEditBlocks(fullText, output);
 
   } catch (err) {
     showError('le-error', 'Something went wrong: ' + err.message);
