@@ -868,11 +868,11 @@
 
       <label>Resumes to analyze</label>
       <div class="resume-pills">
-        <div class="pill selected" data-resume="principal_ds">Principal Design Strategist</div>
-        <div class="pill selected" data-resume="principal_ds_brief">Design Strategist (Brief)</div>
-        <div class="pill selected" data-resume="service_designer">Principal Service Designer</div>
-        <div class="pill selected" data-resume="product_designer">Lead Product Designer</div>
-        <div class="pill selected" data-resume="chief_of_staff">Chief of Staff</div>
+        <div class="pill" data-resume="principal_ds">Principal Design Strategist</div>
+        <div class="pill" data-resume="principal_ds_brief">Design Strategist (Brief)</div>
+        <div class="pill" data-resume="service_designer">Principal Service Designer</div>
+        <div class="pill" data-resume="product_designer">Lead Product Designer</div>
+        <div class="pill" data-resume="chief_of_staff">Chief of Staff</div>
       </div>
 
       <div class="btn-row">
@@ -1554,7 +1554,7 @@ const CARA_BIO = `Cara A. Brown, MBA is a Principal Design Strategist and Servic
 let savedJD = '';
 let savedJDUrl = '';
 let savedRoleName = '';
-let selectedResumesForATS = new Set(['principal_ds','principal_ds_brief','service_designer','product_designer','chief_of_staff']);
+let selectedResumesForATS = new Set();
 let selectedResumeForCL = 'principal_ds';
 let selectedCLTone = 'strategic';
 
@@ -1633,7 +1633,10 @@ async function callClaude(systemPrompt, userMessage, onChunk) {
     })
   });
 
-  if (!response.ok) throw new Error(`API error: ${response.status}`);
+  if (!response.ok) {
+    const errBody = await response.text();
+    throw new Error(`API error ${response.status}: ${errBody}`);
+  }
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
