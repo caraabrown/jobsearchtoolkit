@@ -1079,35 +1079,8 @@
         </div>
       </div>
 
-      <!-- ADD JOB FORM -->
-      <div class="add-job-form">
-        <h3>Log a New Application</h3>
-        <div class="job-form-grid">
-          <div>
-            <label>Company *</label>
-            <input type="text" id="new-company" placeholder="e.g., Accenture Federal Services">
-          </div>
-          <div>
-            <label>Role Title *</label>
-            <input type="text" id="new-role" placeholder="e.g., Principal Service Designer">
-          </div>
-          <div class="full">
-            <label>Job Posting URL (optional)</label>
-            <input type="url" id="new-url" placeholder="https://...">
-          </div>
-          <div>
-            <label>Recruiter / Source (optional)</label>
-            <input type="text" id="new-source" placeholder="e.g., LinkedIn, Indeed, Accenture Careers, Jane Smith @ SearchFirm">
-          </div>
-          <div>
-            <label>Notes (optional)</label>
-            <input type="text" id="new-notes" placeholder="e.g., Dream role, referred by Jordan">
-          </div>
-        </div>
-        <div class="btn-row" style="margin-top:1rem;">
-          <button class="btn" id="add-job-btn">+ Log Application</button>
-        </div>
-      </div>
+      <!-- AUTO-LOG NOTE -->
+      <div class="step-hint" style="margin-bottom:2rem;">Applications are logged automatically when you save a Job Description in Step 01. Use the checkboxes below to track your progress.</div>
 
       <!-- JOBS TABLE -->
       <div id="jobs-empty" class="empty-state">No applications logged yet. Add your first one above.</div>
@@ -1117,13 +1090,11 @@
             <tr>
               <th>Company</th>
               <th>Role</th>
-              <th>Source</th>
-              <th>Date Applied</th>
-              <th style="text-align:center;">Applied</th>
+              <th>Date Added</th>
               <th style="text-align:center;">Screening</th>
               <th style="text-align:center;">Interview</th>
+              <th style="text-align:center;">Rejected</th>
               <th style="text-align:center;">Hired</th>
-              <th>Notes</th>
               <th></th>
             </tr>
           </thead>
@@ -1605,6 +1576,34 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
   savedRoleName = document.getElementById('job-role-name').value.trim();
   if (!savedJD) { alert('Please paste a job description first.'); return; }
   document.getElementById('jd-saved-msg').style.display = 'block';
+
+  // Auto-add to job tracker
+  if (savedRoleName || savedJDUrl) {
+    // Parse "Role at Company" from savedRoleName
+    let autoRole = savedRoleName, autoCompany = '';
+    const atIdx = savedRoleName.lastIndexOf(' at ');
+    if (atIdx > 0) {
+      autoRole = savedRoleName.substring(0, atIdx).trim();
+      autoCompany = savedRoleName.substring(atIdx + 4).trim();
+    }
+    const newJob = {
+      id: Date.now().toString(),
+      company: autoCompany || '(see URL)',
+      role: autoRole || savedRoleName,
+      url: savedJDUrl,
+      source: '',
+      notes: '',
+      dateAdded: new Date().toISOString(),
+      screening: false,
+      interview: false,
+      rejected: false,
+      hired: false
+    };
+    jobs.unshift(newJob);
+    saveJobs();
+    renderJobs();
+  }
+
   setTimeout(() => {
     document.querySelector('nav a[data-panel="ats-check"]').click();
   }, 800);
@@ -2098,10 +2097,10 @@ function updateTrackerStats() {
   const total = jobs.length;
   const weekStart = getWeekStart();
   const weekApps = jobs.filter(j => {
-    const d = new Date(j.dateApplied);
-    return d >= weekStart && j.applied;
+    const d = new Date(j.dateAdded || j.dateApplied || j.dateAdded);
+    return d >= weekStart;
   }).length;
-  const active = jobs.filter(j => (j.screening || j.interview) && !j.hired).length;
+  const active = jobs.filter(j => (j.screening || j.interview) && !j.hired && !j.rejected).length;
 
   document.getElementById('stat-total').textContent = total;
   document.getElementById('stat-week').textContent = weekApps;
@@ -2109,8 +2108,8 @@ function updateTrackerStats() {
 
   // Weeks since first application
   if (jobs.length > 0) {
-    const sorted = [...jobs].sort((a, b) => new Date(a.dateApplied) - new Date(b.dateApplied));
-    const firstDate = new Date(sorted[0].dateApplied);
+    const sorted = [...jobs].sort((a, b) => new Date(a.dateAdded || a.dateApplied) - new Date(b.dateAdded || b.dateApplied));
+    const firstDate = new Date(sorted[0].dateAdded || sorted[0].dateApplied);
     const now = new Date();
     const diffDays = Math.floor((now - firstDate) / (1000 * 60 * 60 * 24));
     const weeks = Math.floor(diffDays / 7);
@@ -2159,38 +2158,37 @@ function renderJobs() {
   tbody.innerHTML = sorted.map(j => {
     const isHired = j.hired ? 'hired-row' : '';
     const urlCell = j.url
-      ? `<a class="job-link" href="${j.url}" target="_blank">↗ View</a>`
-      : '<span style="color:var(--border)">—</span>';
-    return `<tr class="${isHired}" data-id="${j.id}">
-      <td><strong>${escHtml(j.company)}</strong><br><small style="color:var(--muted);font-size:0.7rem;">${urlCell}</small></td>
+      ? `<a class="job-link" href="${j.url}" target="_blank">↗</a>`
+      : '';
+    const isRejected = j.rejected ? 'style="opacity:0.5;"' : '';
+    return `<tr class="${isHired}" data-id="${j.id}" ${isRejected}>
+      <td><strong>${escHtml(j.company)}</strong> ${urlCell}</td>
       <td>${escHtml(j.role)}</td>
-      <td style="font-size:0.75rem;color:var(--muted);">${escHtml(j.source || '—')}</td>
-      <td><span class="applied-date">${j.applied ? formatDate(j.dateApplied) : '—'}</span></td>
+      <td><span class="applied-date">${formatDate(j.dateAdded || j.dateApplied || new Date().toISOString())}</span></td>
       <td style="text-align:center;">
         <div class="stage-check-item">
-          <input type="checkbox" ${j.applied ? 'checked' : ''} onchange="toggleStage('${j.id}','applied',this.checked)" title="Confirmed Applied">
-          <span>Applied</span>
-        </div>
-      </td>
-      <td style="text-align:center;">
-        <div class="stage-check-item">
-          <input type="checkbox" ${j.screening ? 'checked' : ''} onchange="toggleStage('${j.id}','screening',this.checked)" title="Screening">
+          <input type="checkbox" ${j.screening ? 'checked' : ''} onchange="toggleStage('${j.id}','screening',this.checked)">
           <span>Screen</span>
         </div>
       </td>
       <td style="text-align:center;">
         <div class="stage-check-item">
-          <input type="checkbox" ${j.interview ? 'checked' : ''} onchange="toggleStage('${j.id}','interview',this.checked)" title="Interview">
+          <input type="checkbox" ${j.interview ? 'checked' : ''} onchange="toggleStage('${j.id}','interview',this.checked)">
           <span>Interview</span>
         </div>
       </td>
       <td style="text-align:center;">
         <div class="stage-check-item">
-          <input type="checkbox" ${j.hired ? 'checked' : ''} onchange="toggleStage('${j.id}','hired',this.checked)" title="Hired!">
+          <input type="checkbox" ${j.rejected ? 'checked' : ''} onchange="toggleStage('${j.id}','rejected',this.checked)">
+          <span>Rejected</span>
+        </div>
+      </td>
+      <td style="text-align:center;">
+        <div class="stage-check-item">
+          <input type="checkbox" ${j.hired ? 'checked' : ''} onchange="toggleStage('${j.id}','hired',this.checked)">
           <span>Hired!</span>
         </div>
       </td>
-      <td style="font-size:0.75rem;color:var(--muted);max-width:140px;">${escHtml(j.notes || '')}</td>
       <td><button class="delete-job-btn" onclick="deleteJob('${j.id}')" title="Remove">✕</button></td>
     </tr>`;
   }).join('');
@@ -2218,36 +2216,7 @@ function deleteJob(id) {
   renderJobs();
 }
 
-document.getElementById('add-job-btn').addEventListener('click', () => {
-  const company = document.getElementById('new-company').value.trim();
-  const role = document.getElementById('new-role').value.trim();
-  if (!company || !role) {
-    alert('Company and Role are required.');
-    return;
-  }
-  const newJob = {
-    id: Date.now().toString(),
-    company,
-    role,
-    url: document.getElementById('new-url').value.trim(),
-    source: document.getElementById('new-source').value.trim(),
-    notes: document.getElementById('new-notes').value.trim(),
-    dateApplied: new Date().toISOString(),
-    applied: true,
-    screening: false,
-    interview: false,
-    hired: false
-  };
-  jobs.unshift(newJob);
-  saveJobs();
-  renderJobs();
-  // Clear form
-  document.getElementById('new-company').value = '';
-  document.getElementById('new-role').value = '';
-  document.getElementById('new-url').value = '';
-  document.getElementById('new-source').value = '';
-  document.getElementById('new-notes').value = '';
-});
+// Jobs added automatically from Step 01
 
 // Init tracker on load
 renderJobs();
