@@ -7,18 +7,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #0e0e0c;
-    --paper: #f5f2eb;
-    --cream: #ede9df;
-    --gold: #b8975a;
-    --gold-light: #d4b87a;
-    --rust: #a0522d;
-    --muted: #7a7468;
-    --border: #d6d0c4;
-    --success: #3a6b45;
-    --warn: #8b6914;
-    --panel: #faf8f3;
-    --shadow: rgba(14,14,12,0.08);
+    --ink: #0d0d0d;
+    --paper: #ffffff;
+    --cream: #f5f2eb;
+    --gold: #0d0d0d;
+    --gold-light: #333333;
+    --rust: #0d0d0d;
+    --muted: #666666;
+    --border: #e0e0e0;
+    --success: #2a5a35;
+    --warn: #7a5a00;
+    --panel: #ffffff;
+    --shadow: rgba(0,0,0,0.06);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { font-size: 16px; }
@@ -31,7 +31,7 @@
 
   /* ─── HEADER ─── */
   header {
-    background: var(--ink);
+    background: #000000;
     padding: 2rem 3rem;
     display: flex;
     align-items: baseline;
@@ -61,7 +61,7 @@
   /* ─── LAYOUT ─── */
   .app {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 260px 1fr;
     min-height: calc(100vh - 90px);
   }
 
@@ -91,14 +91,14 @@
     cursor: pointer;
   }
   nav ul li a:hover { color: var(--gold-light); background: #141412; }
-  nav ul li a.active { color: var(--gold); background: #141412; border-left: 2px solid var(--gold); }
+  nav ul li a.active { color: #000000; background: #141412; border-left: 2px solid var(--gold); }
   nav ul li a .num {
     font-size: 0.6rem;
     color: #3a3a38;
     width: 16px;
     text-align: right;
   }
-  nav ul li a.active .num { color: var(--gold); opacity: 0.5; }
+  nav ul li a.active .num { color: #000000; opacity: 0.5; }
   .nav-section {
     padding: 1.5rem 1.5rem 0.5rem;
     font-family: 'DM Mono', monospace;
@@ -116,7 +116,7 @@
   .panel {
     display: none;
     padding: 3rem;
-    max-width: 900px;
+    max-width: 1100px;
     animation: fadeIn 0.3s ease;
   }
   .panel.active { display: block; }
@@ -129,7 +129,7 @@
     margin-bottom: 0.3rem;
     line-height: 1.1;
   }
-  .panel-title em { font-style: italic; color: var(--gold); }
+  .panel-title em { font-style: italic; color: #000000; }
   .panel-desc {
     color: var(--muted);
     font-size: 0.85rem;
@@ -139,7 +139,7 @@
   .divider {
     width: 48px;
     height: 1px;
-    background: var(--gold);
+    background: #000000;
     margin: 1rem 0 2rem;
   }
 
@@ -169,7 +169,7 @@
   }
   textarea:focus, input:focus {
     outline: none;
-    border-color: var(--gold);
+    border-color: #000000;
   }
   textarea { min-height: 180px; }
   input[type="url"], input[type="text"] { min-height: unset; }
@@ -182,25 +182,26 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 2rem;
-    background: var(--ink);
-    color: var(--gold);
-    border: 1px solid var(--gold);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
+    background: #000000;
+    color: #ffffff;
+    border: none;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     cursor: pointer;
-    border-radius: 3px;
-    transition: all 0.2s;
+    border-radius: 0;
+    transition: all 0.15s;
   }
-  .btn:hover { background: var(--gold); color: var(--ink); }
+  .btn:hover { background: #000000; color: var(--ink); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .btn-ghost {
     background: transparent;
     border-color: var(--border);
     color: var(--muted);
   }
-  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); background: transparent; }
+  .btn-ghost:hover { border-color: #000000; color: #000000; background: transparent; }
   .btn-row { display: flex; gap: 1rem; margin-top: 0.5rem; }
 
   /* ─── RESUME PILLS ─── */
@@ -223,8 +224,8 @@
   }
   .pill.selected {
     background: var(--ink);
-    color: var(--gold);
-    border-color: var(--gold);
+    color: #000000;
+    border-color: #000000;
   }
   .pill:hover:not(.selected) { border-color: var(--ink); color: var(--ink); }
 
@@ -302,7 +303,7 @@
   .spinner {
     width: 16px; height: 16px;
     border: 2px solid var(--border);
-    border-top-color: var(--gold);
+    border-top-color: #000000;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -322,7 +323,7 @@
     transition: all 0.2s;
     margin-bottom: 0.5rem;
   }
-  .copy-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .copy-btn:hover { border-color: #000000; color: #000000; }
 
   /* ─── STEP INDICATOR ─── */
   .step-hint {
@@ -364,7 +365,7 @@
     margin-bottom: -1px;
     transition: all 0.2s;
   }
-  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab.active { color: #000000; border-bottom-color: #000000; }
   .tab:hover:not(.active) { color: var(--ink); }
 
   /* ─── INFO CHIPS ─── */
@@ -424,9 +425,9 @@
     font-weight: 300;
     margin-bottom: 0.3rem;
   }
-  .modal-box h2 em { font-style: italic; color: var(--gold); }
+  .modal-box h2 em { font-style: italic; color: #000000; }
   .modal-box p { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.6; }
-  .modal-box a { color: var(--gold); }
+  .modal-box a { color: #000000; }
   .modal-close { float: right; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--muted); margin-top: -0.5rem; }
   .key-status {
     font-family: 'DM Mono', monospace;
@@ -458,7 +459,7 @@
     gap: 0.4rem;
     white-space: nowrap;
   }
-  .settings-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .settings-btn:hover { border-color: #000000; color: #000000; }
   .settings-btn.key-set { border-color: var(--success); color: var(--success); }
 
   /* ─── JOB TRACKER ─── */
@@ -479,7 +480,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 2.8rem;
     font-weight: 600;
-    color: var(--gold);
+    color: #000000;
     line-height: 1;
     margin-bottom: 0.3rem;
   }
@@ -591,7 +592,7 @@
   .stage-check-item input[type="checkbox"] {
     width: 16px;
     height: 16px;
-    accent-color: var(--gold);
+    accent-color: #000000;
     cursor: pointer;
     margin: 0;
   }
@@ -612,7 +613,7 @@
     color: var(--muted);
     white-space: nowrap;
   }
-  .job-link { color: var(--gold); text-decoration: none; font-size: 0.75rem; }
+  .job-link { color: #000000; text-decoration: none; font-size: 0.75rem; }
   .job-link:hover { text-decoration: underline; }
   .empty-state {
     text-align: center;
@@ -653,7 +654,7 @@
   }
   .edit-section-label {
     background: var(--ink);
-    color: var(--gold);
+    color: #000000;
     font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
     padding: 0.2rem 0.6rem;
@@ -707,7 +708,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 2rem;
     font-weight: 600;
-    color: var(--gold);
+    color: #000000;
     line-height: 1;
   }
   .edits-summary-bar .summary-text {
@@ -885,6 +886,12 @@
       <div class="result-box" id="ats-result">
         <h3>ATS Score Summary</h3>
         <div class="score-cards" id="score-cards-container"></div>
+        <div class="tab-row" id="ats-output-tabs" style="margin-top:1.5rem;display:none;">
+          <div class="tab active" data-atssec="flags">Red Flags &amp; ATS Notes</div>
+          <div class="tab" data-atssec="summary">Fastest Path to 95%+</div>
+        </div>
+        <div id="ats-flags-output" class="stream-output" style="display:none;"></div>
+        <div id="ats-summary-output" class="stream-output" style="display:none;"></div>
         <div id="ats-detail-output" class="stream-output"></div>
       </div>
     </div>
@@ -911,14 +918,6 @@
         ✓ Auto-selected <strong id="le-auto-resume-name"></strong> — the highest scorer from your ATS analysis.
       </div>
 
-      <label>Edit focus</label>
-      <div class="tab-row" id="le-focus-tabs">
-        <div class="tab active" data-lefocus="full">Full Resume</div>
-        <div class="tab" data-lefocus="summary">Synopsis Only</div>
-        <div class="tab" data-lefocus="competencies">Competencies Only</div>
-        <div class="tab" data-lefocus="bullets">Experience Bullets Only</div>
-      </div>
-
       <div class="btn-row">
         <button class="btn" id="gen-edits-btn">Generate Line-by-Line Edits</button>
       </div>
@@ -927,11 +926,8 @@
       <div class="error-msg" id="le-error"></div>
 
       <div class="result-box" id="le-result">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <div style="margin-bottom:1rem;">
           <h3 style="margin:0;">Edits to Apply</h3>
-          <div style="display:flex;gap:0.5rem;">
-            <button class="copy-btn" style="float:none;margin:0;" onclick="copyResult('le-output')">Copy All</button>
-          </div>
         </div>
         <div class="stream-output" id="le-output"></div>
       </div>
@@ -954,8 +950,17 @@
       <div class="error-msg" id="recheck-error"></div>
 
       <div class="result-box" id="recheck-result">
-        <button class="copy-btn" onclick="copyResult('recheck-output')">Copy</button>
-        <div class="stream-output" id="recheck-output"></div>
+        <div class="tab-row" id="recheck-tabs" style="margin-bottom:1rem;">
+          <div class="tab active" data-rcsec="keywords">Missing Keywords</div>
+          <div class="tab" data-rcsec="improvement">Score Improvement</div>
+          <div class="tab" data-rcsec="gaps">Remaining Gaps</div>
+          <div class="tab" data-rcsec="ready">Ready to Submit?</div>
+        </div>
+        <div id="recheck-keywords-output" class="stream-output"></div>
+        <div id="recheck-improvement-output" class="stream-output" style="display:none;"></div>
+        <div id="recheck-gaps-output" class="stream-output" style="display:none;"></div>
+        <div id="recheck-ready-output" class="stream-output" style="display:none;"></div>
+        <div class="stream-output" id="recheck-output" style="display:none;"></div>
       </div>
     </div>
 
@@ -989,7 +994,10 @@
       <div class="error-msg" id="cl-error"></div>
 
       <div class="result-box" id="cl-result">
-        <button class="copy-btn" onclick="copyResult('cl-output')">Copy</button>
+        <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;">
+          <button class="copy-btn" style="float:none;margin:0;" onclick="copyResult('cl-output')">Copy</button>
+          <button class="copy-btn" style="float:none;margin:0;" onclick="downloadCLasPDF()">Download PDF</button>
+        </div>
         <div class="stream-output" id="cl-output"></div>
       </div>
     </div>
@@ -1613,56 +1621,35 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
 async function callClaude(systemPrompt, userMessage, onChunk) {
   const apiKey = localStorage.getItem('cara_api_key') || '';
   if (!apiKey) {
-    throw new Error('No API key saved. Click ⚙ Settings in the header to add your Anthropic API key.');
+    throw new Error('No API key saved. Click ⚙ API Key in the header to add your key.');
   }
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true"
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: 8000,
-      stream: true,
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 4096,
       system: systemPrompt,
-      messages: [{ role: "user", content: userMessage }]
+      messages: [{ role: 'user', content: userMessage }]
     })
   });
 
   if (!response.ok) {
     const errBody = await response.text();
-    throw new Error(`API error ${response.status}: ${errBody}`);
+    throw new Error('API error ' + response.status + ': ' + errBody);
   }
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-  let fullText = '';
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop();
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        const data = line.slice(6);
-        if (data === '[DONE]') continue;
-        try {
-          const parsed = JSON.parse(data);
-          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
-            fullText += parsed.delta.text;
-            onChunk(fullText);
-          }
-        } catch {}
-      }
-    }
-  }
-  return fullText;
+  const data = await response.json();
+  const text = data.content[0].text;
+  onChunk(text);
+  return text;
 }
+
 
 // ─── ATS CHECK ───────────────────────────────────────────────────────────────
 document.getElementById('run-ats-btn').addEventListener('click', async () => {
@@ -1682,37 +1669,16 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
 
   const systemPrompt = `You are an expert ATS (Applicant Tracking System) analyst and resume coach. You analyze resumes against job descriptions with deep expertise in keyword matching, skills alignment, and recruiter psychology. Be precise, data-driven, and actionable.`;
 
-  const resumeBlock = resumeTexts.map((r, i) => `RESUME ${i+1}: ${r.label}\n---\n${r.text}`).join('\n\n======\n\n');
+  const resumeBlock = resumeTexts.map((r, i) => 'RESUME ' + (i+1) + ': ' + r.label + '\n---\n' + r.text).join('\n\n======\n\n');
 
-  const userMsg = `JOB DESCRIPTION:
-${jd}
-${savedJDUrl ? `\nJob URL: ${savedJDUrl}` : ''}
-${savedRoleName ? `\nRole: ${savedRoleName}` : ''}
-
-RESUMES TO ANALYZE:
-${resumeBlock}
-
-Please perform a comprehensive ATS analysis. For each resume:
-
-1. **ATS SCORE**: Give a percentage score (0-100%) based on:
-   - Keyword match rate with the JD (weighted 40%)
-   - Skills and competency alignment (weighted 30%)
-   - Experience relevance and level match (weighted 20%)
-   - Format/structure optimization for ATS parsing (weighted 10%)
-
-2. **FORMAT FOR SCORES**: Output each score on its own line exactly like this:
-SCORE: [Resume Name] = [XX]%
-
-3. **DETAILED ANALYSIS**: After all scores, provide:
-   - Which resume is the BEST match and why
-   - Top 5-7 keywords/phrases from the JD that are missing or underrepresented in the best-matching resume
-   - Specific, actionable edits that would push the BEST resume's score above 95%:
-     * Exact phrases to add
-     * Sections to rewrite
-     * Skills to add to the competencies section
-   - Red flags (if any) — things that might cause an ATS to reject or downrank
-
-Be thorough and specific. Quote exact phrases from the JD when suggesting additions.`;
+  const userMsg = [
+    'JOB DESCRIPTION:',
+    jd,
+    savedRoleName ? 'Role: ' + savedRoleName : null,
+    'RESUMES TO ANALYZE:',
+    resumeBlock,
+    'For each resume give an ATS score 0-100%. Output each score on its own line exactly like: SCORE: [Resume Name] = [XX]%\n\nThen: which resume is the best match and why, top 5-7 missing keywords from the JD, and specific edits to push the best resume above 95%. Quote exact JD phrases when suggesting additions.'
+  ].filter(Boolean).join('\n\n');
 
   try {
     const result = document.getElementById('ats-detail-output');
@@ -1756,10 +1722,36 @@ Be thorough and specific. Quote exact phrases from the JD when suggesting additi
         // Auto-select best resume for line edits panel
         if (highestKey) autoSelectBestResume(highestKey, highestLabel);
       }
-      // Show full text minus score lines in the detail output
-      const cleanText = text.replace(/SCORE:.*=.*%\n?/g, '').trim();
-      result.textContent = cleanText;
       fullText = text;
+      // Strip scores and detailed analysis/winner section, keep only Red Flags & Summary
+      let display = text;
+      // Remove SCORE lines
+      display = display.replace(/SCORE:[^\n]*\n?/g, '');
+      // Remove everything from DETAILED ANALYSIS / WINNER up to RED FLAGS
+      display = display.replace(/#+\s*(DETAILED ANALYSIS|WINNER)[\s\S]*?(?=#+\s*(RED FLAGS|SUMMARY|$))/gi, '');
+      // Render tabs for Red Flags and Summary
+      const rfMatch = display.match(/#+\s*RED FLAGS[\s\S]*?(?=#+\s*SUMMARY|$)/i);
+      const sumMatch = display.match(/#+\s*SUMMARY[\s\S]*/i);
+      if (rfMatch || sumMatch) {
+        let tabHtml = '<div class="tab-row ats-detail-tabs" style="margin-bottom:1rem;">';
+        if (rfMatch) tabHtml += '<div class="tab active" data-atstab="rf">Red Flags & Wins</div>';
+        if (sumMatch) tabHtml += '<div class="tab" data-atstab="sum">Fastest Path to 95%+</div>';
+        tabHtml += '</div>';
+        tabHtml += rfMatch ? '<div class="ats-tab-content" data-atscontent="rf" style="display:block"><pre style="white-space:pre-wrap;font-family:inherit;font-size:0.85rem;">' + escHtml(rfMatch[0].trim()) + '</pre></div>' : '';
+        tabHtml += sumMatch ? '<div class="ats-tab-content" data-atscontent="sum" style="display:none"><pre style="white-space:pre-wrap;font-family:inherit;font-size:0.85rem;">' + escHtml(sumMatch[0].trim()) + '</pre></div>' : '';
+        result.innerHTML = tabHtml;
+        result.querySelectorAll('.ats-detail-tabs .tab').forEach(t => {
+          t.addEventListener('click', () => {
+            result.querySelectorAll('.ats-detail-tabs .tab').forEach(x => x.classList.remove('active'));
+            t.classList.add('active');
+            result.querySelectorAll('.ats-tab-content').forEach(x => x.style.display = 'none');
+            const target = result.querySelector('[data-atscontent="' + t.dataset.atstab + '"]');
+            if (target) target.style.display = 'block';
+          });
+        });
+      } else {
+        result.textContent = display.trim();
+      }
     });
 
   } catch (err) {
@@ -1802,7 +1794,42 @@ Be specific and direct.`;
     const output = document.getElementById('recheck-output');
     output.textContent = '';
     document.getElementById('recheck-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+        await callClaude(systemPrompt, userMsg, (text) => {
+      // Render tabs on completion
+      const tabs = [
+        { key: 'keywords', label: 'Missing Keywords', pattern: /MISSING OR WEAK KEYWORDS([\s\S]*?)(?=SCORE IMPROVEMENT|$)/i },
+        { key: 'improvement', label: 'Score Improvement', pattern: /SCORE IMPROVEMENT([\s\S]*?)(?=REMAINING GAPS|$)/i },
+        { key: 'gaps', label: 'Remaining Gaps', pattern: /REMAINING GAPS([\s\S]*?)(?=READY TO SUBMIT|$)/i },
+        { key: 'ready', label: 'Ready to Submit?', pattern: /READY TO SUBMIT\?([\s\S]*)/i }
+      ];
+      // Show score at top
+      const scoreMatch = text.match(/OVERALL ATS SCORE:\s*(\d+%)/i);
+      let html = scoreMatch ? '<div style="font-size:1.4rem;font-weight:700;margin-bottom:1rem;">' + scoreMatch[1] + ' ATS Score</div>' : '';
+      // Build tabs
+      const validTabs = tabs.filter(t => t.pattern.test(text));
+      if (validTabs.length > 0) {
+        html += '<div class="tab-row recheck-tabs" style="margin-bottom:1rem;">';
+        validTabs.forEach((t, i) => { html += '<div class="tab' + (i===0?' active':'') + '" data-rctab="' + t.key + '">' + t.label + '</div>'; });
+        html += '</div>';
+        validTabs.forEach((t, i) => {
+          const match = text.match(t.pattern);
+          const content = match ? match[1].trim() : '';
+          html += '<div class="recheck-tab-content" data-rccontent="' + t.key + '" style="display:' + (i===0?'block':'none') + '"><pre style="white-space:pre-wrap;font-family:inherit;font-size:0.85rem;">' + escHtml(content) + '</pre></div>';
+        });
+        output.innerHTML = html;
+        output.querySelectorAll('.recheck-tabs .tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            output.querySelectorAll('.recheck-tabs .tab').forEach(x => x.classList.remove('active'));
+            tab.classList.add('active');
+            output.querySelectorAll('.recheck-tab-content').forEach(x => x.style.display = 'none');
+            const target = output.querySelector('[data-rccontent="' + tab.dataset.rctab + '"]');
+            if (target) target.style.display = 'block';
+          });
+        });
+      } else {
+        output.textContent = text;
+      }
+    });
   } catch (err) {
     showError('recheck-error', 'Something went wrong: ' + err.message);
     document.getElementById('recheck-result').classList.remove('visible');
@@ -2654,10 +2681,12 @@ function renderEditBlocks(rawText, container) {
 
     if (!before && !after) return;
 
-    html += `<div class="edit-block">
+    const editId = 'edit-block-' + i;
+    html += `<div class="edit-block" id="${editId}">
       <div class="edit-block-header">
         <span>Edit ${i + 1}</span>
         ${section ? `<span class="edit-section-label">${escHtml(section)}</span>` : ''}
+        <button class="copy-btn" style="margin-left:auto;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="(function(btn){const txt=btn.closest('.edit-block').querySelector('.edit-row-after').textContent.replace('Replace with','').trim();navigator.clipboard.writeText(txt).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000);})})(this)">Copy</button>
       </div>
       <div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>
       <div class="edit-row-after"><span class="edit-label">Replace with</span>${escHtml(after)}</div>
@@ -2674,7 +2703,43 @@ function renderEditBlocks(rawText, container) {
 }
 
 
+
+// ─── ATS OUTPUT TABS ──────────────────────────────────────────────────────────
+document.getElementById('ats-output-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.tab');
+  if (!tab) return;
+  document.querySelectorAll('#ats-output-tabs .tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  const sec = tab.dataset.atssec;
+  document.getElementById('ats-flags-output').style.display = sec === 'flags' ? 'block' : 'none';
+  document.getElementById('ats-summary-output').style.display = sec === 'summary' ? 'block' : 'none';
+});
+
+// ─── RECHECK OUTPUT TABS ──────────────────────────────────────────────────────
+document.getElementById('recheck-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.tab');
+  if (!tab) return;
+  document.querySelectorAll('#recheck-tabs .tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  const sec = tab.dataset.rcsec;
+  ['keywords','improvement','gaps','ready'].forEach(s => {
+    document.getElementById('recheck-' + s + '-output').style.display = s === sec ? 'block' : 'none';
+  });
+});
+
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
+function downloadCLasPDF() {
+  const text = document.getElementById('cl-output').innerText;
+  if (!text.trim()) { alert('Generate a cover letter first.'); return; }
+  const win = window.open('', '_blank');
+  win.document.write('<html><head><title>Cover Letter</title><style>body{font-family:Georgia,serif;max-width:700px;margin:60px auto;font-size:14px;line-height:1.8;color:#222;}p{margin:0 0 1em;}</style></head><body>');
+  text.split('\n').forEach(line => {
+    win.document.write('<p>' + line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</p>');
+  });
+  win.document.write('</body></html>');
+  win.document.close();
+  win.print();
+}
 function showLoading(id) { document.getElementById(id).classList.add('visible'); }
 function hideLoading(id) { document.getElementById(id).classList.remove('visible'); }
 function showError(id, msg) {
