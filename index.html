@@ -55,7 +55,7 @@
   /* ─── HEADER ─── */
   header {
     background: var(--black);
-    padding: 1.5rem 3rem;
+    padding: 1.8rem 3rem;
     display: flex;
     align-items: center;
     gap: 2rem;
@@ -64,7 +64,7 @@
   }
   header h1 {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.8rem;
+    font-size: 2.16rem;
     font-weight: 300;
     color: #ffffff;
     letter-spacing: 0.02em;
@@ -76,7 +76,7 @@
   }
   header .sub {
     font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
+    font-size: 0.72rem;
     color: #888888;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -87,7 +87,7 @@
   .app {
     display: flex;
     flex-direction: row;
-    min-height: calc(100vh - 72px);
+    min-height: calc(100vh - 86px);
     width: 100%;
   }
 
@@ -97,10 +97,10 @@
     padding: 2rem 0;
     position: sticky;
     top: 0;
-    height: calc(100vh - 72px);
+    height: calc(100vh - 86px);
     overflow-y: auto;
     flex-shrink: 0;
-    width: 220px;
+    width: 297px;
     border-right: 1px solid #2a2a2a;
   }
   nav ul { list-style: none; }
@@ -109,10 +109,10 @@
     display: flex;
     align-items: center;
     gap: 0.7rem;
-    padding: 0.8rem 1.2rem;
+    padding: 0.8rem 1.6rem;
     color: #aaaaaa;
     text-decoration: none;
-    font-size: 0.72rem;
+    font-size: 0.87rem;
     letter-spacing: 0.04em;
     font-family: 'DM Mono', monospace;
     transition: all 0.15s;
@@ -125,17 +125,17 @@
     border-left: 2px solid #ffffff;
   }
   nav ul li a .num {
-    font-size: 0.55rem;
+    font-size: 0.74rem;
     color: #555555;
-    width: 16px;
+    width: 20px;
     text-align: right;
     flex-shrink: 0;
   }
   nav ul li a.active .num { color: #888888; }
   .nav-section {
-    padding: 1.2rem 1.2rem 0.4rem;
+    padding: 1.2rem 1.6rem 0.4rem;
     font-family: 'DM Mono', monospace;
-    font-size: 0.5rem;
+    font-size: 0.67rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: #444444;
@@ -145,7 +145,7 @@
   main {
     flex: 1;
     overflow-y: auto;
-    height: calc(100vh - 72px);
+    height: calc(100vh - 86px);
     min-width: 0;
   }
   .panel {
@@ -486,9 +486,9 @@
     border: 1px solid #444444;
     color: #aaaaaa;
     font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
+    font-size: 0.74rem;
     letter-spacing: 0.08em;
-    padding: 0.45rem 0.9rem;
+    padding: 0.55rem 1.1rem;
     cursor: pointer;
     border-radius: 3px;
     transition: all 0.15s;
@@ -1912,7 +1912,8 @@ REQUIREMENTS:
 - Length: 3-4 tight paragraphs
 - Do not include [placeholder] brackets — write the full letter with all details filled in
 - End with a strong, confident closing
-- Format as a proper letter with date, greeting, body, closing`;
+- Format as a proper letter. Use today's date: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}. Include greeting, body, closing
+- Do not use [Date] or any placeholder for the date — use the actual date provided above`;
 
   try {
     const output = document.getElementById('cl-output');
