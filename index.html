@@ -1672,7 +1672,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
   hideError('ats-error');
   document.getElementById('ats-result').classList.remove('visible');
 
-  const systemPrompt = `You are an expert ATS (Applicant Tracking System) analyst and resume coach. You analyze resumes against job descriptions with deep expertise in keyword matching, skills alignment, and recruiter psychology. Be precise, data-driven, and actionable.`;
+  const systemPrompt = `You are an expert ATS (Applicant Tracking System) analyst and resume coach. You analyze resumes against job descriptions with deep expertise in keyword matching, skills alignment, and recruiter psychology. Be precise, data-driven, and honest. Never inflate scores or suggest fabricating experience. Score what is actually there.`;
 
   const resumeBlock = resumeTexts.map((r, i) => 'RESUME ' + (i+1) + ': ' + r.label + '\n---\n' + r.text).join('\n\n======\n\n');
 
@@ -1682,7 +1682,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     savedRoleName ? 'Role: ' + savedRoleName : null,
     'RESUMES TO ANALYZE:',
     resumeBlock,
-    'For each resume give an ATS score 0-100%. Output each score on its own line exactly like: SCORE: [Resume Name] = [XX]%\n\nThen: which resume is the best match and why, top 5-7 missing keywords from the JD, and specific edits to push the best resume above 95%. Quote exact JD phrases when suggesting additions.'
+    'For each resume give an ATS score 0-100% based strictly on what is actually in the resume — do not inflate scores. Output each score on its own line exactly like: SCORE: [Resume Name] = [XX]%\n\nThen: which resume is the best match and why, and the top missing keywords from the JD.\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume. The score reflects real alignment — not a target.'
   ].filter(Boolean).join('\n\n');
 
   try {
@@ -2562,7 +2562,7 @@ document.getElementById('gen-edits-btn').addEventListener('click', async () => {
   hideError('le-error');
   document.getElementById('le-result').classList.remove('visible');
 
-  const systemPrompt = `You are a senior resume editor and ATS optimization specialist. You produce precise, surgical edits — showing the exact original text, the exact replacement text, and a clear one-line reason for each change. You never give vague advice. Every edit is a specific, copyable rewrite that directly improves ATS keyword matching and relevance scoring for the target job description.`;
+  const systemPrompt = `You are a senior resume editor and ATS optimization specialist. You produce precise, surgical edits — showing the exact original text, the exact replacement text, and a clear one-line reason for each change. You never give vague advice. Every edit is a specific, copyable rewrite that directly improves ATS keyword matching and relevance scoring for the target job description. CRITICAL RULE: You never invent experience, industries, credentials, or titles the candidate has not demonstrated in their resume. Your job is to find the best language for what is already true — not to fabricate. If a gap cannot be bridged honestly, you say so.`;
 
   const userMsg = `Perform a line-by-line ATS edit of the following resume against this job description. Focus on: ${focusMap[selectedLeFocus]}.
 
@@ -2584,15 +2584,22 @@ BEFORE: [exact original text, copied verbatim]
 AFTER: [your rewritten version — complete, ready to paste]
 WHY: [one sentence explaining the specific ATS improvement this makes]
 
-RULES:
+INTEGRITY RULES (non-negotiable):
+- NEVER add industries, sectors, titles, tools, credentials, or skills not evidenced in the resume
+- NEVER suggest changing a title (e.g. do not suggest VP, Director, or any level Cara has not held)
+- NEVER invent client names, company names, or domains (e.g. fintech, healthcare, federal) not in the resume
+- If a JD keyword requires experience Cara does not have, flag it as a gap — do not fabricate a match
+- The goal is the highest score achievable through honest wordsmithing only
+
+EDITING RULES:
 - Only output edits for lines that ACTUALLY need changing — do not include lines that are already strong
 - AFTER text must be complete and ready to paste — no [brackets], no placeholders
 - Each AFTER rewrite must naturally incorporate missing JD keywords without sounding forced
 - Preserve Cara's voice, first-person implied bullet style, and quantified metrics
-- Do not invent accomplishments — only reframe existing ones using JD language
-- Prioritize: (1) missing hard keywords, (2) missing soft skills the JD emphasizes, (3) title/seniority alignment, (4) verb choice
+- Reframe existing accomplishments using JD language — never invent new ones
+- Prioritize: (1) missing hard keywords, (2) missing soft skills the JD emphasizes, (3) verb choice, (4) structure
 - If a bullet needs a keyword added, work it in naturally at the start or end
-- For competencies, add missing keyword clusters as new pipe-separated entries
+- For competencies, add missing keyword clusters as new pipe-separated entries only if they reflect actual skills
 
 Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.`;
 
