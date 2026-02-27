@@ -2218,6 +2218,263 @@ function deleteJob(id) {
 
 // Jobs added automatically from Step 01
 
+
+// ─── LINKEDIN OUTREACH ────────────────────────────────────────────────────────
+let selectedLIType = 'connect';
+
+document.querySelectorAll('#li-type-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#li-type-tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedLIType = tab.dataset.litype;
+  });
+});
+
+document.getElementById('gen-li-btn').addEventListener('click', async () => {
+  const liName = document.getElementById('li-name').value.trim();
+  const liTitle = document.getElementById('li-title').value.trim();
+  if (!liName || !liTitle) { showError('li-error', "Please enter the person's name and title."); return; }
+
+  const liContext = document.getElementById('li-context').value.trim();
+  const liGoal = document.getElementById('li-goal').value.trim();
+
+  const typeMap = {
+    connect: 'a LinkedIn connection request (300 character limit — must be tight, specific, and earn the accept)',
+    info: 'an informational interview request sent via LinkedIn message (~150 words max, goal is a 20-minute call)',
+    referral: 'a referral request (respectful, specific, makes it easy for them to say yes or pass along)',
+    followup: 'a follow-up message after applying online (shows initiative, not desperate)'
+  };
+
+  showLoading('li-loading');
+  hideError('li-error');
+  document.getElementById('li-result').classList.remove('visible');
+
+  const systemPrompt = 'You are an expert at writing LinkedIn outreach that gets replies. You write messages that feel human and specific — never templates. Senior professionals only reply to messages that signal real thought.';
+
+  const userMsg = [
+    'Write ' + typeMap[selectedLIType] + ' for Cara Brown to send to ' + liName + ', ' + liTitle + '.',
+    liContext ? 'What Cara knows about them: ' + liContext : null,
+    liGoal ? 'Goal: ' + liGoal : null,
+    savedRoleName ? 'Role context: ' + savedRoleName : null,
+    'Cara background: ' + CARA_BIO,
+    'Requirements: Write in Caras voice — confident, warm, human. Be specific to THIS person. ' +
+    'Do NOT use these phrases: I came across your profile, I hope this finds you well, pick your brain. ' +
+    'Connection requests must be under 300 characters. All other types under 150 words. ' +
+    'End with a clear low-friction ask. Write the message ready to copy and paste, then add 1-2 sentences on why this approach works.'
+  ].filter(Boolean).join('\n\n');
+    try {
+    const output = document.getElementById('li-output');
+    output.textContent = '';
+    document.getElementById('li-result').classList.add('visible');
+    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+  } catch (err) {
+    showError('li-error', 'Error: ' + err.message);
+    document.getElementById('li-result').classList.remove('visible');
+  } finally {
+    hideLoading('li-loading');
+  }
+});
+
+// ─── COMPANY RESEARCH ─────────────────────────────────────────────────────────
+let selectedResearchDepth = 'standard';
+document.querySelectorAll('#research-depth-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#research-depth-tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedResearchDepth = tab.dataset.depth;
+  });
+});
+
+document.getElementById('gen-research-btn').addEventListener('click', async () => {
+  const companyName = document.getElementById('company-name').value.trim();
+  if (!companyName) { showError('research-error', 'Please enter a company name.'); return; }
+
+  const companyUrl = document.getElementById('company-url').value.trim();
+  const companyNotes = document.getElementById('company-notes').value.trim();
+
+  const depthMap = {
+    standard: 'a focused 1-page brief: mission/values, strategic priorities, culture signals, and how Cara maps to their needs',
+    deep: 'a comprehensive deep-dive: mission/values, leadership, business model, recent news, challenges, competitive positioning, culture, and detailed Cara-fit analysis',
+    interview: 'a pre-interview brief: key talking points, smart questions to ask, culture red flags, and what they will evaluate in this stage'
+  };
+
+  showLoading('research-loading');
+  hideError('research-error');
+  document.getElementById('research-result').classList.remove('visible');
+
+  const systemPrompt = 'You are an expert corporate intelligence analyst and career strategist. You synthesize company research into actionable briefs that help senior professionals walk into interviews with confidence.';
+
+  const userMsg = [
+    'Build ' + depthMap[selectedResearchDepth] + ' for Cara Brown on: ' + companyName,
+    companyUrl ? 'Website: ' + companyUrl : null,
+    companyNotes ? 'What Cara knows: ' + companyNotes : null,
+    savedJD ? 'Job Description: ' + savedJD.substring(0, 1500) : null,
+    'Cara background: ' + CARA_BIO,
+    'Structure with these headers: 1. COMPANY SNAPSHOT  2. MISSION, VALUES & CULTURE  3. STRATEGIC PRIORITIES  4. WHAT THEY ARE REALLY LOOKING FOR  5. HOW CARA MAPS TO THEIR WORLD  6. SMART QUESTIONS TO ASK  7. WATCH-OUTS'
+  ].filter(Boolean).join('\n\n');
+  
+  try {
+    const output = document.getElementById('research-output');
+    output.textContent = '';
+    document.getElementById('research-result').classList.add('visible');
+    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+  } catch (err) {
+    showError('research-error', 'Error: ' + err.message);
+    document.getElementById('research-result').classList.remove('visible');
+  } finally {
+    hideLoading('research-loading');
+  }
+});
+
+// ─── INTERVIEW PREP ───────────────────────────────────────────────────────────
+let selectedInterviewStage = 'phone';
+let selectedInterviewResume = 'principal_ds';
+
+document.querySelectorAll('#interview-stage-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#interview-stage-tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedInterviewStage = tab.dataset.stage;
+  });
+});
+
+document.querySelectorAll('#interview-resume-pills .pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('#interview-resume-pills .pill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+    selectedInterviewResume = pill.dataset.resume;
+  });
+});
+
+document.getElementById('gen-interview-btn').addEventListener('click', async () => {
+  const jd = savedJD || document.getElementById('jd-text').value.trim();
+  if (!jd) { showError('interview-error', 'Please save a job description in Step 01 first.'); return; }
+
+  const focus = document.getElementById('interview-focus').value.trim();
+  const resume = RESUMES[selectedInterviewResume];
+
+  const stageMap = {
+    phone: 'a recruiter phone screen (20-30 min, covers background, fit, salary)',
+    hiring: 'a hiring manager interview (45-60 min, goes deep on approach, projects, leadership)',
+    panel: 'a panel or final-round interview (multiple interviewers, may include case or presentation)'
+  };
+
+  showLoading('interview-loading');
+  hideError('interview-error');
+  document.getElementById('interview-result').classList.remove('visible');
+
+  const systemPrompt = 'You are a world-class interview coach for senior design strategy roles. You prepare candidates with specific story-based answers — never generic advice. Every answer is grounded in real experience.';
+
+  const userMsg = [
+    'Build a complete interview prep guide for Cara Brown.',
+    'Stage: ' + stageMap[selectedInterviewStage],
+    'Job Description: ' + jd.substring(0, 1500),
+    'Resume (' + resume.label + '): ' + resume.text.substring(0, 2500),
+    focus ? 'Caras focus or concerns: ' + focus : null,
+    'Generate: PART 1 — 60-SECOND OPENER: Write Caras tell me about yourself for this role. 4-5 sentences. PART 2 — 10 MOST LIKELY QUESTIONS + STAR ANSWERS: For each, write the question then a complete STAR answer from Caras real experience. Bold each result and metric. PART 3 — LANDMINES TO WATCH: 2-3 tricky questions and exactly how to handle them.'
+  ].filter(Boolean).join('\n\n');
+  
+  try {
+    const output = document.getElementById('interview-output');
+    output.textContent = '';
+    document.getElementById('interview-result').classList.add('visible');
+    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+  } catch (err) {
+    showError('interview-error', 'Error: ' + err.message);
+    document.getElementById('interview-result').classList.remove('visible');
+  } finally {
+    hideLoading('interview-loading');
+  }
+});
+
+// ─── SALARY & RECRUITER INTEL ─────────────────────────────────────────────────
+let salaryMode = 'salary';
+
+document.querySelectorAll('#salary-mode-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#salary-mode-tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    salaryMode = tab.dataset.salmode;
+    document.getElementById('salary-sub').style.display = salaryMode === 'salary' ? 'block' : 'none';
+    document.getElementById('recruiter-sub').style.display = salaryMode === 'recruiter' ? 'block' : 'none';
+  });
+});
+
+document.getElementById('gen-salary-btn').addEventListener('click', async () => {
+  const role = document.getElementById('sal-role').value.trim();
+  if (!role) { showError('salary-error', 'Please enter the role title.'); return; }
+
+  const location = document.getElementById('sal-location').value.trim();
+  const companyType = document.getElementById('sal-company-type').value.trim();
+  const offered = document.getElementById('sal-offered').value.trim();
+  const situation = document.getElementById('sal-situation').value.trim();
+
+  showLoading('salary-loading');
+  hideError('salary-error');
+  document.getElementById('salary-result').classList.remove('visible');
+
+  const systemPrompt = 'You are an expert salary negotiation coach with deep knowledge of design, strategy, and consulting markets. Give specific numbers and exact language — not platitudes.';
+
+  const userMsg = [
+    'Build a salary research brief and negotiation strategy for Cara Brown.',
+    'Role: ' + role,
+    location ? 'Location: ' + location : null,
+    companyType ? 'Company type: ' + companyType : null,
+    offered ? 'Offered or mentioned: ' + offered : null,
+    situation ? 'Situation: ' + situation : null,
+    'Cara: 15+ years, MBA, Principal-level, $270M enterprise impact, C-suite partnerships.',
+    'Provide: 1. MARKET RATE — realistic ranges by level and sector  2. CARAS NUMBERS — target, floor, stretch. Be direct with specific dollar amounts.  3. NEGOTIATION SCRIPTS — exact language for: salary expectations question, countering a lowball, asking for time, negotiating total comp beyond base  4. TRAPS TO AVOID — 3-4 specific mistakes and how to handle them'
+  ].filter(Boolean).join('\n\n');
+  
+  try {
+    const output = document.getElementById('salary-output');
+    output.textContent = '';
+    document.getElementById('salary-result').classList.add('visible');
+    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+  } catch (err) {
+    showError('salary-error', 'Error: ' + err.message);
+    document.getElementById('salary-result').classList.remove('visible');
+  } finally {
+    hideLoading('salary-loading');
+  }
+});
+
+document.getElementById('gen-recruiter-btn').addEventListener('click', async () => {
+  const recRole = document.getElementById('rec-role').value.trim();
+  const recInfo = document.getElementById('rec-info').value.trim();
+  if (!recRole || !recInfo) { showError('recruiter-error', 'Please enter the role and recruiter details.'); return; }
+
+  const recJD = document.getElementById('rec-jd').value.trim();
+
+  showLoading('recruiter-loading');
+  hideError('recruiter-error');
+  document.getElementById('recruiter-result').classList.remove('visible');
+
+  const systemPrompt = 'You are an expert in recruiting industry dynamics and candidate protection. You help senior professionals navigate complex recruiter situations — spotting fakes, avoiding duplicate submissions, protecting their candidacy. Be direct and specific.';
+
+  const userMsg = [
+    'Help Cara Brown analyze this recruiter situation.',
+    'Role: ' + recRole,
+    'Recruiter details: ' + recInfo,
+    recJD ? 'JD or details shared: ' + recJD : null,
+    'Provide: 1. SITUATION ASSESSMENT — what is likely happening  2. RECRUITER LEGITIMACY — for each recruiter: tier (primary/secondary/body shop), red flags, green flags  3. DUPLICATE SUBMISSION RISK — what happens if two agencies submit her, how to protect herself  4. WHO TO RESPOND TO — specific recommendation and in what order  5. QUESTIONS TO ASK BEFORE CONSENTING — exact questions to ask each recruiter  6. PROTOCOL GOING FORWARD — standard process to avoid this again'
+  ].filter(Boolean).join('\n\n');
+  
+  try {
+    const output = document.getElementById('recruiter-output');
+    output.textContent = '';
+    document.getElementById('recruiter-result').classList.add('visible');
+    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+  } catch (err) {
+    showError('recruiter-error', 'Error: ' + err.message);
+    document.getElementById('recruiter-result').classList.remove('visible');
+  } finally {
+    hideLoading('recruiter-loading');
+  }
+});
+
+
+
 // Init tracker on load
 renderJobs();
 
