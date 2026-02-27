@@ -223,8 +223,8 @@
     letter-spacing: 0.03em;
   }
   .pill.selected {
-    background: var(--ink);
-    color: #000000;
+    background: #000000;
+    color: #ffffff;
     border-color: #000000;
   }
   .pill:hover:not(.selected) { border-color: var(--ink); color: var(--ink); }
@@ -676,7 +676,12 @@
     color: #1e4a2a;
     line-height: 1.6;
     border-bottom: 1px solid #c8e6d0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
+  .edit-row-after .edit-label { flex-shrink: 0; }
+  .after-text { flex: 1; }
   .edit-row-why {
     background: var(--panel);
     padding: 0.6rem 1rem;
@@ -1632,7 +1637,7 @@ async function callClaude(systemPrompt, userMessage, onChunk) {
       'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-5-20250929',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 4096,
       system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }]
@@ -2684,12 +2689,10 @@ function renderEditBlocks(rawText, container) {
     const editId = 'edit-block-' + i;
     html += `<div class="edit-block" id="${editId}">
       <div class="edit-block-header">
-        <span>Edit ${i + 1}</span>
-        ${section ? `<span class="edit-section-label">${escHtml(section)}</span>` : ''}
-        <button class="copy-btn" style="margin-left:auto;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="(function(btn){const txt=btn.closest('.edit-block').querySelector('.edit-row-after').textContent.replace('Replace with','').trim();navigator.clipboard.writeText(txt).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000);})})(this)">Copy</button>
+        <span>Edit ${i + 1}${section ? ' — ' + escHtml(section) : ''}</span>
       </div>
       <div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>
-      <div class="edit-row-after"><span class="edit-label">Replace with</span>${escHtml(after)}</div>
+      <div class="edit-row-after" id="after-${i}"><span class="edit-label">Replace with</span><span class="after-text">${escHtml(after)}</span><button class="copy-btn" style="float:right;margin-left:0.5rem;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="var t=this.previousElementSibling.textContent;navigator.clipboard.writeText(t).then(function(){},function(){});this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy'},2000)">Copy</button></div>
       ${why ? `<div class="edit-row-why">💡 ${escHtml(why)}</div>` : ''}
     </div>`;
   });
