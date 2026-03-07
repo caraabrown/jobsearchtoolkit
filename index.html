@@ -967,13 +967,17 @@
       <div class="result-box" id="ats-result">
         <h3>ATS Score Summary</h3>
         <div class="score-cards" id="score-cards-container"></div>
-        <div class="tab-row" id="ats-output-tabs" style="margin-top:1.5rem;display:none;">
-          <div class="tab active" data-atssec="flags">Red Flags &amp; ATS Notes</div>
-          <div class="tab" data-atssec="summary">Fastest Path to 95%+</div>
+        <div class="tab-row" id="ats-static-tabs" style="margin-top:1.5rem;">
+          <div class="tab active" data-atsstatic="best">Best Match</div>
+          <div class="tab" data-atsstatic="keywords">Missing Keywords</div>
+          <div class="tab" data-atsstatic="flags">Red Flags &amp; Wins</div>
+          <div class="tab" data-atsstatic="path">Fastest Path to 95%+</div>
         </div>
+        <div id="ats-best-output" class="stream-output"></div>
+        <div id="ats-keywords-output" class="stream-output" style="display:none;"></div>
         <div id="ats-flags-output" class="stream-output" style="display:none;"></div>
-        <div id="ats-summary-output" class="stream-output" style="display:none;"></div>
-        <div id="ats-detail-output" class="stream-output"></div>
+        <div id="ats-path-output" class="stream-output" style="display:none;"></div>
+        <div id="ats-detail-output" class="stream-output" style="display:none;"></div>
       </div>
     </div>
 
@@ -1758,7 +1762,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     savedRoleName ? 'Role: ' + savedRoleName : null,
     'RESUMES TO ANALYZE:',
     resumeBlock,
-    'For each resume give an ATS score 0-100% based strictly on what is actually in the resume — do not inflate scores. Output each score on its own line exactly like: SCORE: [Resume Name] = [XX]%\n\nFor each resume also output the realistic improved score if honest keyword wordsmithing were applied, on its own line exactly like: IMPROVED_SCORE: [Resume Name] = [XX]%\n\nThen: which resume is the best match and why, and the top missing keywords from the JD.\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume. The score reflects real alignment — not a target.'
+    'For each resume give an ATS score 0-100% based strictly on what is actually in the resume — do not inflate scores. Output each score on its own line exactly like: SCORE: [Resume Name] = [XX]%\n\nFor each resume also output the realistic improved score if honest keyword wordsmithing were applied: IMPROVED_SCORE: [Resume Name] = [XX]%\n\nThen output the following four sections with EXACTLY these headers:\n\n## BEST MATCH\n[Which resume scored highest and a 2-3 sentence explanation of why it fits best]\n\n## MISSING KEYWORDS\n[Bulleted list of keywords from the JD not present in the resumes]\n\n## RED FLAGS & WINS\n[Use ✅ for strengths and ❌ for gaps — one per line]\n\n## FASTEST PATH TO 95%+\n[Specific, honest edits that could raise the score using only wordsmithing of existing experience]\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume.'
   ].filter(Boolean).join('\n\n');
 
   try {
@@ -1818,49 +1822,50 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
         if (highestKey) autoSelectBestResume(highestKey, highestLabel);
       }
       fullText = text;
-      // Strip scores and detailed analysis/winner section, keep only Red Flags & Summary
-      let display = text;
-      // Remove SCORE lines
-      display = display.replace(/SCORE:[^\n]*\n?/g, '');
-      // Remove everything from DETAILED ANALYSIS / WINNER up to RED FLAGS
-      display = display.replace(/#+\s*(DETAILED ANALYSIS|WINNER)[\s\S]*?(?=#+\s*(RED FLAGS|SUMMARY|$))/gi, '');
-      // Render tabs for Red Flags and Summary
-      const rfMatch = display.match(/#+\s*RED FLAGS[\s\S]*?(?=#+\s*SUMMARY|$)/i);
-      const sumMatch = display.match(/#+\s*SUMMARY[\s\S]*/i);
-      if (rfMatch || sumMatch) {
-        let tabHtml = '<div class="tab-row ats-detail-tabs" style="margin-bottom:1rem;">';
-        if (rfMatch) tabHtml += '<div class="tab active" data-atstab="rf">Red Flags & Wins</div>';
-        if (sumMatch) tabHtml += '<div class="tab" data-atstab="sum">Fastest Path to 95%+</div>';
-        tabHtml += '</div>';
-        function fmtAtsSection(raw) {
-          if (!raw) return '';
-          // Turn lines into styled blocks
-          return raw.split('\n').map(line => {
-            const t = line.trim();
-            if (!t) return '';
-            if (t.startsWith('✅')) return '<div class="ats-line ats-win">' + escHtml(t) + '</div>';
-            if (t.startsWith('⚠️') || t.startsWith('❌')) return '<div class="ats-line ats-warn">' + escHtml(t) + '</div>';
-            if (/^#{1,3}\s/.test(t)) return '<div class="ats-heading">' + escHtml(t.replace(/^#+\s*/,'')) + '</div>';
-            if (t.startsWith('**') && t.endsWith('**')) return '<div class="ats-subhead">' + escHtml(t.replace(/\*\*/g,'')) + '</div>';
-            return '<div class="ats-line">' + escHtml(t) + '</div>';
-          }).join('');
-        }
-        tabHtml += rfMatch ? '<div class="ats-tab-content" data-atscontent="rf" style="display:block"><div class="ats-formatted">' + fmtAtsSection(rfMatch[0].trim()) + '</div></div>' : '';
-        tabHtml += sumMatch ? '<div class="ats-tab-content" data-atscontent="sum" style="display:none"><div class="ats-formatted">' + fmtAtsSection(sumMatch[0].trim()) + '</div></div>' : '';
-        result.innerHTML = tabHtml;
-        result.querySelectorAll('.ats-detail-tabs .tab').forEach(t => {
-          t.addEventListener('click', () => {
-            result.querySelectorAll('.ats-detail-tabs .tab').forEach(x => x.classList.remove('active'));
-            t.classList.add('active');
-            result.querySelectorAll('.ats-tab-content').forEach(x => x.style.display = 'none');
-            const target = result.querySelector('[data-atscontent="' + t.dataset.atstab + '"]');
-            if (target) target.style.display = 'block';
-          });
-        });
-      } else {
-        result.textContent = display.trim();
-      }
+      // Live stream into best tab while loading
+      document.getElementById('ats-best-output').textContent = text;
     });
+
+    // After streaming completes, split into static tabs
+    function atsSection(txt, startRe, endRe) {
+      const sm = txt.search(startRe);
+      if (sm < 0) return '';
+      const em = endRe ? txt.search(endRe) : -1;
+      return (em > sm ? txt.substring(sm, em) : txt.substring(sm))
+        .replace(/^##\s*/gm,'').replace(/\*\*/g,'').trim();
+    }
+
+    const bestTxt     = atsSection(fullText, /##\s*BEST MATCH/i,           /##\s*MISSING KEYWORDS/i);
+    const kwTxt       = atsSection(fullText, /##\s*MISSING KEYWORDS/i,      /##\s*RED FLAGS/i);
+    const flagsTxt    = atsSection(fullText, /##\s*RED FLAGS/i,              /##\s*FASTEST PATH/i);
+    const pathTxt     = atsSection(fullText, /##\s*FASTEST PATH/i,          null);
+
+    document.getElementById('ats-best-output').textContent     = bestTxt     || fullText;
+    document.getElementById('ats-keywords-output').textContent = kwTxt       || '';
+    document.getElementById('ats-flags-output').textContent    = flagsTxt    || '';
+    document.getElementById('ats-path-output').textContent     = pathTxt     || '';
+
+    // Wire up static tabs
+    document.querySelectorAll('#ats-static-tabs .tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('#ats-static-tabs .tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const map = {
+          best:     document.getElementById('ats-best-output'),
+          keywords: document.getElementById('ats-keywords-output'),
+          flags:    document.getElementById('ats-flags-output'),
+          path:     document.getElementById('ats-path-output')
+        };
+        Object.values(map).forEach(el => el.style.display = 'none');
+        const active = map[tab.dataset.atsstatic];
+        if (active) active.style.display = 'block';
+      });
+    });
+    // Ensure first tab is shown
+    ['ats-keywords-output','ats-flags-output','ats-path-output'].forEach(id => {
+      document.getElementById(id).style.display = 'none';
+    });
+    document.getElementById('ats-best-output').style.display = 'block';
 
   } catch (err) {
     showError('ats-error', 'Something went wrong: ' + err.message);
