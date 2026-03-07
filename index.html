@@ -422,11 +422,10 @@
     color: var(--mid);
   }
   .resume-slot-body {
-    padding: 1rem 1.2rem;
+    padding: 1rem 1.2rem 1rem;
     display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 0;
   }
   .upload-drop-zone {
     flex: 1;
@@ -449,25 +448,39 @@
   }
   .upload-drop-zone input[type="file"] { display: none; }
   .slot-preview {
-    flex: 2;
-    min-width: 200px;
     font-size: 0.78rem;
     color: var(--mid);
     line-height: 1.5;
-    max-height: 80px;
+    max-height: 72px;
     overflow: hidden;
     font-family: 'Instrument Sans', sans-serif;
     font-style: italic;
+    margin-bottom: 0;
   }
   .slot-preview.has-text {
-    color: var(--black);
+    color: var(--offblack);
     font-style: normal;
   }
   .slot-actions {
     display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    flex-shrink: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: flex-start;
+    margin-top: 0.8rem;
+  }
+  .upload-trigger-btn {
+    background: var(--black) !important;
+    color: #fff !important;
+    border-color: var(--black) !important;
+  }
+  .upload-trigger-btn:hover {
+    background: var(--dark) !important;
+  }
+  .primary-slot-btn {
+    background: var(--black) !important;
+    color: #fff !important;
+    border-color: var(--black) !important;
   }
   .slot-btn {
     font-family: 'DM Mono', monospace;
@@ -829,34 +842,30 @@
     border-bottom: 1px solid var(--border);
   }
   .quote-block {
-    background: var(--black);
-    color: #ffffff;
-    padding: 1.8rem 2.5rem;
-    margin: 2rem 0;
-    border-radius: 4px;
-    text-align: center;
-    min-height: 110px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.6rem;
+    padding: 0.5rem 0 1.5rem 0;
+    margin: 0 0 0.5rem 0;
+    text-align: left;
+    min-height: 60px;
   }
   .quote-text {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.3rem;
-    font-weight: 300;
+    font-size: 1.55rem;
+    font-weight: 400;
     font-style: italic;
-    line-height: 1.5;
-    color: #ffffff;
-    transition: opacity 0.4s ease;
+    line-height: 1.4;
+    color: var(--black);
+    transition: opacity 0.5s ease;
+    display: block;
+    margin-bottom: 0.4rem;
   }
   .quote-author {
     font-family: 'DM Mono', monospace;
     font-size: 0.62rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #888888;
-    transition: opacity 0.4s ease;
+    color: var(--mid);
+    transition: opacity 0.5s ease;
+    display: block;
   }
 
   @media (max-width: 768px) {
@@ -1309,7 +1318,13 @@
     <div class="panel" id="panel-job-tracker">
       <div class="panel-title">Job <em>Tracker</em></div>
       <div class="divider"></div>
-      <div class="panel-desc">Track every application in one place. Log jobs, mark your progress through each stage, and watch your weekly momentum build. Goal: 5 applications per day.</div>
+      <div class="panel-desc">Track every application in one place. Log jobs, mark your progress through each stage, and watch your weekly momentum build. Goal: <input type="number" id="daily-goal-input" value="5" min="1" max="99" style="width:3rem;font-family:inherit;font-size:inherit;border:none;border-bottom:1.5px solid var(--black);background:transparent;text-align:center;font-weight:700;color:var(--black);padding:0 2px;"> applications per day.</div>
+
+      <!-- QUOTE -->
+      <div class="quote-block" id="quote-block">
+        <div class="quote-text" id="quote-text"></div>
+        <div class="quote-author" id="quote-author"></div>
+      </div>
 
       <!-- STATS ROW -->
       <div class="tracker-section-label">This Week</div>
@@ -1878,45 +1893,53 @@ function buildUploadSlots() {
 
   RESUME_KEYS.forEach(({ key, label }) => {
     const isCustom = !!RESUMES[key].custom;
-    const preview = RESUMES[key].text.substring(0, 200).replace(/\s+/g, ' ') + '…';
+    const preview = isCustom ? RESUMES[key].text.substring(0, 220).replace(/\s+/g, ' ') + '…' : '';
 
     const slot = document.createElement('div');
     slot.className = 'resume-slot';
     slot.id = 'slot-' + key;
+
+    const statusHtml = isCustom
+      ? '<span class="resume-slot-status slot-status-custom">✓ Your version loaded</span>'
+      : '<span class="resume-slot-status slot-status-default">Using built-in default</span>';
+
+    const previewHtml = isCustom
+      ? `<div class="slot-preview has-text" id="preview-${key}">${preview}</div>`
+      : `<div class="slot-preview" id="preview-${key}">No file uploaded yet — upload a PDF or paste your resume text below.</div>`;
+
+    const removeBtn = isCustom
+      ? `<button class="slot-btn danger" onclick="clearSlot('${key}')">✕ Remove</button>`
+      : '';
+
     slot.innerHTML = `
       <div class="resume-slot-header">
         <span class="resume-slot-title">${label}</span>
-        <span class="resume-slot-status ${isCustom ? 'slot-status-custom' : 'slot-status-default'}">
-          ${isCustom ? '✓ Your version' : 'Built-in default'}
-        </span>
+        ${statusHtml}
       </div>
       <div class="resume-slot-body">
-        <label class="upload-drop-zone" id="drop-${key}">
-          <input type="file" accept=".pdf,.txt" id="file-${key}">
-          <div>⬆ Upload PDF or TXT</div>
-          <div style="font-size:0.55rem;margin-top:0.3rem;opacity:0.7;">or drag & drop</div>
-        </label>
-        <div class="slot-preview ${isCustom ? 'has-text' : ''}" id="preview-${key}">
-          ${isCustom ? preview : 'Using built-in resume. Upload your latest version above.'}
-        </div>
+        ${previewHtml}
         <div class="slot-actions">
-          <button class="slot-btn" onclick="showPasteArea('${key}')">Paste Text</button>
-          ${isCustom ? `<button class="slot-btn danger" onclick="clearSlot('${key}')">Remove</button>` : ''}
+          <button class="slot-btn upload-trigger-btn" id="trigger-${key}">⬆ Upload PDF / TXT</button>
+          <input type="file" accept=".pdf,.txt" id="file-${key}" style="display:none;">
+          <button class="slot-btn" onclick="showPasteArea('${key}')">✎ Paste Text</button>
+          ${removeBtn}
         </div>
       </div>
       <div class="slot-paste-area" id="paste-area-${key}">
-        <textarea id="paste-text-${key}" placeholder="Paste your resume text here…"></textarea>
-        <div style="display:flex;gap:0.5rem;">
-          <button class="slot-btn" onclick="savePastedResume('${key}')">Save This Resume</button>
+        <textarea id="paste-text-${key}" placeholder="Paste your full resume text here…"></textarea>
+        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+          <button class="slot-btn primary-slot-btn" onclick="savePastedResume('${key}')">Save This Resume</button>
           <button class="slot-btn" onclick="hidePasteArea('${key}')">Cancel</button>
         </div>
       </div>
     `;
     container.appendChild(slot);
 
-    // File input handler
-    const fileInput = document.getElementById('file-' + key);
-    const dropZone = document.getElementById('drop-' + key);
+    // Wire upload button → hidden file input
+    const triggerBtn = document.getElementById('trigger-' + key);
+    const fileInput  = document.getElementById('file-' + key);
+
+    triggerBtn.addEventListener('click', () => fileInput.click());
 
     fileInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
@@ -1924,12 +1947,12 @@ function buildUploadSlots() {
       await handleFileUpload(key, file);
     });
 
-    // Drag and drop
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-    dropZone.addEventListener('drop', async (e) => {
+    // Drag and drop on the slot body
+    slot.addEventListener('dragover', (e) => { e.preventDefault(); slot.classList.add('dragover'); });
+    slot.addEventListener('dragleave', () => slot.classList.remove('dragover'));
+    slot.addEventListener('drop', async (e) => {
       e.preventDefault();
-      dropZone.classList.remove('dragover');
+      slot.classList.remove('dragover');
       const file = e.dataTransfer.files[0];
       if (file) await handleFileUpload(key, file);
     });
@@ -1997,12 +2020,6 @@ function clearSlot(key) {
   clearResume(key);
   buildUploadSlots();
 }
-
-document.getElementById('clear-all-resumes-btn').addEventListener('click', () => {
-  if (!confirm('Remove all uploaded resumes and go back to built-in defaults?')) return;
-  RESUME_KEYS.forEach(({ key }) => clearResume(key));
-  buildUploadSlots();
-});
 
 
 const CARA_BIO = `Cara A. Brown, MBA is a Principal Design Strategist and Service Designer with 15+ years of experience. Website: caraabrown.com. She specializes in enterprise-scale strategy, service design, and systems transformation. Key career highlights: led CEO-identified Kroger initiative driving NPS from -36 to +49, quantified $270M/week in enterprise risk and drove solutions, co-authored 2024-2027 Transportation Strategy, selected for Kroger-Albertsons merger integration team, secured $500K grant at EOYDC, sustained a 15+ year art gallery business scaling to international Art Basel presence. Education: MBA Design Strategy (California College of the Arts), BBA International Business & Marketing (Howard University). She is known for translating ambiguity into executive-ready narratives and measurable outcomes.`;
@@ -2683,10 +2700,16 @@ function updateTrackerStats() {
     document.getElementById('stat-since').textContent = 'Since first application';
   }
 
-  // Goal bar (35/week)
-  const pct = Math.min(100, Math.round((weekApps / 35) * 100));
+  // Goal bar — daily goal × 7
+  const dailyGoalEl = document.getElementById('daily-goal-input');
+  const dailyGoal = dailyGoalEl ? (parseInt(dailyGoalEl.value) || 5) : 5;
+  const weekGoal = dailyGoal * 7;
+  const pct = Math.min(100, Math.round((weekApps / weekGoal) * 100));
   document.getElementById('goal-bar-fill').style.width = pct + '%';
-  document.getElementById('goal-bar-pct').textContent = weekApps + ' / 35  (' + pct + '%)';
+  document.getElementById('goal-bar-pct').textContent = weekApps + ' / ' + weekGoal + '  (' + pct + '%)';
+  // Update sub-label on the week stat card
+  const weekGoalEl = document.getElementById('stat-week-goal');
+  if (weekGoalEl) weekGoalEl.textContent = 'Goal: ' + weekGoal + ' / week';
 }
 
 function formatDate(isoStr) {
@@ -3340,11 +3363,54 @@ function copyResult(id) {
   if (!el) return;
   const text = el.textContent || el.innerText;
   navigator.clipboard.writeText(text).then(() => {
-    // find the copy button near this element
     const btn = el.closest('.result-box')?.querySelector('.copy-btn');
     if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
   });
 }
+
+// ─── PAGE INIT (runs after DOM is ready) ────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+
+  // Load saved resumes from localStorage and build upload slots
+  loadSavedResumes();
+  buildUploadSlots();
+
+  // Wire clear-all button
+  const clearAllBtn = document.getElementById('clear-all-resumes-btn');
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener('click', () => {
+      if (!confirm('Remove all uploaded resumes and go back to built-in defaults?')) return;
+      RESUME_KEYS.forEach(({ key }) => clearResume(key));
+      buildUploadSlots();
+    });
+  }
+
+  // Load and wire daily goal
+  const savedGoal = localStorage.getItem('cara_daily_goal');
+  if (savedGoal) {
+    const goalEl = document.getElementById('daily-goal-input');
+    if (goalEl) goalEl.value = savedGoal;
+  }
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'daily-goal-input') {
+      localStorage.setItem('cara_daily_goal', e.target.value);
+      updateTrackerStats();
+    }
+  });
+
+  // Load saved API key
+  const savedKey = localStorage.getItem('cara_api_key');
+  if (savedKey) {
+    const keyInput = document.getElementById('api-key-input');
+    if (keyInput) keyInput.value = savedKey;
+    const openBtn = document.getElementById('settings-open-btn');
+    if (openBtn) { openBtn.classList.add('key-set'); openBtn.textContent = '⚙ API Key ✓'; }
+    const ks = document.getElementById('key-status');
+    if (ks) { ks.className = 'key-status set'; ks.textContent = 'Key saved'; }
+  }
+
+});
+
 </script>
 </body>
 </html>
