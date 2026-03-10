@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     font-family: 'Lato', sans-serif;
     background: #0d1117;
@@ -17,203 +16,47 @@
     display: flex;
     justify-content: center;
   }
-
-  .page {
-    width: 100%;
-    max-width: 780px;
-  }
-
-  /* ── HEADER ── */
-  .header {
-    border-bottom: 1px solid #2a6496;
-    padding-bottom: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .kicker {
-    font-size: 0.62rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: #4a9eda;
-    margin-bottom: 0.5rem;
-  }
-
-  h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.4rem;
-    font-weight: 400;
-    color: #ffffff;
-    line-height: 1.15;
-  }
-
-  h1 em {
-    font-style: italic;
-    color: #4a9eda;
-  }
-
-  .byline {
-    margin-top: 0.5rem;
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    color: #6b8fa8;
-    text-transform: uppercase;
-  }
-
-  .byline a {
-    color: #4a9eda;
-    text-decoration: none;
-  }
-
-  /* ── INTRO NOTE ── */
-  .intro {
-    background: #162032;
-    border-left: 3px solid #4a9eda;
-    padding: 1rem 1.4rem;
-    margin-bottom: 2rem;
-    font-size: 0.88rem;
-    line-height: 1.65;
-    color: #b8cfe0;
-    border-radius: 0 4px 4px 0;
-  }
-
-  /* ── STEPS ── */
-  .steps {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .step {
-    display: grid;
-    grid-template-columns: 3.5rem 1fr;
-    gap: 0 1.4rem;
-    padding: 1.2rem 0;
-    border-bottom: 1px solid #1e2d3d;
-    align-items: start;
-  }
-
+  .page { width: 100%; max-width: 800px; }
+  .header { border-bottom: 1px solid #2a6496; padding-bottom: 1.5rem; margin-bottom: 2rem; }
+  .kicker { font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: #4a9eda; margin-bottom: 0.5rem; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 400; color: #ffffff; line-height: 1.15; }
+  h1 em { font-style: italic; color: #4a9eda; }
+  .byline { margin-top: 0.5rem; font-size: 0.72rem; letter-spacing: 0.08em; color: #6b8fa8; }
+  .byline a { color: #4a9eda; text-decoration: none; }
+  .intro { background: #162032; border-left: 3px solid #4a9eda; padding: 1rem 1.4rem; margin-bottom: 2rem; font-size: 0.88rem; line-height: 1.65; color: #b8cfe0; border-radius: 0 4px 4px 0; }
+  .steps { display: flex; flex-direction: column; }
+  .step { display: grid; grid-template-columns: 3.5rem 1fr; gap: 0 1.4rem; padding: 1.4rem 0; border-bottom: 1px solid #1e2d3d; align-items: start; }
   .step:last-child { border-bottom: none; }
-
-  .step-num {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.2rem;
-    font-weight: 600;
-    color: #2a6496;
-    line-height: 1;
-    padding-top: 0.1rem;
-    text-align: right;
-  }
-
-  .step-body h2 {
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #4a9eda;
-    margin-bottom: 0.35rem;
-  }
-
-  .step-body p {
-    font-size: 0.87rem;
-    line-height: 1.65;
-    color: #c0cfd8;
-    font-weight: 300;
-  }
-
-  .step-body p strong {
-    color: #e8e4dc;
-    font-weight: 700;
-  }
-
-  .step-body .code {
-    display: inline-block;
-    font-family: 'Courier New', monospace;
-    font-size: 0.78rem;
-    background: #0d1f2d;
-    border: 1px solid #2a6496;
-    color: #7ec8e3;
-    padding: 0.15rem 0.5rem;
-    border-radius: 3px;
-    margin: 0.1rem 0;
-  }
-
-  .step-body .url {
-    color: #4a9eda;
-    font-weight: 400;
-  }
-
-  .step-body ul {
-    margin-top: 0.5rem;
-    padding-left: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-  }
-
-  .step-body ul li {
-    font-size: 0.85rem;
-    line-height: 1.55;
-    color: #c0cfd8;
-    font-weight: 300;
-  }
-
-  .step-body ul li strong { color: #e8e4dc; font-weight: 700; }
-
-  /* ── CALLOUT ── */
-  .callout {
-    margin-top: 0.6rem;
-    background: #0d1f2d;
-    border: 1px solid #1e4060;
-    border-radius: 4px;
-    padding: 0.6rem 1rem;
-    font-size: 0.78rem;
-    color: #7ec8e3;
-    line-height: 1.5;
-  }
-
+  .step-num { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 600; color: #2a6496; line-height: 1; padding-top: 0.1rem; text-align: right; }
+  .step-body h2 { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #4a9eda; margin-bottom: 0.45rem; }
+  .step-body p { font-size: 0.87rem; line-height: 1.7; color: #c0cfd8; font-weight: 300; }
+  .step-body p + p { margin-top: 0.5rem; }
+  .step-body p strong { color: #ffffff; font-weight: 700; }
+  .code { display: inline-block; font-family: 'Courier New', monospace; font-size: 0.78rem; background: #0d1f2d; border: 1px solid #2a6496; color: #7ec8e3; padding: 0.15rem 0.5rem; border-radius: 3px; }
+  .url { color: #4a9eda; }
+  .step-body ul { margin-top: 0.6rem; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+  .step-body ul li { font-size: 0.85rem; line-height: 1.6; color: #c0cfd8; font-weight: 300; }
+  .step-body ul li strong { color: #ffffff; font-weight: 700; }
+  .callout { margin-top: 0.75rem; background: #0d1f2d; border: 1px solid #1e4060; border-radius: 4px; padding: 0.75rem 1rem; font-size: 0.8rem; color: #7ec8e3; line-height: 1.65; }
   .callout strong { color: #4a9eda; }
-
-  /* ── FOOTER ── */
-  .footer {
-    margin-top: 2.5rem;
-    padding-top: 1.2rem;
-    border-top: 1px solid #1e2d3d;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .footer-left {
-    font-size: 0.7rem;
-    color: #4a7a94;
-    font-weight: 300;
-    letter-spacing: 0.05em;
-  }
-
-  .footer-right {
-    font-size: 0.7rem;
-    color: #4a9eda;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  /* Print */
+  .action-box { margin-top: 0.75rem; background: #0f2a1a; border: 1px solid #1e5c30; border-radius: 4px; padding: 0.75rem 1rem; font-size: 0.82rem; color: #7ecfa0; line-height: 1.65; }
+  .action-box strong { color: #4acf7a; }
+  .footer { margin-top: 2.5rem; padding-top: 1.2rem; border-top: 1px solid #1e2d3d; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+  .footer-left { font-size: 0.7rem; color: #4a7a94; font-weight: 300; letter-spacing: 0.05em; }
+  .footer-right { font-size: 0.7rem; color: #4a9eda; letter-spacing: 0.08em; text-transform: uppercase; }
   @media print {
     body { background: #fff; color: #111; padding: 0; }
     .page { max-width: 100%; }
     .header { border-color: #333; }
-    h1 { color: #000; }
-    h1 em, .kicker, .step-num { color: #1a5276; }
-    .step-body h2 { color: #1a5276; }
+    h1 { color: #000; } h1 em, .kicker, .step-num, .step-body h2, .url { color: #1a5276; }
     .step-body p, .step-body ul li { color: #333; }
+    .step-body p strong, .step-body ul li strong { color: #000; }
     .intro { background: #f0f6fb; border-color: #1a5276; color: #333; }
     .callout { background: #f0f6fb; border-color: #aac; color: #1a5276; }
+    .action-box { background: #f0fbf4; border-color: #aaccaa; color: #1a5c30; }
     .code { background: #f5f5f5; border-color: #aaa; color: #1a5276; }
     .footer-left, .footer-right { color: #666; }
-    .step { border-color: #ddd; }
-    .footer { border-color: #ddd; }
+    .step, .footer { border-color: #ddd; }
   }
 </style>
 </head>
@@ -221,13 +64,13 @@
 <div class="page">
 
   <div class="header">
-    <div class="kicker">Setup Guide · One Sheet</div>
+    <div class="kicker">Setup Guide · Step by Step</div>
     <h1>Job Application Toolkit<br><em>Your own free instance in 15 minutes</em></h1>
-    <div class="byline">Built by Cara A. Brown &nbsp;·&nbsp; <a href="https://www.getclarity.consulting" target="_blank">www.getclarity.consulting</a></div>
+    <div class="byline">Built by Cara A. Brown, MBA &nbsp;·&nbsp; <a href="https://www.getclarity.consulting" target="_blank">www.getclarity.consulting</a> &nbsp;·&nbsp; Original repo: <a href="https://github.com/caraabrown/jobsearchtoolkit" target="_blank">github.com/caraabrown/jobsearchtoolkit</a></div>
   </div>
 
   <div class="intro">
-    This toolkit runs entirely in your browser — no servers, no subscriptions. You host your own copy on GitHub for free. The only cost is the Anthropic API, which bills by usage (typically pennies per session). Here's how to get set up.
+    This toolkit runs entirely in your browser — no servers, no subscriptions, no monthly fees. You host your own copy on GitHub for free. The only cost is the Anthropic API, which charges by usage — typically a few cents per session. Follow these steps in order and you'll be up and running in under 15 minutes.
   </div>
 
   <div class="steps">
@@ -235,25 +78,42 @@
     <div class="step">
       <div class="step-num">01</div>
       <div class="step-body">
-        <h2>Create a GitHub account</h2>
-        <p>Go to <span class="url">github.com</span> and sign up for a free account if you don't have one. Your username will be part of your toolkit's URL, so pick something professional.</p>
+        <h2>Create a free GitHub account</h2>
+        <p>Go to <span class="url">github.com</span> and click <strong>Sign up</strong>. Follow the prompts to create a free account. Your username will appear in your toolkit's web address, so choose something professional.</p>
+        <p>If you already have a GitHub account, log in and skip to Step 02.</p>
       </div>
     </div>
 
     <div class="step">
       <div class="step-num">02</div>
       <div class="step-body">
-        <h2>Fork the toolkit repository</h2>
-        <p>Go to <span class="url">github.com/caraabrown/jobsearchtoolkit</span> and click the <strong>Fork</strong> button in the top right. This creates your own personal copy of the toolkit under your GitHub account. You are not editing the original — it's entirely yours.</p>
+        <h2>Fork the toolkit — create your own copy</h2>
+        <p>Go to: <span class="url">github.com/caraabrown/jobsearchtoolkit</span></p>
+        <p>Click the <strong>Fork</strong> button in the top right corner of the page. You'll land on a "Create a new fork" screen. Fill it out exactly like this:</p>
+        <ul>
+          <li><strong>Owner:</strong> Your GitHub username should already be selected — leave it</li>
+          <li><strong>Repository name:</strong> Leave as <span class="code">jobsearchtoolkit</span></li>
+          <li><strong>Description:</strong> Paste this exactly: <span class="code">Forked from github.com/caraabrown/jobsearchtoolkit — Job Application Toolkit built by Cara A. Brown, getclarity.consulting</span></li>
+          <li><strong>"Copy the main branch only" checkbox:</strong> Leave it <strong>checked</strong> — this is correct</li>
+        </ul>
+        <div class="action-box"><strong>→ Click the green "Create fork" button.</strong> GitHub will create your copy and redirect you to it automatically in a few seconds.</div>
+        <div class="callout">A fork is your own completely independent copy. Changes you make will never affect the original, and you are not contributing anything back to it. It belongs to you.</div>
       </div>
     </div>
 
     <div class="step">
       <div class="step-num">03</div>
       <div class="step-body">
-        <h2>Enable GitHub Pages</h2>
-        <p>In your forked repo, go to <strong>Settings → Pages</strong>. Under "Source," select <strong>Deploy from a branch</strong>, choose <strong>main</strong> and <strong>/ (root)</strong>, then click <strong>Save</strong>. Wait about 60 seconds.</p>
-        <div class="callout">Your live URL will be: <strong>yourusername.github.io/jobsearchtoolkit</strong></div>
+        <h2>Make your copy a live website (GitHub Pages)</h2>
+        <p>You're now inside your forked repository. To publish it as a live webpage:</p>
+        <ul>
+          <li>Click <strong>Settings</strong> in the tab row near the top of the page</li>
+          <li>In the left sidebar, scroll down and click <strong>Pages</strong></li>
+          <li>Under "Source," click the dropdown and select <strong>Deploy from a branch</strong></li>
+          <li>Under "Branch," select <strong>main</strong> from the first dropdown and <strong>/ (root)</strong> from the second</li>
+          <li>Click <strong>Save</strong></li>
+        </ul>
+        <div class="callout"><strong>Wait about 60 seconds.</strong> Refresh the Settings → Pages screen. Your live URL will appear there. It will look like:<br><span class="url">yourusername.github.io/jobsearchtoolkit</span></div>
       </div>
     </div>
 
@@ -261,7 +121,14 @@
       <div class="step-num">04</div>
       <div class="step-body">
         <h2>Get your Anthropic API key</h2>
-        <p>The AI features require an Anthropic API key. Go to <span class="url">console.anthropic.com</span>, create a free account, then navigate to <strong>API Keys → Create Key</strong>. Copy the key — you only see it once. Add a small credit ($5–10) under Billing to get started. Typical usage is a few cents per session.</p>
+        <p>The AI features require an Anthropic API key. This is not a Claude subscription — it is a separate developer key that lets the toolkit call the AI directly from your browser. You are billed only for what you use.</p>
+        <ul>
+          <li>Go to <span class="url">console.anthropic.com</span> and create a free account</li>
+          <li>In the left sidebar, click <strong>API Keys</strong></li>
+          <li>Click <strong>Create Key</strong>, give it any name (e.g. "job toolkit"), click <strong>Create</strong></li>
+          <li><strong>Copy the key immediately</strong> — it is shown only once. Paste it somewhere temporarily (Notes app is fine)</li>
+          <li>Click <strong>Billing</strong> in the left sidebar and add a small credit — <strong>$5 is more than enough to start</strong></li>
+        </ul>
       </div>
     </div>
 
@@ -269,7 +136,13 @@
       <div class="step-num">05</div>
       <div class="step-body">
         <h2>Add your API key to the toolkit</h2>
-        <p>Open your live toolkit URL. Click <strong>⚙ API Key</strong> in the top right corner, paste your key, and click <strong>Save</strong>. The key is stored only in your browser — it never leaves your device except to call the AI directly.</p>
+        <p>Open your live toolkit URL in your browser. Once it loads:</p>
+        <ul>
+          <li>Click <strong>⚙ API Key</strong> in the top right corner of the page</li>
+          <li>Paste your API key into the field</li>
+          <li>Click <strong>Save</strong></li>
+        </ul>
+        <div class="callout"><strong>Your key is stored only in your browser.</strong> It is never uploaded to GitHub or any server. It is sent directly from your browser to Anthropic when you run an analysis — no one else can see it.</div>
       </div>
     </div>
 
@@ -277,28 +150,38 @@
       <div class="step-num">06</div>
       <div class="step-body">
         <h2>Upload your resumes</h2>
-        <p>Go to <strong>Step 00 — My Resumes</strong> in the left nav. You'll see slots for each resume version. Click <strong>⬆ Upload PDF / TXT</strong> to upload your resume file, or use <strong>✎ Paste Text</strong> to paste the content directly. The toolkit will use your versions for every analysis. Re-upload any time you make updates.</p>
+        <p>Click <strong>00 My Resumes</strong> in the left navigation panel. You'll see five resume slots. Upload your resume into whichever slots apply to your job search.</p>
         <ul>
-          <li><strong>Best format:</strong> PDF exported from Google Docs or Word</li>
-          <li><strong>Tip:</strong> Upload a separate version for each role type you're targeting</li>
-          <li><strong>Privacy:</strong> Resumes are saved in your browser only — not on any server</li>
+          <li>Click <strong>⬆ Upload PDF / TXT</strong> to choose a file from your computer</li>
+          <li>Or click <strong>✎ Paste Text</strong> to paste your resume content directly</li>
+          <li>You don't need to fill all five slots — just the ones you have</li>
+          <li>Re-upload any time you update your resume — the new version takes effect immediately</li>
         </ul>
+        <div class="callout"><strong>Best format:</strong> PDF exported from Google Docs or Word. If the PDF upload has trouble extracting text, use Paste Text instead.</div>
       </div>
     </div>
 
     <div class="step">
       <div class="step-num">07</div>
       <div class="step-body">
-        <h2>Start your job search</h2>
-        <p>Go to <strong>Step 01 — Job Description</strong>, paste a job posting, and work through the steps in order. The toolkit handles ATS scoring, line-by-line resume edits, cover letters, interview prep, company research, salary intelligence, and application tracking — all in one place.</p>
-        <div class="callout"><strong>Note:</strong> Your data (resumes, job tracker, settings) lives in your browser's local storage. Clearing your browser data will erase it. Export or screenshot anything important.</div>
+        <h2>Run your first analysis</h2>
+        <p>Click <strong>01 Job Description</strong> in the left nav. Paste a job posting you want to apply for and work through the steps in order. Each one builds on the last.</p>
+        <ul>
+          <li><strong>02 ATS Check</strong> — scores your resume against the job posting keywords</li>
+          <li><strong>03 Line-by-Line Edits</strong> — specific rewrite suggestions for each bullet point</li>
+          <li><strong>04 Revised Resume Check</strong> — re-scores after your edits</li>
+          <li><strong>05 Cover Letter</strong> — generates a tailored, ready-to-send cover letter</li>
+          <li><strong>07 Job Tracker</strong> — logs applications automatically and tracks your pipeline</li>
+          <li><strong>08–11</strong> — Company research, interview prep, LinkedIn outreach, salary intel</li>
+        </ul>
+        <div class="action-box"><strong>One important note:</strong> Your resumes, job tracker entries, and API key are all stored in your browser's local storage. If you clear your browser data, switch browsers, or use a different device, you will need to re-upload your resumes and re-enter your API key. Export or screenshot anything important before clearing your browser.</div>
       </div>
     </div>
 
   </div>
 
   <div class="footer">
-    <div class="footer-left">Job Application Toolkit · getclarity.consulting · Built by Cara A. Brown, MBA</div>
+    <div class="footer-left">Original toolkit by Cara A. Brown, MBA &nbsp;·&nbsp; getclarity.consulting &nbsp;·&nbsp; github.com/caraabrown/jobsearchtoolkit</div>
     <div class="footer-right">Free to fork &amp; use</div>
   </div>
 
