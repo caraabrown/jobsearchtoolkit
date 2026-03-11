@@ -314,12 +314,25 @@
     text-transform: uppercase;
     line-height: 1.4;
   }
-  .score-improved {
+  .score-improved { display: none; }
+
+  /* Manual add form */
+  .manual-add-wrap { margin-bottom: 1.5rem; }
+  .manual-add-form { border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; background: var(--bgoff); }
+  .manual-add-form select { width: 100%; padding: 0.6rem 0.75rem; border: 1px solid var(--border); border-radius: 3px; font-family: 'Instrument Sans', sans-serif; font-size: 0.85rem; background: var(--bg); color: var(--black); }
+
+  /* Job detail row */
+  .job-detail-row td { padding: 0.4rem 0.75rem 0.75rem 0.75rem; background: var(--bgoff); }
+  .job-detail-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .detail-chip { font-size: 0.72rem; font-family: 'DM Mono', monospace; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 0.2rem 0.65rem; color: var(--mid); white-space: nowrap; }
+  .job-main-row { cursor: pointer; }
+  .job-main-row:hover td { background: #f9f9f7; }
+  .score-improved-inline {
     font-family: 'DM Mono', monospace;
     font-size: 0.58rem;
     color: var(--green);
     font-weight: 600;
-    margin: 0.25rem 0 0.1rem;
+    margin: 0.15rem 0 0.1rem;
     letter-spacing: 0.02em;
   }
   .score-high { color: var(--green); }
@@ -1088,14 +1101,125 @@
     <div class="panel" id="panel-my-resumes">
       <div class="panel-title">My <em>Resumes</em></div>
       <div class="divider"></div>
-      <div class="panel-desc">Upload your resume files here. The site will extract the text and use your versions instead of the built-in ones. Upload a PDF or paste text directly. Updates save automatically in your browser — re-upload anytime you revise a resume.</div>
+      <div class="panel-desc">Upload your resume files here. The site will use your versions for every analysis. Re-upload any time you update a resume. Files are stored only in your browser — never on any server.</div>
 
-      <div class="step-hint">Supported formats: PDF or plain text paste. Your resumes are stored locally in your browser and never sent anywhere except the AI when you run an analysis.</div>
+      <div id="resume-upload-slots">
 
-      <div id="resume-upload-slots"></div>
+        <div class="resume-slot" id="slot-principal_ds">
+          <div class="resume-slot-header">
+            <span class="resume-slot-title">Principal Design Strategist</span>
+            <span class="resume-slot-status slot-status-default" id="status-principal_ds">Using built-in default</span>
+          </div>
+          <div class="resume-slot-body">
+            <div class="slot-preview" id="preview-principal_ds">No file uploaded yet.</div>
+            <div class="slot-actions">
+              <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-principal_ds').click()">&#11014; Upload PDF / TXT</button>
+              <input type="file" accept=".pdf,.txt" id="file-principal_ds" style="display:none" onchange="handleFileUpload('principal_ds',this.files[0])">
+              <button class="slot-btn" onclick="showPasteArea('principal_ds')">&#9998; Paste Text</button>
+              <button class="slot-btn danger" id="remove-principal_ds" onclick="clearSlot('principal_ds')" style="display:none">&#10005; Remove</button>
+            </div>
+          </div>
+          <div class="slot-paste-area" id="paste-area-principal_ds">
+            <textarea id="paste-text-principal_ds" placeholder="Paste your full resume text here…"></textarea>
+            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+              <button class="slot-btn upload-trigger-btn" onclick="savePastedResume('principal_ds')">Save This Resume</button>
+              <button class="slot-btn" onclick="hidePasteArea('principal_ds')">Cancel</button>
+            </div>
+          </div>
+        </div>
 
-      <div class="btn-row" style="margin-top:2rem;">
-        <button class="btn" id="clear-all-resumes-btn" style="background:transparent;border:1px solid var(--border);color:var(--mid);">Clear All Uploaded Resumes</button>
+        <div class="resume-slot" id="slot-principal_ds_brief">
+          <div class="resume-slot-header">
+            <span class="resume-slot-title">Design Strategist (Brief)</span>
+            <span class="resume-slot-status slot-status-default" id="status-principal_ds_brief">Using built-in default</span>
+          </div>
+          <div class="resume-slot-body">
+            <div class="slot-preview" id="preview-principal_ds_brief">No file uploaded yet.</div>
+            <div class="slot-actions">
+              <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-principal_ds_brief').click()">&#11014; Upload PDF / TXT</button>
+              <input type="file" accept=".pdf,.txt" id="file-principal_ds_brief" style="display:none" onchange="handleFileUpload('principal_ds_brief',this.files[0])">
+              <button class="slot-btn" onclick="showPasteArea('principal_ds_brief')">&#9998; Paste Text</button>
+              <button class="slot-btn danger" id="remove-principal_ds_brief" onclick="clearSlot('principal_ds_brief')" style="display:none">&#10005; Remove</button>
+            </div>
+          </div>
+          <div class="slot-paste-area" id="paste-area-principal_ds_brief">
+            <textarea id="paste-text-principal_ds_brief" placeholder="Paste your full resume text here…"></textarea>
+            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+              <button class="slot-btn upload-trigger-btn" onclick="savePastedResume('principal_ds_brief')">Save This Resume</button>
+              <button class="slot-btn" onclick="hidePasteArea('principal_ds_brief')">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="resume-slot" id="slot-service_designer">
+          <div class="resume-slot-header">
+            <span class="resume-slot-title">Principal Service Designer</span>
+            <span class="resume-slot-status slot-status-default" id="status-service_designer">Using built-in default</span>
+          </div>
+          <div class="resume-slot-body">
+            <div class="slot-preview" id="preview-service_designer">No file uploaded yet.</div>
+            <div class="slot-actions">
+              <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-service_designer').click()">&#11014; Upload PDF / TXT</button>
+              <input type="file" accept=".pdf,.txt" id="file-service_designer" style="display:none" onchange="handleFileUpload('service_designer',this.files[0])">
+              <button class="slot-btn" onclick="showPasteArea('service_designer')">&#9998; Paste Text</button>
+              <button class="slot-btn danger" id="remove-service_designer" onclick="clearSlot('service_designer')" style="display:none">&#10005; Remove</button>
+            </div>
+          </div>
+          <div class="slot-paste-area" id="paste-area-service_designer">
+            <textarea id="paste-text-service_designer" placeholder="Paste your full resume text here…"></textarea>
+            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+              <button class="slot-btn upload-trigger-btn" onclick="savePastedResume('service_designer')">Save This Resume</button>
+              <button class="slot-btn" onclick="hidePasteArea('service_designer')">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="resume-slot" id="slot-product_designer">
+          <div class="resume-slot-header">
+            <span class="resume-slot-title">Lead Product Designer</span>
+            <span class="resume-slot-status slot-status-default" id="status-product_designer">Using built-in default</span>
+          </div>
+          <div class="resume-slot-body">
+            <div class="slot-preview" id="preview-product_designer">No file uploaded yet.</div>
+            <div class="slot-actions">
+              <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-product_designer').click()">&#11014; Upload PDF / TXT</button>
+              <input type="file" accept=".pdf,.txt" id="file-product_designer" style="display:none" onchange="handleFileUpload('product_designer',this.files[0])">
+              <button class="slot-btn" onclick="showPasteArea('product_designer')">&#9998; Paste Text</button>
+              <button class="slot-btn danger" id="remove-product_designer" onclick="clearSlot('product_designer')" style="display:none">&#10005; Remove</button>
+            </div>
+          </div>
+          <div class="slot-paste-area" id="paste-area-product_designer">
+            <textarea id="paste-text-product_designer" placeholder="Paste your full resume text here…"></textarea>
+            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+              <button class="slot-btn upload-trigger-btn" onclick="savePastedResume('product_designer')">Save This Resume</button>
+              <button class="slot-btn" onclick="hidePasteArea('product_designer')">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="resume-slot" id="slot-chief_of_staff">
+          <div class="resume-slot-header">
+            <span class="resume-slot-title">Chief of Staff</span>
+            <span class="resume-slot-status slot-status-default" id="status-chief_of_staff">Using built-in default</span>
+          </div>
+          <div class="resume-slot-body">
+            <div class="slot-preview" id="preview-chief_of_staff">No file uploaded yet.</div>
+            <div class="slot-actions">
+              <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-chief_of_staff').click()">&#11014; Upload PDF / TXT</button>
+              <input type="file" accept=".pdf,.txt" id="file-chief_of_staff" style="display:none" onchange="handleFileUpload('chief_of_staff',this.files[0])">
+              <button class="slot-btn" onclick="showPasteArea('chief_of_staff')">&#9998; Paste Text</button>
+              <button class="slot-btn danger" id="remove-chief_of_staff" onclick="clearSlot('chief_of_staff')" style="display:none">&#10005; Remove</button>
+            </div>
+          </div>
+          <div class="slot-paste-area" id="paste-area-chief_of_staff">
+            <textarea id="paste-text-chief_of_staff" placeholder="Paste your full resume text here…"></textarea>
+            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+              <button class="slot-btn upload-trigger-btn" onclick="savePastedResume('chief_of_staff')">Save This Resume</button>
+              <button class="slot-btn" onclick="hidePasteArea('chief_of_staff')">Cancel</button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -1233,9 +1357,11 @@
     <div class="panel" id="panel-cover-letter">
       <div class="panel-title">Cover <em>Letter</em></div>
       <div class="divider"></div>
-      <div class="panel-desc">Generates a personalized cover letter using your resumes and website (caraabrown.com). The letter will reference specific accomplishments and tie them to the job requirements.</div>
+      <div class="panel-desc">Generates a personalized cover letter. Automatically uses your revised resume if one has been pasted in Step 04, or the highest ATS-scoring resume if an ATS check has been run.</div>
 
-      <label>Resume to reference</label>
+      <div class="step-hint" id="cl-source-hint" style="display:none; border-color:var(--green); background:#f0f7f2;"></div>
+
+      <label>Resume to reference <span style="font-family:'Instrument Sans',sans-serif;font-size:0.75rem;font-weight:400;color:var(--mid);">(auto-selected from above — override here if needed)</span></label>
       <div class="resume-pills" id="cl-resume-pills">
         <div class="pill selected" data-resume="principal_ds">Principal Design Strategist</div>
         <div class="pill" data-resume="principal_ds_brief">Design Strategist (Brief)</div>
@@ -1246,10 +1372,16 @@
 
       <label>Tone preference</label>
       <div class="tab-row" id="cl-tone">
-        <div class="tab active" data-tone="strategic">Strategic & Precise</div>
-        <div class="tab" data-tone="warm">Warm & Personal</div>
+        <div class="tab active" data-tone="strategic">Strategic &amp; Precise</div>
+        <div class="tab" data-tone="warm">Warm &amp; Personal</div>
         <div class="tab" data-tone="executive">Executive Confidence</div>
       </div>
+
+      <label>Recipient name <span style="font-family:'Instrument Sans',sans-serif;font-size:0.75rem;font-weight:400;color:var(--mid);">(optional — replaces "Hiring Team")</span></label>
+      <input type="text" id="cl-recipient-name" placeholder="e.g., Sarah Chen, Dr. Marcus Webb">
+
+      <label>Personal anecdote or specific context to include <span style="font-family:'Instrument Sans',sans-serif;font-size:0.75rem;font-weight:400;color:var(--mid);">(optional)</span></label>
+      <textarea id="cl-anecdote" rows="4" placeholder="e.g., I was raised by an entrepreneur — my mother ran a small business from our home and I grew up watching her turn nothing into something. If this company serves entrepreneurs, fold this story into the letter naturally."></textarea>
 
       <div class="btn-row">
         <button class="btn" id="gen-cl-btn">Generate Cover Letter</button>
@@ -1390,8 +1522,78 @@
         <div class="quote-author" id="quote-author"></div>
       </div>
 
+      <!-- MANUAL ADD FORM -->
+      <div class="manual-add-wrap" id="manual-add-wrap" style="display:none;">
+        <div class="manual-add-form">
+          <div class="form-row">
+            <div>
+              <label>Company *</label>
+              <input type="text" id="man-company" placeholder="Company name">
+            </div>
+            <div>
+              <label>Role *</label>
+              <input type="text" id="man-role" placeholder="Job title">
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label>Date Applied</label>
+              <input type="date" id="man-date">
+            </div>
+            <div>
+              <label>Job Posting URL</label>
+              <input type="text" id="man-url" placeholder="https://...">
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label>How Applied</label>
+              <select id="man-how-applied">
+                <option value="">— select —</option>
+                <option>LinkedIn</option>
+                <option>LinkedIn Easy Apply</option>
+                <option>Company Website</option>
+                <option>Referral</option>
+                <option>Recruiter</option>
+                <option>Job Board (Indeed / Glassdoor / etc.)</option>
+                <option>Email</option>
+                <option>Career Fair</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div>
+              <label>Work Type</label>
+              <select id="man-work-type">
+                <option value="">— select —</option>
+                <option>Remote</option>
+                <option>Hybrid</option>
+                <option>On-site</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label>Location</label>
+              <input type="text" id="man-location" placeholder="City, State or Remote">
+            </div>
+            <div>
+              <label>Salary Range</label>
+              <input type="text" id="man-salary" placeholder="e.g., $130K–$160K">
+            </div>
+          </div>
+          <div class="btn-row" style="margin-top:1rem;">
+            <button class="btn" id="man-add-save-btn">Add Application</button>
+            <button class="btn" id="man-add-cancel-btn" style="background:transparent;border:1px solid var(--border);color:var(--mid);">Cancel</button>
+          </div>
+        </div>
+      </div>
+
       <!-- AUTO-LOG NOTE -->
-      <div class="step-hint" style="margin-bottom:2rem;">Applications are logged automatically when you save a Job Description in Step 01. Use the checkboxes below to track your progress.</div>
+      <div class="step-hint" style="margin-bottom:1rem;">Applications are logged automatically when you save a Job Description in Step 01. Use <strong>+ Add Manually</strong> for any others. Click any row to see details.</div>
+
+      <div class="btn-row" style="margin-bottom:1.5rem;">
+        <button class="btn" id="manual-add-btn" style="font-size:0.75rem;padding:0.5rem 1.2rem;">+ Add Manually</button>
+      </div>
 
       <!-- JOBS TABLE -->
       <div id="jobs-empty" class="empty-state">No applications logged yet. Add your first one above.</div>
@@ -1401,7 +1603,8 @@
             <tr>
               <th>Company</th>
               <th>Role</th>
-              <th>Date Added</th>
+              <th>Date</th>
+              <th>How Applied</th>
               <th style="text-align:center;">Screening</th>
               <th style="text-align:center;">Interview</th>
               <th style="text-align:center;">Rejected</th>
@@ -1580,8 +1783,21 @@
         <div class="error-msg" id="salary-error"></div>
 
         <div class="result-box" id="salary-result">
-          <button class="copy-btn" onclick="copyResult('salary-output')">Copy</button>
-          <div class="stream-output" id="salary-output"></div>
+          <button class="copy-btn" onclick="copyResult('salary-active-output')">Copy</button>
+          <div class="tab-row" id="salary-result-tabs" style="margin-bottom:1rem;">
+            <div class="tab active" data-saltab="positioning">Final Positioning</div>
+            <div class="tab" data-saltab="market">Market Rate</div>
+            <div class="tab" data-saltab="numbers">Your Numbers</div>
+            <div class="tab" data-saltab="scripts">Negotiation Scripts</div>
+            <div class="tab" data-saltab="traps">Traps to Avoid</div>
+          </div>
+          <div id="salary-tab-positioning" class="stream-output salary-tab-content"></div>
+          <div id="salary-tab-market"      class="stream-output salary-tab-content" style="display:none;"></div>
+          <div id="salary-tab-numbers"     class="stream-output salary-tab-content" style="display:none;"></div>
+          <div id="salary-tab-scripts"     class="stream-output salary-tab-content" style="display:none;"></div>
+          <div id="salary-tab-traps"       class="stream-output salary-tab-content" style="display:none;"></div>
+          <div id="salary-output"          class="stream-output" style="display:none;"></div>
+          <div id="salary-active-output"   style="display:none;"></div>
         </div>
       </div>
 
@@ -1887,81 +2103,34 @@ async function extractPdfText(file) {
 
 // Build upload slots UI
 function buildUploadSlots() {
-  const container = document.getElementById('resume-upload-slots');
-  if (!container) return;
-  container.innerHTML = '';
-
-  RESUME_KEYS.forEach(({ key, label }) => {
+  // Slots are static HTML — just refresh the status badges and previews
+  RESUME_KEYS.forEach(({ key }) => {
     const isCustom = !!RESUMES[key].custom;
-    const preview = isCustom ? RESUMES[key].text.substring(0, 220).replace(/\s+/g, ' ') + '…' : '';
-
-    const slot = document.createElement('div');
-    slot.className = 'resume-slot';
-    slot.id = 'slot-' + key;
-
-    const statusHtml = isCustom
-      ? '<span class="resume-slot-status slot-status-custom">✓ Your version loaded</span>'
-      : '<span class="resume-slot-status slot-status-default">Using built-in default</span>';
-
-    const previewHtml = isCustom
-      ? `<div class="slot-preview has-text" id="preview-${key}">${preview}</div>`
-      : `<div class="slot-preview" id="preview-${key}">No file uploaded yet — upload a PDF or paste your resume text below.</div>`;
-
-    const removeBtn = isCustom
-      ? `<button class="slot-btn danger" onclick="clearSlot('${key}')">✕ Remove</button>`
-      : '';
-
-    slot.innerHTML = `
-      <div class="resume-slot-header">
-        <span class="resume-slot-title">${label}</span>
-        ${statusHtml}
-      </div>
-      <div class="resume-slot-body">
-        ${previewHtml}
-        <div class="slot-actions">
-          <button class="slot-btn upload-trigger-btn" id="trigger-${key}">⬆ Upload PDF / TXT</button>
-          <input type="file" accept=".pdf,.txt" id="file-${key}" style="display:none;">
-          <button class="slot-btn" onclick="showPasteArea('${key}')">✎ Paste Text</button>
-          ${removeBtn}
-        </div>
-      </div>
-      <div class="slot-paste-area" id="paste-area-${key}">
-        <textarea id="paste-text-${key}" placeholder="Paste your full resume text here…"></textarea>
-        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-          <button class="slot-btn primary-slot-btn" onclick="savePastedResume('${key}')">Save This Resume</button>
-          <button class="slot-btn" onclick="hidePasteArea('${key}')">Cancel</button>
-        </div>
-      </div>
-    `;
-    container.appendChild(slot);
-
-    // Wire upload button → hidden file input
-    const triggerBtn = document.getElementById('trigger-' + key);
-    const fileInput  = document.getElementById('file-' + key);
-
-    triggerBtn.addEventListener('click', () => fileInput.click());
-
-    fileInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      await handleFileUpload(key, file);
-    });
-
-    // Drag and drop on the slot body
-    slot.addEventListener('dragover', (e) => { e.preventDefault(); slot.classList.add('dragover'); });
-    slot.addEventListener('dragleave', () => slot.classList.remove('dragover'));
-    slot.addEventListener('drop', async (e) => {
-      e.preventDefault();
-      slot.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file) await handleFileUpload(key, file);
-    });
+    const statusEl  = document.getElementById('status-' + key);
+    const previewEl = document.getElementById('preview-' + key);
+    const removeBtn = document.getElementById('remove-' + key);
+    if (statusEl) {
+      statusEl.className = 'resume-slot-status ' + (isCustom ? 'slot-status-custom' : 'slot-status-default');
+      statusEl.textContent = isCustom ? '✓ Your version loaded' : 'Using built-in default';
+    }
+    if (previewEl) {
+      if (isCustom) {
+        previewEl.className = 'slot-preview has-text';
+        previewEl.textContent = RESUMES[key].text.substring(0, 220).replace(/\s+/g, ' ') + '…';
+      } else {
+        previewEl.className = 'slot-preview';
+        previewEl.textContent = 'No file uploaded yet.';
+      }
+    }
+    if (removeBtn) removeBtn.style.display = isCustom ? 'inline-block' : 'none';
   });
 }
 
+
 async function handleFileUpload(key, file) {
-  const dropZone = document.getElementById('drop-' + key);
-  dropZone.innerHTML = '<div>Processing…</div>';
+  if (!file) return;
+  const btn = document.querySelector('#slot-' + key + ' .upload-trigger-btn');
+  if (btn) { btn.textContent = 'Reading…'; btn.disabled = true; }
   try {
     let text = '';
     if (file.name.endsWith('.pdf')) {
@@ -1982,10 +2151,14 @@ async function handleFileUpload(key, file) {
     }
     saveResume(key, text);
     buildUploadSlots();
-    showSlotSuccess(key, file.name);
   } catch (err) {
-    alert('Error reading file: ' + err.message + '. Try "Paste Text" instead.');
-    buildUploadSlots();
+    alert('Could not read this file. Try the "Paste Text" button instead.');
+  } finally {
+    const btn = document.querySelector('#slot-' + key + ' .upload-trigger-btn');
+    if (btn) { btn.textContent = '⬆ Upload PDF / TXT'; btn.disabled = false; }
+    // Reset file input so same file can be re-uploaded
+    const fi = document.getElementById('file-' + key);
+    if (fi) fi.value = '';
   }
 }
 
@@ -2164,7 +2337,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
 
   const systemPrompt = `You are an expert ATS (Applicant Tracking System) analyst and resume coach. You analyze resumes against job descriptions with deep expertise in keyword matching, skills alignment, and recruiter psychology. Be precise, data-driven, and honest. Never inflate scores or suggest fabricating experience. Score what is actually there.`;
 
-  const resumeBlock = resumeTexts.map((r, i) => 'RESUME ' + (i+1) + ': ' + r.label + '\n---\n' + r.text).join('\n\n======\n\n');
+  const resumeBlock = resumeTexts.map(r => r.label + '\n---\n' + r.text).join('\n\n======\n\n');
 
   const userMsg = [
     'JOB DESCRIPTION:',
@@ -2212,7 +2385,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
               if (name.includes(k) || k.includes(name)) { improved = v; break; }
             }
           }
-          const improvedHtml = improved ? `<div class="score-improved">↑ ${improved}% with edits</div>` : '';
+          const improvedHtml = improved ? `<div class="score-improved-inline">↑ ${improved}% with edits</div>` : '';
           document.getElementById('score-cards-container').innerHTML += `
             <div class="score-card">
               <div class="score-num ${colorClass}">${pct}%</div>
@@ -2376,7 +2549,34 @@ document.getElementById('gen-cl-btn').addEventListener('click', async () => {
   const jd = savedJD || document.getElementById('jd-text').value.trim();
   if (!jd) { showError('cl-error', 'Please save a job description in Step 01 first.'); return; }
 
-  const resume = RESUMES[selectedResumeForCL];
+  // ── Edit 1: Determine resume source ─────────────────────────────────────────
+  const revisedText = document.getElementById('updated-resume-text')
+    ? document.getElementById('updated-resume-text').value.trim() : '';
+  const recipientName = (document.getElementById('cl-recipient-name').value || '').trim();
+  const anecdote = (document.getElementById('cl-anecdote').value || '').trim();
+
+  let resumeText, resumeSourceLabel;
+  if (revisedText.length > 100) {
+    resumeText = revisedText;
+    resumeSourceLabel = '✓ Using your revised resume from Step 04';
+  } else if (atsHighestResume && RESUMES[atsHighestResume]) {
+    resumeText = RESUMES[atsHighestResume].text;
+    resumeSourceLabel = '✓ Using ' + RESUMES[atsHighestResume].label + ' — highest ATS score';
+  } else {
+    resumeText = RESUMES[selectedResumeForCL].text;
+    resumeSourceLabel = '✓ Using ' + RESUMES[selectedResumeForCL].label + ' — manually selected';
+  }
+  const hintEl = document.getElementById('cl-source-hint');
+  if (hintEl) { hintEl.textContent = resumeSourceLabel; hintEl.style.display = 'block'; }
+
+  const companyName = savedRoleName
+    ? savedRoleName.replace(/^.+?(?:at|@|,)\s*/i, '').trim() || savedRoleName
+    : 'the company';
+
+  const greeting = recipientName
+    ? 'Dear ' + recipientName + ','
+    : 'Dear Hiring Team at ' + companyName + ',';
+
   const toneMap = {
     strategic: 'strategic, precise, and confident — demonstrating systems-level thinking and enterprise impact without being cold. Authoritative but not stiff.',
     warm: 'warm, personal, and human — showing genuine enthusiasm and personality while maintaining professionalism.',
@@ -2387,35 +2587,57 @@ document.getElementById('gen-cl-btn').addEventListener('click', async () => {
   hideError('cl-error');
   document.getElementById('cl-result').classList.remove('visible');
 
-  const systemPrompt = `You are an expert cover letter writer who specializes in crafting highly personalized, compelling cover letters for senior design strategy and service design professionals. You never write generic letters — every sentence is specific, grounded in actual accomplishments, and directly relevant to the target role.`;
+  const systemPrompt = `You are an expert cover letter writer who specializes in crafting highly personalized, compelling cover letters for senior design strategy and service design professionals. You never write generic letters — every sentence is specific, grounded in actual accomplishments, and directly relevant to the target role.
+
+CRITICAL FORMATTING RULES — follow exactly:
+- NEVER use asterisks (**) anywhere in the letter
+- Use this exact greeting: ${greeting}
+- After 2-3 body paragraphs, insert a plain-text skills alignment table formatted like this (no markdown, no asterisks, aligned with spaces):
+
+YOUR NEEDS                          MY PROVEN ABILITIES
+─────────────────────────────────   ─────────────────────────────────────────
+[top need from JD]                  [specific accomplishment from resume]
+[second need from JD]               [specific accomplishment from resume]
+[third need from JD]                [specific accomplishment from resume]
+
+- After the table, write one closing paragraph then the sign-off
+- Sign off: Respectfully,\n\nCara A. Brown, MBA\n(202) 489-9901\nhi@caraabrown.com\nlinkedin.com/in/caraabrown\ncaraabrown.com
+- Do NOT double-space the signature block — each line on its own line, no blank lines between them
+- Do not use [Date] or any placeholder — use the actual date provided`;
+
+  const anecdoteBlock = anecdote
+    ? `\n\nPERSONAL CONTEXT TO FOLD IN NATURALLY:\n${anecdote}\n(Weave this into the letter where it fits — do not quote it verbatim)`
+    : '';
 
   const userMsg = `Write a compelling cover letter for Cara Brown applying to the following role.
 
 JOB DESCRIPTION:
 ${jd}
-${savedRoleName ? `Role: ${savedRoleName}` : ''}
-${savedJDUrl ? `URL: ${savedJDUrl}` : ''}
+${savedRoleName ? 'Role: ' + savedRoleName : ''}
+${savedJDUrl ? 'URL: ' + savedJDUrl : ''}
 
 CARA'S RESUME (use this as the primary source):
-${resume.text}
+${resumeText}
 
 ADDITIONAL CONTEXT ABOUT CARA:
 ${CARA_BIO}
 Website: caraabrown.com — case studies and work samples available there.
+${anecdoteBlock}
 
 TONE: ${toneMap[selectedCLTone]}
 
+DATE: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}
+
 REQUIREMENTS:
+- Start with the date, then a blank line, then the greeting: ${greeting}
 - Address the specific requirements in the JD directly
-- Reference 2-3 specific, quantified accomplishments from the resume that are most relevant
-- Connect Cara's background explicitly to what the company/role needs
+- Reference 2-3 specific, quantified accomplishments from the resume
+- Connect Cara's background explicitly to what this company needs
+- Insert the skills alignment table between the body paragraphs and closing paragraph
 - Mention caraabrown.com naturally as a source for case studies/portfolio
 - Do NOT use clichés like "I am excited to apply" or "I am a perfect fit"
-- Length: 3-4 tight paragraphs
-- Do not include [placeholder] brackets — write the full letter with all details filled in
-- End with a strong, confident closing
-- Format as a proper letter. Use today's date: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}. Include greeting, body, closing
-- Do not use [Date] or any placeholder for the date — use the actual date provided above`;
+- Do NOT use asterisks anywhere
+- Length: 3-4 tight paragraphs + table + closing`;
 
   try {
     const output = document.getElementById('cl-output');
@@ -2740,40 +2962,47 @@ function renderJobs() {
 
   tbody.innerHTML = sorted.map(j => {
     const isHired = j.hired ? 'hired-row' : '';
-    const urlCell = j.url
-      ? `<a class="job-link" href="${j.url}" target="_blank">↗</a>`
-      : '';
+    const urlCell = j.url ? `<a class="job-link" href="${j.url}" target="_blank">↗</a>` : '';
     const isRejected = j.rejected ? 'style="opacity:0.5;"' : '';
-    return `<tr class="${isHired}" data-id="${j.id}" ${isRejected}>
+    const howApplied = escHtml(j.howApplied || '—');
+    // Detail row with salary, location, work type
+    const detailParts = [
+      j.salary ? `<span class="detail-chip">💰 ${escHtml(j.salary)}</span>` : '',
+      j.location ? `<span class="detail-chip">📍 ${escHtml(j.location)}</span>` : '',
+      j.workType ? `<span class="detail-chip">🏠 ${escHtml(j.workType)}</span>` : '',
+    ].filter(Boolean).join('');
+    const detailRow = detailParts ? `<tr class="job-detail-row ${isHired}" data-detail-id="${j.id}"><td colspan="9"><div class="job-detail-chips">${detailParts}</div></td></tr>` : '';
+    return `<tr class="${isHired} job-main-row" data-id="${j.id}" ${isRejected} onclick="toggleDetailRow('${j.id}')">
       <td><strong>${escHtml(j.company)}</strong> ${urlCell}</td>
       <td>${escHtml(j.role)}</td>
       <td><span class="applied-date">${formatDate(j.dateAdded || j.dateApplied || new Date().toISOString())}</span></td>
+      <td style="font-size:0.75rem;color:var(--mid);">${howApplied}</td>
       <td style="text-align:center;">
         <div class="stage-check-item">
-          <input type="checkbox" ${j.screening ? 'checked' : ''} onchange="toggleStage('${j.id}','screening',this.checked)">
+          <input type="checkbox" ${j.screening ? 'checked' : ''} onchange="event.stopPropagation();toggleStage('${j.id}','screening',this.checked)">
           <span>Screen</span>
         </div>
       </td>
       <td style="text-align:center;">
         <div class="stage-check-item">
-          <input type="checkbox" ${j.interview ? 'checked' : ''} onchange="toggleStage('${j.id}','interview',this.checked)">
+          <input type="checkbox" ${j.interview ? 'checked' : ''} onchange="event.stopPropagation();toggleStage('${j.id}','interview',this.checked)">
           <span>Interview</span>
         </div>
       </td>
       <td style="text-align:center;">
         <div class="stage-check-item">
-          <input type="checkbox" ${j.rejected ? 'checked' : ''} onchange="toggleStage('${j.id}','rejected',this.checked)">
+          <input type="checkbox" ${j.rejected ? 'checked' : ''} onchange="event.stopPropagation();toggleStage('${j.id}','rejected',this.checked)">
           <span>Rejected</span>
         </div>
       </td>
       <td style="text-align:center;">
         <div class="stage-check-item">
-          <input type="checkbox" ${j.hired ? 'checked' : ''} onchange="toggleStage('${j.id}','hired',this.checked)">
+          <input type="checkbox" ${j.hired ? 'checked' : ''} onchange="event.stopPropagation();toggleStage('${j.id}','hired',this.checked)">
           <span>Hired!</span>
         </div>
       </td>
-      <td><button class="delete-job-btn" onclick="deleteJob('${j.id}')" title="Remove">✕</button></td>
-    </tr>`;
+      <td><button class="delete-job-btn" onclick="event.stopPropagation();deleteJob('${j.id}')" title="Remove">✕</button></td>
+    </tr>${detailRow}`;
   }).join('');
 }
 
@@ -2798,6 +3027,58 @@ function deleteJob(id) {
   saveJobs();
   renderJobs();
 }
+
+function toggleDetailRow(id) {
+  const detailRow = document.querySelector(`[data-detail-id="${id}"]`);
+  if (detailRow) detailRow.style.display = detailRow.style.display === 'none' ? 'table-row' : 'none';
+}
+
+// Manual add form wiring
+document.getElementById('manual-add-btn').addEventListener('click', () => {
+  const wrap = document.getElementById('manual-add-wrap');
+  wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+  if (wrap.style.display === 'block') {
+    // Set today's date as default
+    document.getElementById('man-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('man-company').focus();
+  }
+});
+
+document.getElementById('man-add-cancel-btn').addEventListener('click', () => {
+  document.getElementById('manual-add-wrap').style.display = 'none';
+});
+
+document.getElementById('man-add-save-btn').addEventListener('click', () => {
+  const company = document.getElementById('man-company').value.trim();
+  const role    = document.getElementById('man-role').value.trim();
+  if (!company || !role) { alert('Company and Role are required.'); return; }
+  const dateVal = document.getElementById('man-date').value;
+  const newJob = {
+    id:          Date.now().toString(),
+    company,
+    role,
+    url:         document.getElementById('man-url').value.trim(),
+    howApplied:  document.getElementById('man-how-applied').value,
+    workType:    document.getElementById('man-work-type').value,
+    location:    document.getElementById('man-location').value.trim(),
+    salary:      document.getElementById('man-salary').value.trim(),
+    dateAdded:   dateVal ? new Date(dateVal).toISOString() : new Date().toISOString(),
+    screening:   false,
+    interview:   false,
+    rejected:    false,
+    hired:       false
+  };
+  jobs.unshift(newJob);
+  saveJobs();
+  renderJobs();
+  // Reset + hide form
+  ['man-company','man-role','man-url','man-location','man-salary'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('man-how-applied').value = '';
+  document.getElementById('man-work-type').value = '';
+  document.getElementById('manual-add-wrap').style.display = 'none';
+});
 
 // Jobs added automatically from Step 01
 
@@ -2983,6 +3264,21 @@ document.querySelectorAll('#salary-mode-tabs .tab').forEach(tab => {
   });
 });
 
+// Salary result tabs — event delegation so they work before first run
+document.getElementById('salary-result-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.tab');
+  if (!tab) return;
+  document.querySelectorAll('#salary-result-tabs .tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  ['positioning','market','numbers','scripts','traps'].forEach(key => {
+    const el = document.getElementById('salary-tab-' + key);
+    if (el) el.style.display = tab.dataset.saltab === key ? 'block' : 'none';
+  });
+  const activeEl = document.getElementById('salary-tab-' + tab.dataset.saltab);
+  const activeOut = document.getElementById('salary-active-output');
+  if (activeEl && activeOut) activeOut.textContent = activeEl.textContent;
+});
+
 document.getElementById('gen-salary-btn').addEventListener('click', async () => {
   const role = document.getElementById('sal-role').value.trim();
   if (!role) { showError('salary-error', 'Please enter the role title.'); return; }
@@ -3006,14 +3302,47 @@ document.getElementById('gen-salary-btn').addEventListener('click', async () => 
     offered ? 'Offered or mentioned: ' + offered : null,
     situation ? 'Situation: ' + situation : null,
     'Cara: 15+ years, MBA, Principal-level, $270M enterprise impact, C-suite partnerships.',
-    'Provide: 1. MARKET RATE — realistic ranges by level and sector  2. CARAS NUMBERS — target, floor, stretch. Be direct with specific dollar amounts.  3. NEGOTIATION SCRIPTS — exact language for: salary expectations question, countering a lowball, asking for time, negotiating total comp beyond base  4. TRAPS TO AVOID — 3-4 specific mistakes and how to handle them'
+    'Output EXACTLY these five sections with these headers:\n\n## FINAL POSITIONING\n[2-3 sentence confident summary of how Cara should position herself and what number she should lead with. Be direct.]\n\n## MARKET RATE\n[Realistic salary ranges by level and sector for this role]\n\n## CARAS NUMBERS\n[Target, floor, and stretch — specific dollar amounts]\n\n## NEGOTIATION SCRIPTS\n[Exact language for: salary expectations question, countering a lowball, asking for time, negotiating total comp]\n\n## TRAPS TO AVOID\n[3-4 specific mistakes and how to handle them]'
   ].filter(Boolean).join('\n\n');
-  
+
+  // Clear all tab outputs
+  ['positioning','market','numbers','scripts','traps'].forEach(tab => {
+    const el = document.getElementById('salary-tab-' + tab);
+    if (el) { el.textContent = ''; el.style.display = 'none'; }
+  });
+  // Show first tab active
+  document.getElementById('salary-tab-positioning').style.display = 'block';
+  document.querySelectorAll('#salary-result-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===0));
+
   try {
-    const output = document.getElementById('salary-output');
-    output.textContent = '';
+    const rawOut = document.getElementById('salary-output');
+    rawOut.textContent = '';
     document.getElementById('salary-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+    let fullSalText = '';
+    await callClaude(systemPrompt, userMsg, text => {
+      fullSalText = text;
+      // Live stream into positioning tab
+      document.getElementById('salary-tab-positioning').textContent = text;
+    });
+
+    // Split into sections
+    function salSection(txt, startRe, endRe) {
+      const sm = txt.search(startRe);
+      if (sm < 0) return txt;
+      const em = endRe ? txt.search(endRe) : -1;
+      return (em > sm ? txt.substring(sm, em) : txt.substring(sm))
+        .replace(/^##\s*/gm,'').replace(/\*\*/g,'').trim();
+    }
+    document.getElementById('salary-tab-positioning').textContent = salSection(fullSalText, /##\s*FINAL POSITIONING/i, /##\s*MARKET RATE/i);
+    document.getElementById('salary-tab-market').textContent      = salSection(fullSalText, /##\s*MARKET RATE/i,       /##\s*CARAS NUMBERS/i);
+    document.getElementById('salary-tab-numbers').textContent     = salSection(fullSalText, /##\s*CARAS NUMBERS/i,     /##\s*NEGOTIATION SCRIPTS/i);
+    document.getElementById('salary-tab-scripts').textContent     = salSection(fullSalText, /##\s*NEGOTIATION SCRIPTS/i, /##\s*TRAPS TO AVOID/i);
+    document.getElementById('salary-tab-traps').textContent       = salSection(fullSalText, /##\s*TRAPS TO AVOID/i,    null);
+
+    // Seed active output for copy
+    document.getElementById('salary-active-output').textContent =
+      document.getElementById('salary-tab-positioning').textContent;
+
   } catch (err) {
     showError('salary-error', 'Error: ' + err.message);
     document.getElementById('salary-result').classList.remove('visible');
@@ -3368,48 +3697,34 @@ function copyResult(id) {
   });
 }
 
-// ─── PAGE INIT (runs after DOM is ready) ────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
+// ─── PAGE INIT ───────────────────────────────────────────────────────────────
+// Script loads after all HTML (bottom of body), so DOM is already ready.
+loadSavedResumes();
+buildUploadSlots();
 
-  // Load saved resumes from localStorage and build upload slots
-  loadSavedResumes();
-  buildUploadSlots();
-
-  // Wire clear-all button
-  const clearAllBtn = document.getElementById('clear-all-resumes-btn');
-  if (clearAllBtn) {
-    clearAllBtn.addEventListener('click', () => {
-      if (!confirm('Remove all uploaded resumes and go back to built-in defaults?')) return;
-      RESUME_KEYS.forEach(({ key }) => clearResume(key));
-      buildUploadSlots();
-    });
+// Wire daily goal input
+const savedGoal = localStorage.getItem('cara_daily_goal');
+if (savedGoal) {
+  const goalEl = document.getElementById('daily-goal-input');
+  if (goalEl) goalEl.value = savedGoal;
+}
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.id === 'daily-goal-input') {
+    localStorage.setItem('cara_daily_goal', e.target.value);
+    updateTrackerStats();
   }
-
-  // Load and wire daily goal
-  const savedGoal = localStorage.getItem('cara_daily_goal');
-  if (savedGoal) {
-    const goalEl = document.getElementById('daily-goal-input');
-    if (goalEl) goalEl.value = savedGoal;
-  }
-  document.addEventListener('change', function(e) {
-    if (e.target && e.target.id === 'daily-goal-input') {
-      localStorage.setItem('cara_daily_goal', e.target.value);
-      updateTrackerStats();
-    }
-  });
-
-  // Load saved API key
-  const savedKey = localStorage.getItem('cara_api_key');
-  if (savedKey) {
-    const keyInput = document.getElementById('api-key-input');
-    if (keyInput) keyInput.value = savedKey;
-    const openBtn = document.getElementById('settings-open-btn');
-    if (openBtn) { openBtn.classList.add('key-set'); openBtn.textContent = '⚙ API Key ✓'; }
-    const ks = document.getElementById('key-status');
-    if (ks) { ks.className = 'key-status set'; ks.textContent = 'Key saved'; }
-  }
-
 });
+
+// Load saved API key
+const savedKey = localStorage.getItem('cara_api_key');
+if (savedKey) {
+  const keyInput = document.getElementById('api-key-input');
+  if (keyInput) keyInput.value = savedKey;
+  const openBtn = document.getElementById('settings-open-btn');
+  if (openBtn) { openBtn.classList.add('key-set'); openBtn.textContent = '⚙ API Key ✓'; }
+  const ks = document.getElementById('key-status');
+  if (ks) { ks.className = 'key-status set'; ks.textContent = 'Key saved'; }
+}
 
 </script>
 </body>
