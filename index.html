@@ -314,25 +314,12 @@
     text-transform: uppercase;
     line-height: 1.4;
   }
-  .score-improved { display: none; }
-
-  /* Manual add form */
-  .manual-add-wrap { margin-bottom: 1.5rem; }
-  .manual-add-form { border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; background: var(--bgoff); }
-  .manual-add-form select { width: 100%; padding: 0.6rem 0.75rem; border: 1px solid var(--border); border-radius: 3px; font-family: 'Instrument Sans', sans-serif; font-size: 0.85rem; background: var(--bg); color: var(--black); }
-
-  /* Job detail row */
-  .job-detail-row td { padding: 0.4rem 0.75rem 0.75rem 0.75rem; background: var(--bgoff); }
-  .job-detail-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-  .detail-chip { font-size: 0.72rem; font-family: 'DM Mono', monospace; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 0.2rem 0.65rem; color: var(--mid); white-space: nowrap; }
-  .job-main-row { cursor: pointer; }
-  .job-main-row:hover td { background: #f9f9f7; }
-  .score-improved-inline {
+  .score-improved {
     font-family: 'DM Mono', monospace;
     font-size: 0.58rem;
     color: var(--green);
     font-weight: 600;
-    margin: 0.15rem 0 0.1rem;
+    margin: 0.25rem 0 0.1rem;
     letter-spacing: 0.02em;
   }
   .score-high { color: var(--green); }
@@ -396,134 +383,7 @@
   }
 
   /* ─── STREAMED TEXT ─── */
-  /* ─── RESUME UPLOAD SLOTS ─── */
-  .resume-slot {
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    margin-bottom: 1.2rem;
-    overflow: hidden;
-  }
-  .resume-slot-header {
-    background: var(--bgoff);
-    padding: 0.8rem 1.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-  }
-  .resume-slot-title {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--black);
-  }
-  .resume-slot-status {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
-    letter-spacing: 0.05em;
-    padding: 0.2rem 0.6rem;
-    border-radius: 20px;
-  }
-  .slot-status-custom {
-    background: var(--greenlt);
-    color: var(--green);
-  }
-  .slot-status-default {
-    background: var(--bgdark);
-    color: var(--mid);
-  }
-  .resume-slot-body {
-    padding: 1rem 1.2rem 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-  .upload-drop-zone {
-    flex: 1;
-    min-width: 200px;
-    border: 2px dashed var(--border);
-    border-radius: 4px;
-    padding: 1.2rem;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--mid);
-    letter-spacing: 0.06em;
-  }
-  .upload-drop-zone:hover, .upload-drop-zone.dragover {
-    border-color: var(--black);
-    background: var(--bgoff);
-    color: var(--black);
-  }
-  .upload-drop-zone input[type="file"] { display: none; }
-  .slot-preview {
-    font-size: 0.78rem;
-    color: var(--mid);
-    line-height: 1.5;
-    max-height: 72px;
-    overflow: hidden;
-    font-family: 'Instrument Sans', sans-serif;
-    font-style: italic;
-    margin-bottom: 0;
-  }
-  .slot-preview.has-text {
-    color: var(--offblack);
-    font-style: normal;
-  }
-  .slot-actions {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    align-items: flex-start;
-    margin-top: 0.8rem;
-  }
-  .upload-trigger-btn {
-    background: var(--black) !important;
-    color: #fff !important;
-    border-color: var(--black) !important;
-  }
-  .upload-trigger-btn:hover {
-    background: var(--dark) !important;
-  }
-  .primary-slot-btn {
-    background: var(--black) !important;
-    color: #fff !important;
-    border-color: var(--black) !important;
-  }
-  .slot-btn {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.06em;
-    padding: 0.3rem 0.8rem;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--mid);
-    cursor: pointer;
-    border-radius: 3px;
-    white-space: nowrap;
-    transition: all 0.15s;
-    text-transform: uppercase;
-  }
-  .slot-btn:hover { border-color: var(--black); color: var(--black); }
-  .slot-btn.danger:hover { border-color: var(--red); color: var(--red); }
-
-  .slot-paste-area {
-    width: 100%;
-    margin-top: 0.5rem;
-    display: none;
-  }
-  .slot-paste-area textarea {
-    margin-bottom: 0.5rem;
-    min-height: 120px;
-    font-size: 0.8rem;
-  }
-
-    .stream-output {
+  .stream-output {
     font-size: 0.88rem;
     line-height: 1.75;
     color: var(--black);
@@ -844,42 +704,6 @@
     font-size: 0.7rem;
     letter-spacing: 0.08em;
   }
-  .tracker-section-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--mid);
-    margin-bottom: 0.6rem;
-    padding-bottom: 0.4rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .quote-block {
-    padding: 0.5rem 0 1.5rem 0;
-    margin: 0 0 0.5rem 0;
-    text-align: left;
-    min-height: 60px;
-  }
-  .quote-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.55rem;
-    font-weight: 400;
-    font-style: italic;
-    line-height: 1.4;
-    color: var(--black);
-    transition: opacity 0.5s ease;
-    display: block;
-    margin-bottom: 0.4rem;
-  }
-  .quote-author {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--mid);
-    transition: opacity 0.5s ease;
-    display: block;
-  }
 
   @media (max-width: 768px) {
     .tracker-stats { grid-template-columns: 1fr 1fr; }
@@ -995,13 +819,12 @@
     letter-spacing: 0.1em;
   }
 </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
 <header>
   <div>
-    <h1>Job Application Toolkit — <em>built by Cara A. Brown</em> · www.getclarity.consulting</h1>
+    <h1>Cara Brown — <em>Job Application Toolkit</em></h1>
     <div class="sub">ATS Analysis · Cover Letters · Interview Prep · Company Research · Salary &amp; Recruiter Intel</div>
   </div>
   <button class="settings-btn" id="settings-open-btn">⚙ API Key</button>
@@ -1066,7 +889,6 @@
   <nav>
     <div class="nav-section">Setup</div>
     <ul>
-      <li><a href="#" data-panel="my-resumes"><span class="num">00</span> My Resumes</a></li>
       <li><a href="#" class="active" data-panel="job-input"><span class="num">01</span> Job Description</a></li>
     </ul>
     <div class="nav-section">Analysis</div>
@@ -1096,132 +918,6 @@
 
   <!-- MAIN -->
   <main>
-
-    <!-- ── PANEL 0: MY RESUMES ── -->
-    <div class="panel" id="panel-my-resumes">
-      <div class="panel-title">My <em>Resumes</em></div>
-      <div class="divider"></div>
-      <div class="panel-desc">Upload your resume files here. The site will use your versions for every analysis. Re-upload any time you update a resume. Files are stored only in your browser — never on any server.</div>
-
-      <div id="resume-upload-slots">
-
-        <div class="resume-slot" id="slot-principal_ds">
-          <div class="resume-slot-header">
-            <span class="resume-slot-title">Principal Design Strategist</span>
-            <span class="resume-slot-status slot-status-default" id="status-principal_ds">Using built-in default</span>
-          </div>
-          <div class="resume-slot-body">
-            <div class="slot-preview" id="preview-principal_ds">No file uploaded yet.</div>
-            <div class="slot-actions">
-              <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-principal_ds').click()">&#11014; Upload PDF / TXT</button>
-              <input type="file" accept=".pdf,.txt" id="file-principal_ds" style="display:none" onchange="handleFileUpload('principal_ds',this.files[0])">
-              <button class="slot-btn" onclick="showPasteArea('principal_ds')">&#9998; Paste Text</button>
-              <button class="slot-btn danger" id="remove-principal_ds" onclick="clearSlot('principal_ds')" style="display:none">&#10005; Remove</button>
-            </div>
-          </div>
-          <div class="slot-paste-area" id="paste-area-principal_ds">
-            <textarea id="paste-text-principal_ds" placeholder="Paste your full resume text here…"></textarea>
-            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-              <button class="slot-btn upload-trigger-btn" onclick="savePastedResume('principal_ds')">Save This Resume</button>
-              <button class="slot-btn" onclick="hidePasteArea('principal_ds')">Cancel</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="resume-slot" id="slot-principal_ds_brief">
-          <div class="resume-slot-header">
-            <span class="resume-slot-title">Design Strategist (Brief)</span>
-            <span class="resume-slot-status slot-status-default" id="status-principal_ds_brief">Using built-in default</span>
-          </div>
-          <div class="resume-slot-body">
-            <div class="slot-preview" id="preview-principal_ds_brief">No file uploaded yet.</div>
-            <div class="slot-actions">
-              <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-principal_ds_brief').click()">&#11014; Upload PDF / TXT</button>
-              <input type="file" accept=".pdf,.txt" id="file-principal_ds_brief" style="display:none" onchange="handleFileUpload('principal_ds_brief',this.files[0])">
-              <button class="slot-btn" onclick="showPasteArea('principal_ds_brief')">&#9998; Paste Text</button>
-              <button class="slot-btn danger" id="remove-principal_ds_brief" onclick="clearSlot('principal_ds_brief')" style="display:none">&#10005; Remove</button>
-            </div>
-          </div>
-          <div class="slot-paste-area" id="paste-area-principal_ds_brief">
-            <textarea id="paste-text-principal_ds_brief" placeholder="Paste your full resume text here…"></textarea>
-            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-              <button class="slot-btn upload-trigger-btn" onclick="savePastedResume('principal_ds_brief')">Save This Resume</button>
-              <button class="slot-btn" onclick="hidePasteArea('principal_ds_brief')">Cancel</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="resume-slot" id="slot-service_designer">
-          <div class="resume-slot-header">
-            <span class="resume-slot-title">Principal Service Designer</span>
-            <span class="resume-slot-status slot-status-default" id="status-service_designer">Using built-in default</span>
-          </div>
-          <div class="resume-slot-body">
-            <div class="slot-preview" id="preview-service_designer">No file uploaded yet.</div>
-            <div class="slot-actions">
-              <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-service_designer').click()">&#11014; Upload PDF / TXT</button>
-              <input type="file" accept=".pdf,.txt" id="file-service_designer" style="display:none" onchange="handleFileUpload('service_designer',this.files[0])">
-              <button class="slot-btn" onclick="showPasteArea('service_designer')">&#9998; Paste Text</button>
-              <button class="slot-btn danger" id="remove-service_designer" onclick="clearSlot('service_designer')" style="display:none">&#10005; Remove</button>
-            </div>
-          </div>
-          <div class="slot-paste-area" id="paste-area-service_designer">
-            <textarea id="paste-text-service_designer" placeholder="Paste your full resume text here…"></textarea>
-            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-              <button class="slot-btn upload-trigger-btn" onclick="savePastedResume('service_designer')">Save This Resume</button>
-              <button class="slot-btn" onclick="hidePasteArea('service_designer')">Cancel</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="resume-slot" id="slot-product_designer">
-          <div class="resume-slot-header">
-            <span class="resume-slot-title">Lead Product Designer</span>
-            <span class="resume-slot-status slot-status-default" id="status-product_designer">Using built-in default</span>
-          </div>
-          <div class="resume-slot-body">
-            <div class="slot-preview" id="preview-product_designer">No file uploaded yet.</div>
-            <div class="slot-actions">
-              <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-product_designer').click()">&#11014; Upload PDF / TXT</button>
-              <input type="file" accept=".pdf,.txt" id="file-product_designer" style="display:none" onchange="handleFileUpload('product_designer',this.files[0])">
-              <button class="slot-btn" onclick="showPasteArea('product_designer')">&#9998; Paste Text</button>
-              <button class="slot-btn danger" id="remove-product_designer" onclick="clearSlot('product_designer')" style="display:none">&#10005; Remove</button>
-            </div>
-          </div>
-          <div class="slot-paste-area" id="paste-area-product_designer">
-            <textarea id="paste-text-product_designer" placeholder="Paste your full resume text here…"></textarea>
-            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-              <button class="slot-btn upload-trigger-btn" onclick="savePastedResume('product_designer')">Save This Resume</button>
-              <button class="slot-btn" onclick="hidePasteArea('product_designer')">Cancel</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="resume-slot" id="slot-chief_of_staff">
-          <div class="resume-slot-header">
-            <span class="resume-slot-title">Chief of Staff</span>
-            <span class="resume-slot-status slot-status-default" id="status-chief_of_staff">Using built-in default</span>
-          </div>
-          <div class="resume-slot-body">
-            <div class="slot-preview" id="preview-chief_of_staff">No file uploaded yet.</div>
-            <div class="slot-actions">
-              <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-chief_of_staff').click()">&#11014; Upload PDF / TXT</button>
-              <input type="file" accept=".pdf,.txt" id="file-chief_of_staff" style="display:none" onchange="handleFileUpload('chief_of_staff',this.files[0])">
-              <button class="slot-btn" onclick="showPasteArea('chief_of_staff')">&#9998; Paste Text</button>
-              <button class="slot-btn danger" id="remove-chief_of_staff" onclick="clearSlot('chief_of_staff')" style="display:none">&#10005; Remove</button>
-            </div>
-          </div>
-          <div class="slot-paste-area" id="paste-area-chief_of_staff">
-            <textarea id="paste-text-chief_of_staff" placeholder="Paste your full resume text here…"></textarea>
-            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-              <button class="slot-btn upload-trigger-btn" onclick="savePastedResume('chief_of_staff')">Save This Resume</button>
-              <button class="slot-btn" onclick="hidePasteArea('chief_of_staff')">Cancel</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
 
     <!-- ── PANEL 1: JOB DESCRIPTION ── -->
     <div class="panel active" id="panel-job-input">
@@ -1271,17 +967,13 @@
       <div class="result-box" id="ats-result">
         <h3>ATS Score Summary</h3>
         <div class="score-cards" id="score-cards-container"></div>
-        <div class="tab-row" id="ats-static-tabs" style="margin-top:1.5rem;">
-          <div class="tab active" data-atsstatic="best">Best Match</div>
-          <div class="tab" data-atsstatic="keywords">Missing Keywords</div>
-          <div class="tab" data-atsstatic="flags">Red Flags &amp; Wins</div>
-          <div class="tab" data-atsstatic="path">Fastest Path to 95%+</div>
+        <div class="tab-row" id="ats-output-tabs" style="margin-top:1.5rem;display:none;">
+          <div class="tab active" data-atssec="flags">Red Flags &amp; ATS Notes</div>
+          <div class="tab" data-atssec="summary">Fastest Path to 95%+</div>
         </div>
-        <div id="ats-best-output" class="stream-output"></div>
-        <div id="ats-keywords-output" class="stream-output" style="display:none;"></div>
         <div id="ats-flags-output" class="stream-output" style="display:none;"></div>
-        <div id="ats-path-output" class="stream-output" style="display:none;"></div>
-        <div id="ats-detail-output" class="stream-output" style="display:none;"></div>
+        <div id="ats-summary-output" class="stream-output" style="display:none;"></div>
+        <div id="ats-detail-output" class="stream-output"></div>
       </div>
     </div>
 
@@ -1357,11 +1049,9 @@
     <div class="panel" id="panel-cover-letter">
       <div class="panel-title">Cover <em>Letter</em></div>
       <div class="divider"></div>
-      <div class="panel-desc">Generates a personalized cover letter. Automatically uses your revised resume if one has been pasted in Step 04, or the highest ATS-scoring resume if an ATS check has been run.</div>
+      <div class="panel-desc">Generates a personalized cover letter using your resumes and website (caraabrown.com). The letter will reference specific accomplishments and tie them to the job requirements.</div>
 
-      <div class="step-hint" id="cl-source-hint" style="display:none; border-color:var(--green); background:#f0f7f2;"></div>
-
-      <label>Resume to reference <span style="font-family:'Instrument Sans',sans-serif;font-size:0.75rem;font-weight:400;color:var(--mid);">(auto-selected from above — override here if needed)</span></label>
+      <label>Resume to reference</label>
       <div class="resume-pills" id="cl-resume-pills">
         <div class="pill selected" data-resume="principal_ds">Principal Design Strategist</div>
         <div class="pill" data-resume="principal_ds_brief">Design Strategist (Brief)</div>
@@ -1372,16 +1062,10 @@
 
       <label>Tone preference</label>
       <div class="tab-row" id="cl-tone">
-        <div class="tab active" data-tone="strategic">Strategic &amp; Precise</div>
-        <div class="tab" data-tone="warm">Warm &amp; Personal</div>
+        <div class="tab active" data-tone="strategic">Strategic & Precise</div>
+        <div class="tab" data-tone="warm">Warm & Personal</div>
         <div class="tab" data-tone="executive">Executive Confidence</div>
       </div>
-
-      <label>Recipient name <span style="font-family:'Instrument Sans',sans-serif;font-size:0.75rem;font-weight:400;color:var(--mid);">(optional — replaces "Hiring Team")</span></label>
-      <input type="text" id="cl-recipient-name" placeholder="e.g., Sarah Chen, Dr. Marcus Webb">
-
-      <label>Personal anecdote or specific context to include <span style="font-family:'Instrument Sans',sans-serif;font-size:0.75rem;font-weight:400;color:var(--mid);">(optional)</span></label>
-      <textarea id="cl-anecdote" rows="4" placeholder="e.g., I was raised by an entrepreneur — my mother ran a small business from our home and I grew up watching her turn nothing into something. If this company serves entrepreneurs, fold this story into the letter naturally."></textarea>
 
       <div class="btn-row">
         <button class="btn" id="gen-cl-btn">Generate Cover Letter</button>
@@ -1450,17 +1134,14 @@
     <div class="panel" id="panel-job-tracker">
       <div class="panel-title">Job <em>Tracker</em></div>
       <div class="divider"></div>
-      <div class="panel-desc">Track every application in one place. Log jobs, mark your progress through each stage, and watch your weekly momentum build. Goal: <input type="number" id="daily-goal-input" value="5" min="1" max="99" style="width:3rem;font-family:inherit;font-size:inherit;border:none;border-bottom:1.5px solid var(--black);background:transparent;text-align:center;font-weight:700;color:var(--black);padding:0 2px;"> applications per day.</div>
-
-      <!-- QUOTE -->
-      <div class="quote-block" id="quote-block">
-        <div class="quote-text" id="quote-text"></div>
-        <div class="quote-author" id="quote-author"></div>
-      </div>
+      <div class="panel-desc">Track every application in one place. Log jobs, mark your progress through each stage, and watch your weekly momentum build. Goal: 5 applications per day.</div>
 
       <!-- STATS ROW -->
-      <div class="tracker-section-label">This Week</div>
       <div class="tracker-stats">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">Total Applied</div>
+        </div>
         <div class="stat-card">
           <div class="stat-num" id="stat-week">0</div>
           <div class="stat-label">Applied This Week</div>
@@ -1472,12 +1153,9 @@
           <div class="stat-sub">(Screening or Interview)</div>
         </div>
         <div class="stat-card">
-          <div class="stat-num" id="stat-week-screen">0</div>
-          <div class="stat-label">Screenings This Week</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="stat-week-interview">0</div>
-          <div class="stat-label">Interviews This Week</div>
+          <div class="stat-num" id="stat-weeks">—</div>
+          <div class="stat-label">Weeks Searching</div>
+          <div class="stat-sub" id="stat-since">Since first application</div>
         </div>
         <div class="goal-bar-wrap">
           <div class="goal-bar-label">
@@ -1490,110 +1168,8 @@
         </div>
       </div>
 
-      <!-- ALL-TIME STATS ROW -->
-      <div class="tracker-section-label" style="margin-top:1.5rem;">All Time</div>
-      <div class="tracker-stats">
-        <div class="stat-card">
-          <div class="stat-num" id="stat-total">0</div>
-          <div class="stat-label">Total Applied</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="stat-total-screen">0</div>
-          <div class="stat-label">Total Screenings</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="stat-total-interview">0</div>
-          <div class="stat-label">Total Interviews</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="stat-weeks">—</div>
-          <div class="stat-label">Weeks Searching</div>
-          <div class="stat-sub" id="stat-since">Since first application</div>
-        </div>
-        <div class="stat-card" id="stat-hired-card" style="display:none;">
-          <div class="stat-num" id="stat-hired" style="color:var(--green);">🎉</div>
-          <div class="stat-label">Offers Received</div>
-        </div>
-      </div>
-
-      <!-- QUOTE BLOCK -->
-      <div class="quote-block" id="quote-block">
-        <div class="quote-text" id="quote-text"></div>
-        <div class="quote-author" id="quote-author"></div>
-      </div>
-
-      <!-- MANUAL ADD FORM -->
-      <div class="manual-add-wrap" id="manual-add-wrap" style="display:none;">
-        <div class="manual-add-form">
-          <div class="form-row">
-            <div>
-              <label>Company *</label>
-              <input type="text" id="man-company" placeholder="Company name">
-            </div>
-            <div>
-              <label>Role *</label>
-              <input type="text" id="man-role" placeholder="Job title">
-            </div>
-          </div>
-          <div class="form-row">
-            <div>
-              <label>Date Applied</label>
-              <input type="date" id="man-date">
-            </div>
-            <div>
-              <label>Job Posting URL</label>
-              <input type="text" id="man-url" placeholder="https://...">
-            </div>
-          </div>
-          <div class="form-row">
-            <div>
-              <label>How Applied</label>
-              <select id="man-how-applied">
-                <option value="">— select —</option>
-                <option>LinkedIn</option>
-                <option>LinkedIn Easy Apply</option>
-                <option>Company Website</option>
-                <option>Referral</option>
-                <option>Recruiter</option>
-                <option>Job Board (Indeed / Glassdoor / etc.)</option>
-                <option>Email</option>
-                <option>Career Fair</option>
-                <option>Other</option>
-              </select>
-            </div>
-            <div>
-              <label>Work Type</label>
-              <select id="man-work-type">
-                <option value="">— select —</option>
-                <option>Remote</option>
-                <option>Hybrid</option>
-                <option>On-site</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div>
-              <label>Location</label>
-              <input type="text" id="man-location" placeholder="City, State or Remote">
-            </div>
-            <div>
-              <label>Salary Range</label>
-              <input type="text" id="man-salary" placeholder="e.g., $130K–$160K">
-            </div>
-          </div>
-          <div class="btn-row" style="margin-top:1rem;">
-            <button class="btn" id="man-add-save-btn">Add Application</button>
-            <button class="btn" id="man-add-cancel-btn" style="background:transparent;border:1px solid var(--border);color:var(--mid);">Cancel</button>
-          </div>
-        </div>
-      </div>
-
       <!-- AUTO-LOG NOTE -->
-      <div class="step-hint" style="margin-bottom:1rem;">Applications are logged automatically when you save a Job Description in Step 01. Use <strong>+ Add Manually</strong> for any others. Click any row to see details.</div>
-
-      <div class="btn-row" style="margin-bottom:1.5rem;">
-        <button class="btn" id="manual-add-btn" style="font-size:0.75rem;padding:0.5rem 1.2rem;">+ Add Manually</button>
-      </div>
+      <div class="step-hint" style="margin-bottom:2rem;">Applications are logged automatically when you save a Job Description in Step 01. Use the checkboxes below to track your progress.</div>
 
       <!-- JOBS TABLE -->
       <div id="jobs-empty" class="empty-state">No applications logged yet. Add your first one above.</div>
@@ -1603,8 +1179,7 @@
             <tr>
               <th>Company</th>
               <th>Role</th>
-              <th>Date</th>
-              <th>How Applied</th>
+              <th>Date Added</th>
               <th style="text-align:center;">Screening</th>
               <th style="text-align:center;">Interview</th>
               <th style="text-align:center;">Rejected</th>
@@ -1783,21 +1358,8 @@
         <div class="error-msg" id="salary-error"></div>
 
         <div class="result-box" id="salary-result">
-          <button class="copy-btn" onclick="copyResult('salary-active-output')">Copy</button>
-          <div class="tab-row" id="salary-result-tabs" style="margin-bottom:1rem;">
-            <div class="tab active" data-saltab="positioning">Final Positioning</div>
-            <div class="tab" data-saltab="market">Market Rate</div>
-            <div class="tab" data-saltab="numbers">Your Numbers</div>
-            <div class="tab" data-saltab="scripts">Negotiation Scripts</div>
-            <div class="tab" data-saltab="traps">Traps to Avoid</div>
-          </div>
-          <div id="salary-tab-positioning" class="stream-output salary-tab-content"></div>
-          <div id="salary-tab-market"      class="stream-output salary-tab-content" style="display:none;"></div>
-          <div id="salary-tab-numbers"     class="stream-output salary-tab-content" style="display:none;"></div>
-          <div id="salary-tab-scripts"     class="stream-output salary-tab-content" style="display:none;"></div>
-          <div id="salary-tab-traps"       class="stream-output salary-tab-content" style="display:none;"></div>
-          <div id="salary-output"          class="stream-output" style="display:none;"></div>
-          <div id="salary-active-output"   style="display:none;"></div>
+          <button class="copy-btn" onclick="copyResult('salary-output')">Copy</button>
+          <div class="stream-output" id="salary-output"></div>
         </div>
       </div>
 
@@ -2046,155 +1608,6 @@ EDUCATION: MBA Design Strategy, California College of the Arts | BBA, Howard Uni
   }
 };
 
-// Deep copy of original resume texts for restore-to-default
-const RESUME_DEFAULTS = {};
-Object.keys(RESUMES).forEach(k => { RESUME_DEFAULTS[k] = RESUMES[k].text; });
-
-
-// ─── RESUME UPLOAD SYSTEM ─────────────────────────────────────────────────────
-const RESUME_KEYS = [
-  { key: 'principal_ds',       label: 'Principal Design Strategist' },
-  { key: 'principal_ds_brief', label: 'Design Strategist (Brief)' },
-  { key: 'service_designer',   label: 'Principal Service Designer' },
-  { key: 'product_designer',   label: 'Lead Product Designer' },
-  { key: 'chief_of_staff',     label: 'Chief of Staff' }
-];
-
-const LS_PREFIX = 'cara_resume_';
-
-// Load any saved custom resumes from localStorage, overriding hardcoded text
-function loadSavedResumes() {
-  RESUME_KEYS.forEach(({ key }) => {
-    const saved = localStorage.getItem(LS_PREFIX + key);
-    if (saved) {
-      RESUMES[key].text = saved;
-      RESUMES[key].custom = true;
-    }
-  });
-}
-
-// Save a resume text to localStorage and update RESUMES object
-function saveResume(key, text) {
-  localStorage.setItem(LS_PREFIX + key, text);
-  RESUMES[key].text = text;
-  RESUMES[key].custom = true;
-}
-
-// Clear a single resume slot back to default
-function clearResume(key) {
-  localStorage.removeItem(LS_PREFIX + key);
-  const orig = RESUME_DEFAULTS[key];
-  RESUMES[key].text = orig;
-  RESUMES[key].custom = false;
-}
-
-// Extract text from PDF using pdf.js
-async function extractPdfText(file) {
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  let text = '';
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    text += content.items.map(item => item.str).join(' ') + '\n';
-  }
-  return text.trim();
-}
-
-// Build upload slots UI
-function buildUploadSlots() {
-  // Slots are static HTML — just refresh the status badges and previews
-  RESUME_KEYS.forEach(({ key }) => {
-    const isCustom = !!RESUMES[key].custom;
-    const statusEl  = document.getElementById('status-' + key);
-    const previewEl = document.getElementById('preview-' + key);
-    const removeBtn = document.getElementById('remove-' + key);
-    if (statusEl) {
-      statusEl.className = 'resume-slot-status ' + (isCustom ? 'slot-status-custom' : 'slot-status-default');
-      statusEl.textContent = isCustom ? '✓ Your version loaded' : 'Using built-in default';
-    }
-    if (previewEl) {
-      if (isCustom) {
-        previewEl.className = 'slot-preview has-text';
-        previewEl.textContent = RESUMES[key].text.substring(0, 220).replace(/\s+/g, ' ') + '…';
-      } else {
-        previewEl.className = 'slot-preview';
-        previewEl.textContent = 'No file uploaded yet.';
-      }
-    }
-    if (removeBtn) removeBtn.style.display = isCustom ? 'inline-block' : 'none';
-  });
-}
-
-
-async function handleFileUpload(key, file) {
-  if (!file) return;
-  const btn = document.querySelector('#slot-' + key + ' .upload-trigger-btn');
-  if (btn) { btn.textContent = 'Reading…'; btn.disabled = true; }
-  try {
-    let text = '';
-    if (file.name.endsWith('.pdf')) {
-      if (typeof pdfjsLib === 'undefined') {
-        alert('PDF library not loaded. Please paste your resume text instead using the "Paste Text" button.');
-        buildUploadSlots();
-        return;
-      }
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      text = await extractPdfText(file);
-    } else {
-      text = await file.text();
-    }
-    if (!text || text.length < 50) {
-      alert('Could not extract text from this file. Try the "Paste Text" option instead.');
-      buildUploadSlots();
-      return;
-    }
-    saveResume(key, text);
-    buildUploadSlots();
-  } catch (err) {
-    alert('Could not read this file. Try the "Paste Text" button instead.');
-  } finally {
-    const btn = document.querySelector('#slot-' + key + ' .upload-trigger-btn');
-    if (btn) { btn.textContent = '⬆ Upload PDF / TXT'; btn.disabled = false; }
-    // Reset file input so same file can be re-uploaded
-    const fi = document.getElementById('file-' + key);
-    if (fi) fi.value = '';
-  }
-}
-
-function showSlotSuccess(key, filename) {
-  const header = document.querySelector('#slot-' + key + ' .resume-slot-status');
-  if (header) {
-    header.className = 'resume-slot-status slot-status-custom';
-    header.textContent = '✓ Saved: ' + filename;
-  }
-}
-
-function showPasteArea(key) {
-  const area = document.getElementById('paste-area-' + key);
-  if (area) area.style.display = 'block';
-}
-
-function hidePasteArea(key) {
-  const area = document.getElementById('paste-area-' + key);
-  if (area) area.style.display = 'none';
-}
-
-function savePastedResume(key) {
-  const text = document.getElementById('paste-text-' + key).value.trim();
-  if (!text || text.length < 50) { alert('Please paste at least a few lines of your resume.'); return; }
-  saveResume(key, text);
-  hidePasteArea(key);
-  buildUploadSlots();
-}
-
-function clearSlot(key) {
-  if (!confirm('Remove your uploaded version and go back to the built-in default?')) return;
-  clearResume(key);
-  buildUploadSlots();
-}
-
-
 const CARA_BIO = `Cara A. Brown, MBA is a Principal Design Strategist and Service Designer with 15+ years of experience. Website: caraabrown.com. She specializes in enterprise-scale strategy, service design, and systems transformation. Key career highlights: led CEO-identified Kroger initiative driving NPS from -36 to +49, quantified $270M/week in enterprise risk and drove solutions, co-authored 2024-2027 Transportation Strategy, selected for Kroger-Albertsons merger integration team, secured $500K grant at EOYDC, sustained a 15+ year art gallery business scaling to international Art Basel presence. Education: MBA Design Strategy (California College of the Arts), BBA International Business & Marketing (Howard University). She is known for translating ambiguity into executive-ready narratives and measurable outcomes.`;
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
@@ -2337,7 +1750,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
 
   const systemPrompt = `You are an expert ATS (Applicant Tracking System) analyst and resume coach. You analyze resumes against job descriptions with deep expertise in keyword matching, skills alignment, and recruiter psychology. Be precise, data-driven, and honest. Never inflate scores or suggest fabricating experience. Score what is actually there.`;
 
-  const resumeBlock = resumeTexts.map(r => r.label + '\n---\n' + r.text).join('\n\n======\n\n');
+  const resumeBlock = resumeTexts.map((r, i) => 'RESUME ' + (i+1) + ': ' + r.label + '\n---\n' + r.text).join('\n\n======\n\n');
 
   const userMsg = [
     'JOB DESCRIPTION:',
@@ -2345,7 +1758,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     savedRoleName ? 'Role: ' + savedRoleName : null,
     'RESUMES TO ANALYZE:',
     resumeBlock,
-    'For each resume give an ATS score 0-100% based strictly on what is actually in the resume — do not inflate scores. Output each score on its own line exactly like: SCORE: [Resume Name] = [XX]%\n\nFor each resume also output the realistic improved score if honest keyword wordsmithing were applied: IMPROVED_SCORE: [Resume Name] = [XX]%\n\nThen output the following four sections with EXACTLY these headers:\n\n## BEST MATCH\n[Which resume scored highest and a 2-3 sentence explanation of why it fits best]\n\n## MISSING KEYWORDS\n[Bulleted list of keywords from the JD not present in the resumes]\n\n## RED FLAGS & WINS\n[Use ✅ for strengths and ❌ for gaps — one per line]\n\n## FASTEST PATH TO 95%+\n[Specific, honest edits that could raise the score using only wordsmithing of existing experience]\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume.'
+    'For each resume give an ATS score 0-100% based strictly on what is actually in the resume — do not inflate scores. Output each score on its own line exactly like: SCORE: [Resume Name] = [XX]%\n\nFor each resume also output the realistic improved score if honest keyword wordsmithing were applied, on its own line exactly like: IMPROVED_SCORE: [Resume Name] = [XX]%\n\nThen: which resume is the best match and why, and the top missing keywords from the JD.\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume. The score reflects real alignment — not a target.'
   ].filter(Boolean).join('\n\n');
 
   try {
@@ -2385,7 +1798,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
               if (name.includes(k) || k.includes(name)) { improved = v; break; }
             }
           }
-          const improvedHtml = improved ? `<div class="score-improved-inline">↑ ${improved}% with edits</div>` : '';
+          const improvedHtml = improved ? `<div class="score-improved">↑ ${improved}% with edits</div>` : '';
           document.getElementById('score-cards-container').innerHTML += `
             <div class="score-card">
               <div class="score-num ${colorClass}">${pct}%</div>
@@ -2405,50 +1818,49 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
         if (highestKey) autoSelectBestResume(highestKey, highestLabel);
       }
       fullText = text;
-      // Live stream into best tab while loading
-      document.getElementById('ats-best-output').textContent = text;
+      // Strip scores and detailed analysis/winner section, keep only Red Flags & Summary
+      let display = text;
+      // Remove SCORE lines
+      display = display.replace(/SCORE:[^\n]*\n?/g, '');
+      // Remove everything from DETAILED ANALYSIS / WINNER up to RED FLAGS
+      display = display.replace(/#+\s*(DETAILED ANALYSIS|WINNER)[\s\S]*?(?=#+\s*(RED FLAGS|SUMMARY|$))/gi, '');
+      // Render tabs for Red Flags and Summary
+      const rfMatch = display.match(/#+\s*RED FLAGS[\s\S]*?(?=#+\s*SUMMARY|$)/i);
+      const sumMatch = display.match(/#+\s*SUMMARY[\s\S]*/i);
+      if (rfMatch || sumMatch) {
+        let tabHtml = '<div class="tab-row ats-detail-tabs" style="margin-bottom:1rem;">';
+        if (rfMatch) tabHtml += '<div class="tab active" data-atstab="rf">Red Flags & Wins</div>';
+        if (sumMatch) tabHtml += '<div class="tab" data-atstab="sum">Fastest Path to 95%+</div>';
+        tabHtml += '</div>';
+        function fmtAtsSection(raw) {
+          if (!raw) return '';
+          // Turn lines into styled blocks
+          return raw.split('\n').map(line => {
+            const t = line.trim();
+            if (!t) return '';
+            if (t.startsWith('✅')) return '<div class="ats-line ats-win">' + escHtml(t) + '</div>';
+            if (t.startsWith('⚠️') || t.startsWith('❌')) return '<div class="ats-line ats-warn">' + escHtml(t) + '</div>';
+            if (/^#{1,3}\s/.test(t)) return '<div class="ats-heading">' + escHtml(t.replace(/^#+\s*/,'')) + '</div>';
+            if (t.startsWith('**') && t.endsWith('**')) return '<div class="ats-subhead">' + escHtml(t.replace(/\*\*/g,'')) + '</div>';
+            return '<div class="ats-line">' + escHtml(t) + '</div>';
+          }).join('');
+        }
+        tabHtml += rfMatch ? '<div class="ats-tab-content" data-atscontent="rf" style="display:block"><div class="ats-formatted">' + fmtAtsSection(rfMatch[0].trim()) + '</div></div>' : '';
+        tabHtml += sumMatch ? '<div class="ats-tab-content" data-atscontent="sum" style="display:none"><div class="ats-formatted">' + fmtAtsSection(sumMatch[0].trim()) + '</div></div>' : '';
+        result.innerHTML = tabHtml;
+        result.querySelectorAll('.ats-detail-tabs .tab').forEach(t => {
+          t.addEventListener('click', () => {
+            result.querySelectorAll('.ats-detail-tabs .tab').forEach(x => x.classList.remove('active'));
+            t.classList.add('active');
+            result.querySelectorAll('.ats-tab-content').forEach(x => x.style.display = 'none');
+            const target = result.querySelector('[data-atscontent="' + t.dataset.atstab + '"]');
+            if (target) target.style.display = 'block';
+          });
+        });
+      } else {
+        result.textContent = display.trim();
+      }
     });
-
-    // After streaming completes, split into static tabs
-    function atsSection(txt, startRe, endRe) {
-      const sm = txt.search(startRe);
-      if (sm < 0) return '';
-      const em = endRe ? txt.search(endRe) : -1;
-      return (em > sm ? txt.substring(sm, em) : txt.substring(sm))
-        .replace(/^##\s*/gm,'').replace(/\*\*/g,'').trim();
-    }
-
-    const bestTxt     = atsSection(fullText, /##\s*BEST MATCH/i,           /##\s*MISSING KEYWORDS/i);
-    const kwTxt       = atsSection(fullText, /##\s*MISSING KEYWORDS/i,      /##\s*RED FLAGS/i);
-    const flagsTxt    = atsSection(fullText, /##\s*RED FLAGS/i,              /##\s*FASTEST PATH/i);
-    const pathTxt     = atsSection(fullText, /##\s*FASTEST PATH/i,          null);
-
-    document.getElementById('ats-best-output').textContent     = bestTxt     || fullText;
-    document.getElementById('ats-keywords-output').textContent = kwTxt       || '';
-    document.getElementById('ats-flags-output').textContent    = flagsTxt    || '';
-    document.getElementById('ats-path-output').textContent     = pathTxt     || '';
-
-    // Wire up static tabs
-    document.querySelectorAll('#ats-static-tabs .tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('#ats-static-tabs .tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        const map = {
-          best:     document.getElementById('ats-best-output'),
-          keywords: document.getElementById('ats-keywords-output'),
-          flags:    document.getElementById('ats-flags-output'),
-          path:     document.getElementById('ats-path-output')
-        };
-        Object.values(map).forEach(el => el.style.display = 'none');
-        const active = map[tab.dataset.atsstatic];
-        if (active) active.style.display = 'block';
-      });
-    });
-    // Ensure first tab is shown
-    ['ats-keywords-output','ats-flags-output','ats-path-output'].forEach(id => {
-      document.getElementById(id).style.display = 'none';
-    });
-    document.getElementById('ats-best-output').style.display = 'block';
 
   } catch (err) {
     showError('ats-error', 'Something went wrong: ' + err.message);
@@ -2549,34 +1961,7 @@ document.getElementById('gen-cl-btn').addEventListener('click', async () => {
   const jd = savedJD || document.getElementById('jd-text').value.trim();
   if (!jd) { showError('cl-error', 'Please save a job description in Step 01 first.'); return; }
 
-  // ── Edit 1: Determine resume source ─────────────────────────────────────────
-  const revisedText = document.getElementById('updated-resume-text')
-    ? document.getElementById('updated-resume-text').value.trim() : '';
-  const recipientName = (document.getElementById('cl-recipient-name').value || '').trim();
-  const anecdote = (document.getElementById('cl-anecdote').value || '').trim();
-
-  let resumeText, resumeSourceLabel;
-  if (revisedText.length > 100) {
-    resumeText = revisedText;
-    resumeSourceLabel = '✓ Using your revised resume from Step 04';
-  } else if (atsHighestResume && RESUMES[atsHighestResume]) {
-    resumeText = RESUMES[atsHighestResume].text;
-    resumeSourceLabel = '✓ Using ' + RESUMES[atsHighestResume].label + ' — highest ATS score';
-  } else {
-    resumeText = RESUMES[selectedResumeForCL].text;
-    resumeSourceLabel = '✓ Using ' + RESUMES[selectedResumeForCL].label + ' — manually selected';
-  }
-  const hintEl = document.getElementById('cl-source-hint');
-  if (hintEl) { hintEl.textContent = resumeSourceLabel; hintEl.style.display = 'block'; }
-
-  const companyName = savedRoleName
-    ? savedRoleName.replace(/^.+?(?:at|@|,)\s*/i, '').trim() || savedRoleName
-    : 'the company';
-
-  const greeting = recipientName
-    ? 'Dear ' + recipientName + ','
-    : 'Dear Hiring Team at ' + companyName + ',';
-
+  const resume = RESUMES[selectedResumeForCL];
   const toneMap = {
     strategic: 'strategic, precise, and confident — demonstrating systems-level thinking and enterprise impact without being cold. Authoritative but not stiff.',
     warm: 'warm, personal, and human — showing genuine enthusiasm and personality while maintaining professionalism.',
@@ -2587,63 +1972,48 @@ document.getElementById('gen-cl-btn').addEventListener('click', async () => {
   hideError('cl-error');
   document.getElementById('cl-result').classList.remove('visible');
 
-  const systemPrompt = `You are an expert cover letter writer who specializes in crafting highly personalized, compelling cover letters for senior design strategy and service design professionals. You never write generic letters — every sentence is specific, grounded in actual accomplishments, and directly relevant to the target role.
-
-CRITICAL FORMATTING RULES — follow exactly:
-- NEVER use asterisks (**) anywhere in the letter
-- Use this exact greeting: ${greeting}
-- After 2-3 body paragraphs, insert a plain-text skills alignment table formatted like this (no markdown, no asterisks, aligned with spaces):
-
-YOUR NEEDS                          MY PROVEN ABILITIES
-─────────────────────────────────   ─────────────────────────────────────────
-[top need from JD]                  [specific accomplishment from resume]
-[second need from JD]               [specific accomplishment from resume]
-[third need from JD]                [specific accomplishment from resume]
-
-- After the table, write one closing paragraph then the sign-off
-- Sign off: Respectfully,\n\nCara A. Brown, MBA\n(202) 489-9901\nhi@caraabrown.com\nlinkedin.com/in/caraabrown\ncaraabrown.com
-- Do NOT double-space the signature block — each line on its own line, no blank lines between them
-- Do not use [Date] or any placeholder — use the actual date provided`;
-
-  const anecdoteBlock = anecdote
-    ? `\n\nPERSONAL CONTEXT TO FOLD IN NATURALLY:\n${anecdote}\n(Weave this into the letter where it fits — do not quote it verbatim)`
-    : '';
+  const systemPrompt = `You are an expert cover letter writer who specializes in crafting highly personalized, compelling cover letters for senior design strategy and service design professionals. You never write generic letters — every sentence is specific, grounded in actual accomplishments, and directly relevant to the target role.`;
 
   const userMsg = `Write a compelling cover letter for Cara Brown applying to the following role.
 
 JOB DESCRIPTION:
 ${jd}
-${savedRoleName ? 'Role: ' + savedRoleName : ''}
-${savedJDUrl ? 'URL: ' + savedJDUrl : ''}
+${savedRoleName ? `Role: ${savedRoleName}` : ''}
+${savedJDUrl ? `URL: ${savedJDUrl}` : ''}
 
 CARA'S RESUME (use this as the primary source):
-${resumeText}
+${resume.text}
 
 ADDITIONAL CONTEXT ABOUT CARA:
 ${CARA_BIO}
 Website: caraabrown.com — case studies and work samples available there.
-${anecdoteBlock}
 
 TONE: ${toneMap[selectedCLTone]}
 
-DATE: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}
-
 REQUIREMENTS:
-- Start with the date, then a blank line, then the greeting: ${greeting}
 - Address the specific requirements in the JD directly
-- Reference 2-3 specific, quantified accomplishments from the resume
-- Connect Cara's background explicitly to what this company needs
-- Insert the skills alignment table between the body paragraphs and closing paragraph
+- Reference 2-3 specific, quantified accomplishments from the resume that are most relevant
+- Connect Cara's background explicitly to what the company/role needs
 - Mention caraabrown.com naturally as a source for case studies/portfolio
 - Do NOT use clichés like "I am excited to apply" or "I am a perfect fit"
-- Do NOT use asterisks anywhere
-- Length: 3-4 tight paragraphs + table + closing`;
+- Length: 3-4 tight paragraphs
+- Do not include [placeholder] brackets — write the full letter with all details filled in
+- End with a strong, confident closing
+- Format as a proper letter. Use today's date: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}. Include greeting, body, closing
+- Do not use [Date] or any placeholder for the date — use the actual date provided above
+- If you include a skill alignment section (e.g. "Your Needs" vs "My Proven Abilities"), format it as an HTML table like this:
+<table style="width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.85rem;"><tr style="border-bottom:2px solid #ccc;"><th style="text-align:left;padding:0.5rem 1rem 0.5rem 0;font-weight:600;white-space:nowrap;">YOUR NEEDS</th><th style="text-align:left;padding:0.5rem 0 0.5rem 1rem;font-weight:600;">MY PROVEN ABILITIES</th></tr><tr style="border-bottom:1px solid #eee;"><td style="padding:0.6rem 1rem 0.6rem 0;vertical-align:top;">Need here</td><td style="padding:0.6rem 0 0.6rem 1rem;vertical-align:top;">Ability here</td></tr></table>
+- Use that exact HTML table structure with inline styles. Do NOT use plain text columns or markdown tables.`;
 
   try {
     const output = document.getElementById('cl-output');
-    output.textContent = '';
+    output.innerHTML = '';
     document.getElementById('cl-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+    await callClaude(systemPrompt, userMsg, text => {
+      // Convert newlines to <br> and preserve HTML tables
+      const html = text.replace(/\n/g, '<br>');
+      output.innerHTML = html;
+    });
   } catch (err) {
     showError('cl-error', 'Something went wrong: ' + err.message);
     document.getElementById('cl-result').classList.remove('visible');
@@ -2877,34 +2247,17 @@ function getWeekStart() {
 }
 
 function updateTrackerStats() {
+  const total = jobs.length;
   const weekStart = getWeekStart();
+  const weekApps = jobs.filter(j => {
+    const d = new Date(j.dateAdded || j.dateApplied || j.dateAdded);
+    return d >= weekStart;
+  }).length;
+  const active = jobs.filter(j => (j.screening || j.interview) && !j.hired && !j.rejected).length;
 
-  // This-week stats
-  const weekJobs = jobs.filter(j => new Date(j.dateAdded || j.dateApplied) >= weekStart);
-  const weekApps      = weekJobs.length;
-  const weekScreens   = weekJobs.filter(j => j.screening).length;
-  const weekInterviews= weekJobs.filter(j => j.interview).length;
-  const active        = jobs.filter(j => (j.screening || j.interview) && !j.hired && !j.rejected).length;
-
-  document.getElementById('stat-week').textContent          = weekApps;
-  document.getElementById('stat-week-screen').textContent   = weekScreens;
-  document.getElementById('stat-week-interview').textContent= weekInterviews;
-  document.getElementById('stat-active').textContent        = active;
-
-  // All-time stats
-  const total          = jobs.length;
-  const totalScreens   = jobs.filter(j => j.screening).length;
-  const totalInterviews= jobs.filter(j => j.interview).length;
-  const totalHired     = jobs.filter(j => j.hired).length;
-
-  document.getElementById('stat-total').textContent          = total;
-  document.getElementById('stat-total-screen').textContent   = totalScreens;
-  document.getElementById('stat-total-interview').textContent= totalInterviews;
-
-  if (totalHired > 0) {
-    document.getElementById('stat-hired-card').style.display = 'block';
-    document.getElementById('stat-hired').textContent = totalHired;
-  }
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-week').textContent = weekApps;
+  document.getElementById('stat-active').textContent = active;
 
   // Weeks since first application
   if (jobs.length > 0) {
@@ -2913,6 +2266,7 @@ function updateTrackerStats() {
     const now = new Date();
     const diffDays = Math.floor((now - firstDate) / (1000 * 60 * 60 * 24));
     const weeks = Math.floor(diffDays / 7);
+    const days = diffDays % 7;
     document.getElementById('stat-weeks').textContent = weeks === 0 ? '<1' : weeks;
     document.getElementById('stat-since').textContent = weeks === 0
       ? 'Started ' + diffDays + ' day(s) ago'
@@ -2922,16 +2276,10 @@ function updateTrackerStats() {
     document.getElementById('stat-since').textContent = 'Since first application';
   }
 
-  // Goal bar — daily goal × 7
-  const dailyGoalEl = document.getElementById('daily-goal-input');
-  const dailyGoal = dailyGoalEl ? (parseInt(dailyGoalEl.value) || 5) : 5;
-  const weekGoal = dailyGoal * 7;
-  const pct = Math.min(100, Math.round((weekApps / weekGoal) * 100));
+  // Goal bar (35/week)
+  const pct = Math.min(100, Math.round((weekApps / 35) * 100));
   document.getElementById('goal-bar-fill').style.width = pct + '%';
-  document.getElementById('goal-bar-pct').textContent = weekApps + ' / ' + weekGoal + '  (' + pct + '%)';
-  // Update sub-label on the week stat card
-  const weekGoalEl = document.getElementById('stat-week-goal');
-  if (weekGoalEl) weekGoalEl.textContent = 'Goal: ' + weekGoal + ' / week';
+  document.getElementById('goal-bar-pct').textContent = weekApps + ' / 35  (' + pct + '%)';
 }
 
 function formatDate(isoStr) {
@@ -2962,47 +2310,40 @@ function renderJobs() {
 
   tbody.innerHTML = sorted.map(j => {
     const isHired = j.hired ? 'hired-row' : '';
-    const urlCell = j.url ? `<a class="job-link" href="${j.url}" target="_blank">↗</a>` : '';
+    const urlCell = j.url
+      ? `<a class="job-link" href="${j.url}" target="_blank">↗</a>`
+      : '';
     const isRejected = j.rejected ? 'style="opacity:0.5;"' : '';
-    const howApplied = escHtml(j.howApplied || '—');
-    // Detail row with salary, location, work type
-    const detailParts = [
-      j.salary ? `<span class="detail-chip">💰 ${escHtml(j.salary)}</span>` : '',
-      j.location ? `<span class="detail-chip">📍 ${escHtml(j.location)}</span>` : '',
-      j.workType ? `<span class="detail-chip">🏠 ${escHtml(j.workType)}</span>` : '',
-    ].filter(Boolean).join('');
-    const detailRow = detailParts ? `<tr class="job-detail-row ${isHired}" data-detail-id="${j.id}"><td colspan="9"><div class="job-detail-chips">${detailParts}</div></td></tr>` : '';
-    return `<tr class="${isHired} job-main-row" data-id="${j.id}" ${isRejected} onclick="toggleDetailRow('${j.id}')">
+    return `<tr class="${isHired}" data-id="${j.id}" ${isRejected}>
       <td><strong>${escHtml(j.company)}</strong> ${urlCell}</td>
       <td>${escHtml(j.role)}</td>
       <td><span class="applied-date">${formatDate(j.dateAdded || j.dateApplied || new Date().toISOString())}</span></td>
-      <td style="font-size:0.75rem;color:var(--mid);">${howApplied}</td>
       <td style="text-align:center;">
         <div class="stage-check-item">
-          <input type="checkbox" ${j.screening ? 'checked' : ''} onchange="event.stopPropagation();toggleStage('${j.id}','screening',this.checked)">
+          <input type="checkbox" ${j.screening ? 'checked' : ''} onchange="toggleStage('${j.id}','screening',this.checked)">
           <span>Screen</span>
         </div>
       </td>
       <td style="text-align:center;">
         <div class="stage-check-item">
-          <input type="checkbox" ${j.interview ? 'checked' : ''} onchange="event.stopPropagation();toggleStage('${j.id}','interview',this.checked)">
+          <input type="checkbox" ${j.interview ? 'checked' : ''} onchange="toggleStage('${j.id}','interview',this.checked)">
           <span>Interview</span>
         </div>
       </td>
       <td style="text-align:center;">
         <div class="stage-check-item">
-          <input type="checkbox" ${j.rejected ? 'checked' : ''} onchange="event.stopPropagation();toggleStage('${j.id}','rejected',this.checked)">
+          <input type="checkbox" ${j.rejected ? 'checked' : ''} onchange="toggleStage('${j.id}','rejected',this.checked)">
           <span>Rejected</span>
         </div>
       </td>
       <td style="text-align:center;">
         <div class="stage-check-item">
-          <input type="checkbox" ${j.hired ? 'checked' : ''} onchange="event.stopPropagation();toggleStage('${j.id}','hired',this.checked)">
+          <input type="checkbox" ${j.hired ? 'checked' : ''} onchange="toggleStage('${j.id}','hired',this.checked)">
           <span>Hired!</span>
         </div>
       </td>
-      <td><button class="delete-job-btn" onclick="event.stopPropagation();deleteJob('${j.id}')" title="Remove">✕</button></td>
-    </tr>${detailRow}`;
+      <td><button class="delete-job-btn" onclick="deleteJob('${j.id}')" title="Remove">✕</button></td>
+    </tr>`;
   }).join('');
 }
 
@@ -3027,58 +2368,6 @@ function deleteJob(id) {
   saveJobs();
   renderJobs();
 }
-
-function toggleDetailRow(id) {
-  const detailRow = document.querySelector(`[data-detail-id="${id}"]`);
-  if (detailRow) detailRow.style.display = detailRow.style.display === 'none' ? 'table-row' : 'none';
-}
-
-// Manual add form wiring
-document.getElementById('manual-add-btn').addEventListener('click', () => {
-  const wrap = document.getElementById('manual-add-wrap');
-  wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
-  if (wrap.style.display === 'block') {
-    // Set today's date as default
-    document.getElementById('man-date').value = new Date().toISOString().split('T')[0];
-    document.getElementById('man-company').focus();
-  }
-});
-
-document.getElementById('man-add-cancel-btn').addEventListener('click', () => {
-  document.getElementById('manual-add-wrap').style.display = 'none';
-});
-
-document.getElementById('man-add-save-btn').addEventListener('click', () => {
-  const company = document.getElementById('man-company').value.trim();
-  const role    = document.getElementById('man-role').value.trim();
-  if (!company || !role) { alert('Company and Role are required.'); return; }
-  const dateVal = document.getElementById('man-date').value;
-  const newJob = {
-    id:          Date.now().toString(),
-    company,
-    role,
-    url:         document.getElementById('man-url').value.trim(),
-    howApplied:  document.getElementById('man-how-applied').value,
-    workType:    document.getElementById('man-work-type').value,
-    location:    document.getElementById('man-location').value.trim(),
-    salary:      document.getElementById('man-salary').value.trim(),
-    dateAdded:   dateVal ? new Date(dateVal).toISOString() : new Date().toISOString(),
-    screening:   false,
-    interview:   false,
-    rejected:    false,
-    hired:       false
-  };
-  jobs.unshift(newJob);
-  saveJobs();
-  renderJobs();
-  // Reset + hide form
-  ['man-company','man-role','man-url','man-location','man-salary'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('man-how-applied').value = '';
-  document.getElementById('man-work-type').value = '';
-  document.getElementById('manual-add-wrap').style.display = 'none';
-});
 
 // Jobs added automatically from Step 01
 
@@ -3264,21 +2553,6 @@ document.querySelectorAll('#salary-mode-tabs .tab').forEach(tab => {
   });
 });
 
-// Salary result tabs — event delegation so they work before first run
-document.getElementById('salary-result-tabs').addEventListener('click', e => {
-  const tab = e.target.closest('.tab');
-  if (!tab) return;
-  document.querySelectorAll('#salary-result-tabs .tab').forEach(t => t.classList.remove('active'));
-  tab.classList.add('active');
-  ['positioning','market','numbers','scripts','traps'].forEach(key => {
-    const el = document.getElementById('salary-tab-' + key);
-    if (el) el.style.display = tab.dataset.saltab === key ? 'block' : 'none';
-  });
-  const activeEl = document.getElementById('salary-tab-' + tab.dataset.saltab);
-  const activeOut = document.getElementById('salary-active-output');
-  if (activeEl && activeOut) activeOut.textContent = activeEl.textContent;
-});
-
 document.getElementById('gen-salary-btn').addEventListener('click', async () => {
   const role = document.getElementById('sal-role').value.trim();
   if (!role) { showError('salary-error', 'Please enter the role title.'); return; }
@@ -3302,47 +2576,14 @@ document.getElementById('gen-salary-btn').addEventListener('click', async () => 
     offered ? 'Offered or mentioned: ' + offered : null,
     situation ? 'Situation: ' + situation : null,
     'Cara: 15+ years, MBA, Principal-level, $270M enterprise impact, C-suite partnerships.',
-    'Output EXACTLY these five sections with these headers:\n\n## FINAL POSITIONING\n[2-3 sentence confident summary of how Cara should position herself and what number she should lead with. Be direct.]\n\n## MARKET RATE\n[Realistic salary ranges by level and sector for this role]\n\n## CARAS NUMBERS\n[Target, floor, and stretch — specific dollar amounts]\n\n## NEGOTIATION SCRIPTS\n[Exact language for: salary expectations question, countering a lowball, asking for time, negotiating total comp]\n\n## TRAPS TO AVOID\n[3-4 specific mistakes and how to handle them]'
+    'Provide: 1. MARKET RATE — realistic ranges by level and sector  2. CARAS NUMBERS — target, floor, stretch. Be direct with specific dollar amounts.  3. NEGOTIATION SCRIPTS — exact language for: salary expectations question, countering a lowball, asking for time, negotiating total comp beyond base  4. TRAPS TO AVOID — 3-4 specific mistakes and how to handle them'
   ].filter(Boolean).join('\n\n');
-
-  // Clear all tab outputs
-  ['positioning','market','numbers','scripts','traps'].forEach(tab => {
-    const el = document.getElementById('salary-tab-' + tab);
-    if (el) { el.textContent = ''; el.style.display = 'none'; }
-  });
-  // Show first tab active
-  document.getElementById('salary-tab-positioning').style.display = 'block';
-  document.querySelectorAll('#salary-result-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===0));
-
+  
   try {
-    const rawOut = document.getElementById('salary-output');
-    rawOut.textContent = '';
+    const output = document.getElementById('salary-output');
+    output.textContent = '';
     document.getElementById('salary-result').classList.add('visible');
-    let fullSalText = '';
-    await callClaude(systemPrompt, userMsg, text => {
-      fullSalText = text;
-      // Live stream into positioning tab
-      document.getElementById('salary-tab-positioning').textContent = text;
-    });
-
-    // Split into sections
-    function salSection(txt, startRe, endRe) {
-      const sm = txt.search(startRe);
-      if (sm < 0) return txt;
-      const em = endRe ? txt.search(endRe) : -1;
-      return (em > sm ? txt.substring(sm, em) : txt.substring(sm))
-        .replace(/^##\s*/gm,'').replace(/\*\*/g,'').trim();
-    }
-    document.getElementById('salary-tab-positioning').textContent = salSection(fullSalText, /##\s*FINAL POSITIONING/i, /##\s*MARKET RATE/i);
-    document.getElementById('salary-tab-market').textContent      = salSection(fullSalText, /##\s*MARKET RATE/i,       /##\s*CARAS NUMBERS/i);
-    document.getElementById('salary-tab-numbers').textContent     = salSection(fullSalText, /##\s*CARAS NUMBERS/i,     /##\s*NEGOTIATION SCRIPTS/i);
-    document.getElementById('salary-tab-scripts').textContent     = salSection(fullSalText, /##\s*NEGOTIATION SCRIPTS/i, /##\s*TRAPS TO AVOID/i);
-    document.getElementById('salary-tab-traps').textContent       = salSection(fullSalText, /##\s*TRAPS TO AVOID/i,    null);
-
-    // Seed active output for copy
-    document.getElementById('salary-active-output').textContent =
-      document.getElementById('salary-tab-positioning').textContent;
-
+    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
   } catch (err) {
     showError('salary-error', 'Error: ' + err.message);
     document.getElementById('salary-result').classList.remove('visible');
@@ -3617,50 +2858,6 @@ document.getElementById('recheck-tabs').addEventListener('click', e => {
   });
 });
 
-// ─── QUOTE ROTATOR ───────────────────────────────────────────────────────────
-const QUOTES = [
-  { text: "The job search is a numbers game. Every 'no' is one closer to your 'yes'.", author: "Unknown" },
-  { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
-  { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-  { text: "Opportunities don't happen. You create them.", author: "Chris Grosser" },
-  { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
-  { text: "You are not your job rejection. You are the sum of everything you've built and learned.", author: "" },
-  { text: "Every expert was once a beginner. Every pro was once an amateur.", author: "Robin Sharma" },
-  { text: "Your next application could be the one that changes everything.", author: "" },
-  { text: "What you do today can improve all your tomorrows.", author: "Ralph Marston" },
-  { text: "The harder the battle, the sweeter the victory.", author: "Les Brown" },
-  { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
-  { text: "You have survived 100% of your worst days so far.", author: "" },
-  { text: "Your skills didn't disappear because someone didn't see them. Keep showing up.", author: "" },
-  { text: "A rejection is nothing more than a necessary step on the path to success.", author: "Bo Bennett" },
-  { text: "Persistence guarantees that results are inevitable.", author: "Paramahansa Yogananda" },
-  { text: "The resume gets you in the room. You close the deal.", author: "" },
-  { text: "Every application is an act of belief in yourself. Keep believing.", author: "" },
-  { text: "Courage doesn't always roar. Sometimes it's quietly sending one more application.", author: "" },
-];
-
-let quoteIndex = Math.floor(Math.random() * QUOTES.length);
-
-function showQuote() {
-  const q = QUOTES[quoteIndex];
-  const textEl = document.getElementById('quote-text');
-  const authEl = document.getElementById('quote-author');
-  if (!textEl) return;
-  textEl.style.opacity = '0';
-  authEl.style.opacity = '0';
-  setTimeout(() => {
-    textEl.textContent = '“' + q.text + '”';
-    authEl.textContent = q.author ? '— ' + q.author : '';
-    textEl.style.opacity = '1';
-    authEl.style.opacity = '1';
-  }, 400);
-  quoteIndex = (quoteIndex + 1) % QUOTES.length;
-}
-
-// Rotate every 8 seconds
-showQuote();
-setInterval(showQuote, 8000);
-
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 function downloadCLasPDF() {
   const text = document.getElementById('cl-output').innerText;
@@ -3692,40 +2889,11 @@ function copyResult(id) {
   if (!el) return;
   const text = el.textContent || el.innerText;
   navigator.clipboard.writeText(text).then(() => {
+    // find the copy button near this element
     const btn = el.closest('.result-box')?.querySelector('.copy-btn');
     if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
   });
 }
-
-// ─── PAGE INIT ───────────────────────────────────────────────────────────────
-// Script loads after all HTML (bottom of body), so DOM is already ready.
-loadSavedResumes();
-buildUploadSlots();
-
-// Wire daily goal input
-const savedGoal = localStorage.getItem('cara_daily_goal');
-if (savedGoal) {
-  const goalEl = document.getElementById('daily-goal-input');
-  if (goalEl) goalEl.value = savedGoal;
-}
-document.addEventListener('change', function(e) {
-  if (e.target && e.target.id === 'daily-goal-input') {
-    localStorage.setItem('cara_daily_goal', e.target.value);
-    updateTrackerStats();
-  }
-});
-
-// Load saved API key
-const savedKey = localStorage.getItem('cara_api_key');
-if (savedKey) {
-  const keyInput = document.getElementById('api-key-input');
-  if (keyInput) keyInput.value = savedKey;
-  const openBtn = document.getElementById('settings-open-btn');
-  if (openBtn) { openBtn.classList.add('key-set'); openBtn.textContent = '⚙ API Key ✓'; }
-  const ks = document.getElementById('key-status');
-  if (ks) { ks.className = 'key-status set'; ks.textContent = 'Key saved'; }
-}
-
 </script>
 </body>
 </html>
