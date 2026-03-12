@@ -322,6 +322,10 @@
     margin: 0.25rem 0 0.1rem;
     letter-spacing: 0.02em;
   }
+  .resume-mgr-row input:focus {
+    outline: none;
+    border-color: var(--black);
+  }
   .score-high { color: var(--green); }
   .score-mid  { color: var(--amber); }
   .score-low  { color: var(--red); }
@@ -889,6 +893,7 @@
   <nav>
     <div class="nav-section">Setup</div>
     <ul>
+      <li><a href="#" data-panel="my-resumes"><span class="num">00</span> My Resumes</a></li>
       <li><a href="#" class="active" data-panel="job-input"><span class="num">01</span> Job Description</a></li>
     </ul>
     <div class="nav-section">Analysis</div>
@@ -920,6 +925,26 @@
   <main>
 
     <!-- ── PANEL 1: JOB DESCRIPTION ── -->
+    <div class="panel" id="panel-my-resumes">
+      <div class="panel-title">My <em>Resumes</em></div>
+      <div class="divider"></div>
+      <div class="panel-desc">Rename resumes, edit their text, or add new ones. Changes are saved to your browser and appear across all toolkit steps.</div>
+
+      <div id="resume-manager-list"></div>
+
+      <div style="margin-top:1.5rem; border-top:1px solid var(--border); padding-top:1.5rem;">
+        <div class="panel-desc" style="margin-bottom:0.8rem; font-weight:500; color:var(--black);">Add a New Resume</div>
+        <label>Resume Name *</label>
+        <input type="text" id="new-resume-name" placeholder="e.g., VP of Strategy">
+        <label>Resume Text *</label>
+        <textarea id="new-resume-text" placeholder="Paste the full text of this resume…" rows="10"></textarea>
+        <div class="btn-row" style="margin-top:0.8rem;">
+          <button class="btn" id="add-resume-btn">Add Resume</button>
+        </div>
+        <div id="add-resume-msg" style="display:none;margin-top:0.8rem;color:var(--success);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;"></div>
+      </div>
+    </div>
+
     <div class="panel active" id="panel-job-input">
       <div class="panel-title">Job <em>Description</em></div>
       <div class="divider"></div>
@@ -949,13 +974,7 @@
       <div class="step-hint">Make sure you've saved a job description in step 01 before running this analysis.</div>
 
       <label>Resumes to analyze</label>
-      <div class="resume-pills">
-        <div class="pill" data-resume="principal_ds">Principal Design Strategist</div>
-        <div class="pill" data-resume="principal_ds_brief">Design Strategist (Brief)</div>
-        <div class="pill" data-resume="service_designer">Principal Service Designer</div>
-        <div class="pill" data-resume="product_designer">Lead Product Designer</div>
-        <div class="pill" data-resume="chief_of_staff">Chief of Staff</div>
-      </div>
+      <div class="resume-pills" id="ats-resume-pills"></div>
 
       <div class="btn-row">
         <button class="btn" id="run-ats-btn">Run ATS Analysis</button>
@@ -987,13 +1006,7 @@
       <div class="step-hint">Run the ATS Analysis first (Step 02) so this tool knows which resume scored highest. It will automatically use that resume as the base.</div>
 
       <label>Which resume to edit</label>
-      <div class="resume-pills" id="le-resume-pills">
-        <div class="pill selected" data-resume="principal_ds">Principal Design Strategist</div>
-        <div class="pill" data-resume="principal_ds_brief">Design Strategist (Brief)</div>
-        <div class="pill" data-resume="service_designer">Principal Service Designer</div>
-        <div class="pill" data-resume="product_designer">Lead Product Designer</div>
-        <div class="pill" data-resume="chief_of_staff">Chief of Staff</div>
-      </div>
+      <div class="resume-pills" id="le-resume-pills"></div>
 
       <div class="step-hint" id="le-auto-hint" style="display:none; border-color: var(--success); background: #f0f7f2;">
         ✓ Auto-selected <strong id="le-auto-resume-name"></strong> — the highest scorer from your ATS analysis.
@@ -1031,6 +1044,7 @@
       <div class="error-msg" id="recheck-error"></div>
 
       <div class="result-box" id="recheck-result">
+        <div class="score-cards" id="recheck-score-card" style="margin-bottom:1.2rem;"></div>
         <div class="tab-row" id="recheck-tabs" style="margin-bottom:1rem;">
           <div class="tab active" data-rcsec="keywords">Missing Keywords</div>
           <div class="tab" data-rcsec="improvement">Score Improvement</div>
@@ -1052,13 +1066,7 @@
       <div class="panel-desc">Generates a personalized cover letter using your resumes and website (caraabrown.com). The letter will reference specific accomplishments and tie them to the job requirements.</div>
 
       <label>Resume to reference</label>
-      <div class="resume-pills" id="cl-resume-pills">
-        <div class="pill selected" data-resume="principal_ds">Principal Design Strategist</div>
-        <div class="pill" data-resume="principal_ds_brief">Design Strategist (Brief)</div>
-        <div class="pill" data-resume="service_designer">Principal Service Designer</div>
-        <div class="pill" data-resume="product_designer">Lead Product Designer</div>
-        <div class="pill" data-resume="chief_of_staff">Chief of Staff</div>
-      </div>
+      <div class="resume-pills" id="cl-resume-pills"></div>
 
       <label>Tone preference</label>
       <div class="tab-row" id="cl-tone">
@@ -1250,12 +1258,7 @@
       </div>
 
       <label>Resume to draw stories from</label>
-      <div class="resume-pills" id="interview-resume-pills">
-        <div class="pill selected" data-resume="principal_ds">Principal Design Strategist</div>
-        <div class="pill" data-resume="service_designer">Principal Service Designer</div>
-        <div class="pill" data-resume="product_designer">Lead Product Designer</div>
-        <div class="pill" data-resume="chief_of_staff">Chief of Staff</div>
-      </div>
+      <div class="resume-pills" id="interview-resume-pills"></div>
 
       <label>Anything you want to make sure comes up? (optional)</label>
       <textarea id="interview-focus" placeholder="e.g., I want to make sure I highlight the Kroger NPS story and the $270M trailer finding. I'm nervous about the 'gap' question…" rows="4"></textarea>
@@ -1395,7 +1398,7 @@
 
 <script>
 // ─── RESUME CONTENT ───────────────────────────────────────────────────────────
-const RESUMES = {
+let RESUMES = {
   principal_ds: {
     label: "Principal Design Strategist",
     text: `CARA A. BROWN, MBA — PRINCIPAL DESIGN STRATEGIST + SERVICE DESIGN + ENTERPRISE STRATEGY
@@ -1608,6 +1611,179 @@ EDUCATION: MBA Design Strategy, California College of the Arts | BBA, Howard Uni
   }
 };
 
+// ─── RESUME MANAGEMENT ────────────────────────────────────────────────────────
+function loadCustomResumes() {
+  const saved = localStorage.getItem('cara_custom_resumes');
+  if (saved) {
+    try {
+      const custom = JSON.parse(saved);
+      for (const [key, val] of Object.entries(custom)) {
+        RESUMES[key] = val;
+      }
+    } catch(e) {}
+  }
+  // Load renamed labels
+  const renames = localStorage.getItem('cara_resume_labels');
+  if (renames) {
+    try {
+      const labels = JSON.parse(renames);
+      for (const [key, label] of Object.entries(labels)) {
+        if (RESUMES[key]) RESUMES[key].label = label;
+      }
+    } catch(e) {}
+  }
+  // Load text overrides for built-in resumes
+  const texts = localStorage.getItem('cara_resume_texts');
+  if (texts) {
+    try {
+      const overrides = JSON.parse(texts);
+      for (const [key, text] of Object.entries(overrides)) {
+        if (RESUMES[key]) RESUMES[key].text = text;
+      }
+    } catch(e) {}
+  }
+}
+loadCustomResumes();
+
+function saveResumeCustomizations() {
+  // Save custom resumes (non-default ones)
+  const defaultKeys = ['principal_ds','principal_ds_brief','service_designer','product_designer','chief_of_staff'];
+  const custom = {};
+  for (const [key, val] of Object.entries(RESUMES)) {
+    if (!defaultKeys.includes(key)) custom[key] = val;
+  }
+  localStorage.setItem('cara_custom_resumes', JSON.stringify(custom));
+  // Save all labels (including renames of defaults)
+  const labels = {};
+  for (const [key, val] of Object.entries(RESUMES)) {
+    labels[key] = val.label;
+  }
+  localStorage.setItem('cara_resume_labels', JSON.stringify(labels));
+  // Save text overrides for built-in resumes
+  const textOverrides = {};
+  for (const key of defaultKeys) {
+    if (RESUMES[key]) textOverrides[key] = RESUMES[key].text;
+  }
+  localStorage.setItem('cara_resume_texts', JSON.stringify(textOverrides));
+}
+
+function rebuildAllPills() {
+  const keys = Object.keys(RESUMES);
+  
+  // ATS pills (multi-select — all selected by default)
+  const atsC = document.getElementById('ats-resume-pills');
+  if (atsC) {
+    atsC.innerHTML = keys.map(k => `<div class="pill" data-resume="${k}">${escHtml(RESUMES[k].label)}</div>`).join('');
+    selectedResumesForATS.clear();
+  }
+  
+  // LE pills (single select, first selected)
+  const leC = document.getElementById('le-resume-pills');
+  if (leC) {
+    leC.innerHTML = keys.map((k,i) => `<div class="pill${i===0?' selected':''}" data-resume="${k}">${escHtml(RESUMES[k].label)}</div>`).join('');
+    selectedLeResume = keys[0];
+  }
+  
+  // CL pills (single select, first selected)
+  const clC = document.getElementById('cl-resume-pills');
+  if (clC) {
+    clC.innerHTML = keys.map((k,i) => `<div class="pill${i===0?' selected':''}" data-resume="${k}">${escHtml(RESUMES[k].label)}</div>`).join('');
+    selectedResumeForCL = keys[0];
+  }
+  
+  // Interview pills (single select, first selected)
+  const intC = document.getElementById('interview-resume-pills');
+  if (intC) {
+    intC.innerHTML = keys.map((k,i) => `<div class="pill${i===0?' selected':''}" data-resume="${k}">${escHtml(RESUMES[k].label)}</div>`).join('');
+    selectedInterviewResume = keys[0];
+  }
+}
+
+function renderResumeManager() {
+  const list = document.getElementById('resume-manager-list');
+  if (!list) return;
+  const defaultKeys = ['principal_ds','principal_ds_brief','service_designer','product_designer','chief_of_staff'];
+  let html = '';
+  for (const [key, val] of Object.entries(RESUMES)) {
+    const isCustom = !defaultKeys.includes(key);
+    html += `<div class="resume-mgr-item" data-key="${key}" style="border-bottom:1px solid var(--border);padding:0.8rem 0;">
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <input type="text" value="${escHtml(val.label)}" data-rename="${key}" style="flex:1;font-size:0.85rem;padding:0.4rem 0.6rem;border:1px solid var(--border);border-radius:4px;font-family:'Instrument Sans',sans-serif;">
+        <span style="font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--mid);letter-spacing:0.06em;text-transform:uppercase;white-space:nowrap;">${isCustom ? 'CUSTOM' : 'BUILT-IN'}</span>
+        <button onclick="toggleResumeText('${key}')" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.55rem;padding:0.3rem 0.6rem;color:var(--mid);letter-spacing:0.06em;text-transform:uppercase;" id="toggle-${key}">Edit Text</button>
+        ${isCustom ? `<button onclick="deleteResume('${key}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem;padding:0.2rem;">✕</button>` : ''}
+      </div>
+      <div id="text-${key}" style="display:none;margin-top:0.6rem;">
+        <textarea data-resumetext="${key}" rows="12" style="width:100%;font-size:0.8rem;font-family:'Instrument Sans',sans-serif;line-height:1.5;padding:0.6rem;border:1px solid var(--border);border-radius:4px;resize:vertical;">${escHtml(val.text)}</textarea>
+      </div>
+    </div>`;
+  }
+  html += `<div class="btn-row" style="margin-top:1rem;">
+    <button class="btn" id="save-resume-names-btn">Save Changes</button>
+  </div>
+  <div id="resume-names-saved" style="display:none;margin-top:0.6rem;color:var(--success);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;">✓ SAVED</div>`;
+  list.innerHTML = html;
+  
+  document.getElementById('save-resume-names-btn').addEventListener('click', () => {
+    document.querySelectorAll('[data-rename]').forEach(input => {
+      const key = input.dataset.rename;
+      if (RESUMES[key]) RESUMES[key].label = input.value.trim() || RESUMES[key].label;
+    });
+    document.querySelectorAll('[data-resumetext]').forEach(ta => {
+      const key = ta.dataset.resumetext;
+      if (RESUMES[key]) RESUMES[key].text = ta.value;
+    });
+    saveResumeCustomizations();
+    rebuildAllPills();
+    const msg = document.getElementById('resume-names-saved');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 2500);
+  });
+}
+
+function toggleResumeText(key) {
+  const el = document.getElementById('text-' + key);
+  if (!el) return;
+  const visible = el.style.display !== 'none';
+  el.style.display = visible ? 'none' : 'block';
+  const btn = document.getElementById('toggle-' + key);
+  if (btn) btn.textContent = visible ? 'Edit Text' : 'Collapse';
+}
+
+function deleteResume(key) {
+  if (!confirm('Delete this resume?')) return;
+  delete RESUMES[key];
+  saveResumeCustomizations();
+  rebuildAllPills();
+  renderResumeManager();
+}
+
+document.getElementById('add-resume-btn').addEventListener('click', () => {
+  const name = document.getElementById('new-resume-name').value.trim();
+  const text = document.getElementById('new-resume-text').value.trim();
+  if (!name || !text) { 
+    const msg = document.getElementById('add-resume-msg');
+    msg.textContent = '⚠ Please enter both a name and resume text.';
+    msg.style.color = 'var(--red)';
+    msg.style.display = 'block';
+    return; 
+  }
+  const key = 'custom_' + Date.now();
+  RESUMES[key] = { label: name, text: text };
+  saveResumeCustomizations();
+  rebuildAllPills();
+  renderResumeManager();
+  document.getElementById('new-resume-name').value = '';
+  document.getElementById('new-resume-text').value = '';
+  const msg = document.getElementById('add-resume-msg');
+  msg.textContent = '✓ RESUME ADDED';
+  msg.style.color = 'var(--success)';
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 2500);
+});
+
+// Init pills and manager — called at end of script after all vars declared
+
 const CARA_BIO = `Cara A. Brown, MBA is a Principal Design Strategist and Service Designer with 15+ years of experience. Website: caraabrown.com. She specializes in enterprise-scale strategy, service design, and systems transformation. Key career highlights: led CEO-identified Kroger initiative driving NPS from -36 to +49, quantified $270M/week in enterprise risk and drove solutions, co-authored 2024-2027 Transportation Strategy, selected for Kroger-Albertsons merger integration team, secured $500K grant at EOYDC, sustained a 15+ year art gallery business scaling to international Art Basel presence. Education: MBA Design Strategy (California College of the Arts), BBA International Business & Marketing (Howard University). She is known for translating ambiguity into executive-ready narratives and measurable outcomes.`;
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
@@ -1630,23 +1806,23 @@ document.querySelectorAll('nav a[data-panel]').forEach(link => {
   });
 });
 
-// ─── RESUME PILLS (ATS) ───────────────────────────────────────────────────────
-document.querySelectorAll('#panel-ats-check .pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    pill.classList.toggle('selected');
-    const r = pill.dataset.resume;
-    if (pill.classList.contains('selected')) selectedResumesForATS.add(r);
-    else selectedResumesForATS.delete(r);
-  });
+// ─── RESUME PILLS (ATS) — delegated ──────────────────────────────────────────
+document.getElementById('ats-resume-pills').addEventListener('click', e => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  pill.classList.toggle('selected');
+  const r = pill.dataset.resume;
+  if (pill.classList.contains('selected')) selectedResumesForATS.add(r);
+  else selectedResumesForATS.delete(r);
 });
 
-// ─── COVER LETTER PILLS (single select) ──────────────────────────────────────
-document.querySelectorAll('#cl-resume-pills .pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('#cl-resume-pills .pill').forEach(p => p.classList.remove('selected'));
-    pill.classList.add('selected');
-    selectedResumeForCL = pill.dataset.resume;
-  });
+// ─── COVER LETTER PILLS (single select, delegated) ──────────────────────────
+document.getElementById('cl-resume-pills').addEventListener('click', e => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  document.querySelectorAll('#cl-resume-pills .pill').forEach(p => p.classList.remove('selected'));
+  pill.classList.add('selected');
+  selectedResumeForCL = pill.dataset.resume;
 });
 
 // ─── COVER LETTER TONE TABS ───────────────────────────────────────────────────
@@ -1732,6 +1908,44 @@ async function callClaude(systemPrompt, userMessage, onChunk) {
 }
 
 
+// ─── RESULT TEXT FORMATTER ─────────────────────────────────────────────────
+function formatResultHtml(text) {
+  if (!text) return '';
+  return text.split('\n').map(line => {
+    let t = line.trim();
+    if (!t) return '<div style="height:0.5rem;"></div>';
+    // Headers
+    if (/^#{1,3}\s/.test(t)) {
+      t = t.replace(/^#+\s*/, '');
+      return '<div class="ats-heading">' + escHtml(t).replace(/\*\*/g,'') + '</div>';
+    }
+    // Numbered section headers like "1. MARKET RATE" or "**MARKET RATE**"
+    if (/^\d+\.\s*\*\*/.test(t) || (/^\*\*[A-Z]/.test(t) && t.endsWith('**'))) {
+      const clean = t.replace(/^\d+\.\s*/, '').replace(/\*\*/g, '');
+      return '<div class="ats-subhead">' + escHtml(clean) + '</div>';
+    }
+    // Lines with bold text — render inline bold
+    if (t.includes('**')) {
+      let html = escHtml(t);
+      // Re-apply bold after escaping
+      html = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      // Win / warn indicators
+      if (t.startsWith('✅')) return '<div class="ats-line ats-win">' + html + '</div>';
+      if (t.startsWith('⚠️') || t.startsWith('❌') || t.startsWith('🚩')) return '<div class="ats-line ats-warn">' + html + '</div>';
+      return '<div class="ats-line">' + html + '</div>';
+    }
+    // Bullet points
+    if (t.startsWith('- ') || t.startsWith('• ')) {
+      return '<div class="ats-line" style="padding-left:1rem;text-indent:-0.6rem;">' + escHtml(t) + '</div>';
+    }
+    // Status lines
+    if (t.startsWith('✅')) return '<div class="ats-line ats-win">' + escHtml(t) + '</div>';
+    if (t.startsWith('⚠️') || t.startsWith('❌') || t.startsWith('🚩')) return '<div class="ats-line ats-warn">' + escHtml(t) + '</div>';
+    return '<div class="ats-line">' + escHtml(t) + '</div>';
+  }).join('');
+}
+
 // ─── ATS CHECK ───────────────────────────────────────────────────────────────
 document.getElementById('run-ats-btn').addEventListener('click', async () => {
   const jd = savedJD || document.getElementById('jd-text').value.trim();
@@ -1758,7 +1972,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     savedRoleName ? 'Role: ' + savedRoleName : null,
     'RESUMES TO ANALYZE:',
     resumeBlock,
-    'For each resume give an ATS score 0-100% based strictly on what is actually in the resume — do not inflate scores. Output each score on its own line exactly like: SCORE: [Resume Name] = [XX]%\n\nFor each resume also output the realistic improved score if honest keyword wordsmithing were applied, on its own line exactly like: IMPROVED_SCORE: [Resume Name] = [XX]%\n\nThen: which resume is the best match and why, and the top missing keywords from the JD.\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume. The score reflects real alignment — not a target.'
+    'For each resume give an ATS score 0-100% based strictly on what is actually in the resume — do not inflate scores. Output each score on its own line exactly like: SCORE: [Resume Name] = [XX]%\n\nThen: which resume is the best match and why, and the top missing keywords from the JD.\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume. The score reflects real alignment — not a target.'
   ].filter(Boolean).join('\n\n');
 
   try {
@@ -1775,34 +1989,20 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
         let highestPct = 0;
         let highestKey = null;
         let highestLabel = null;
-        const resumeKeyMap = {
-          'Principal Design Strategist': 'principal_ds',
-          'Design Strategist (Brief)': 'principal_ds_brief',
-          'Principal Service Designer': 'service_designer',
-          'Lead Product Designer': 'product_designer',
-          'Chief of Staff': 'chief_of_staff'
-        };
-        // Build improved score map
-        const improvedMatches = [...text.matchAll(/IMPROVED_SCORE:\s*(.+?)\s*=\s*(\d+)%/g)];
-        const improvedMap = {};
-        improvedMatches.forEach(m => { improvedMap[m[1].trim()] = parseInt(m[2]); });
+        const resumeKeyMap = {};
+        for (const [key, val] of Object.entries(RESUMES)) {
+          resumeKeyMap[val.label] = key;
+        }
+
 
         scoreMatches.forEach(match => {
           const name = match[1].trim();
           const pct = parseInt(match[2]);
           const colorClass = pct >= 80 ? 'score-high' : pct >= 60 ? 'score-mid' : 'score-low';
-          // Find improved score - try exact match then partial
-          let improved = improvedMap[name];
-          if (!improved) {
-            for (const [k,v] of Object.entries(improvedMap)) {
-              if (name.includes(k) || k.includes(name)) { improved = v; break; }
-            }
-          }
-          const improvedHtml = improved ? `<div class="score-improved">↑ ${improved}% with edits</div>` : '';
+
           document.getElementById('score-cards-container').innerHTML += `
             <div class="score-card">
               <div class="score-num ${colorClass}">${pct}%</div>
-              ${improvedHtml}
               <div class="score-label">${name}</div>
             </div>`;
           if (pct > highestPct) {
@@ -1822,6 +2022,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
       let display = text;
       // Remove SCORE lines
       display = display.replace(/SCORE:[^\n]*\n?/g, '');
+      display = display.replace(/IMPROVED_SCORE:[^\n]*\n?/g, '');
       // Remove everything from DETAILED ANALYSIS / WINNER up to RED FLAGS
       display = display.replace(/#+\s*(DETAILED ANALYSIS|WINNER)[\s\S]*?(?=#+\s*(RED FLAGS|SUMMARY|$))/gi, '');
       // Render tabs for Red Flags and Summary
@@ -1888,9 +2089,13 @@ ${jd}
 UPDATED RESUME:
 ${updatedResume}
 
-Run a comprehensive ATS check on this revised resume:
+Run a comprehensive ATS check on this revised resume.
 
-1. **Overall ATS Score**: Give a percentage (0-100%)
+IMPORTANT: Output the overall score on its own line in this exact format:
+RECHECK_SCORE: XX%
+
+Then provide:
+1. **Overall ATS Score**: (already output above)
 2. **Keyword Match**: List matched keywords and any still missing
 3. **Score Improvement**: Compare to what a typical unoptimized resume would score
 4. **Remaining Gaps**: Any final tweaks needed to hit 95%+
@@ -1913,6 +2118,17 @@ Be specific and direct.`;
     let fullText = '';
     await callClaude(systemPrompt, userMsg, (text) => {
       fullText = text;
+      // Parse and show score card live
+      const scoreMatch = text.match(/RECHECK_SCORE:\s*(\d+)%/);
+      if (scoreMatch) {
+        const pct = parseInt(scoreMatch[1]);
+        const colorClass = pct >= 80 ? 'score-high' : pct >= 60 ? 'score-mid' : 'score-low';
+        document.getElementById('recheck-score-card').innerHTML = `
+          <div class="score-card">
+            <div class="score-num ${colorClass}">${pct}%</div>
+            <div class="score-label">Revised Resume</div>
+          </div>`;
+      }
       kwOut.textContent = text; // live stream visible
     });
 
@@ -1923,15 +2139,16 @@ Be specific and direct.`;
       const em = endRe ? txt.search(endRe) : -1;
       return (em > sm ? txt.substring(sm, em) : txt.substring(sm)).replace(/^#+\s*/gm,'').replace(/\*\*/g,'').trim();
     }
+    fullText = fullText.replace(/RECHECK_SCORE:[^\n]*\n?/g, '');
     const kw   = getSection(fullText, /KEYWORD|MISSING/i,    /SCORE IMPROVEMENT/i);
     const imp  = getSection(fullText, /SCORE IMPROVEMENT/i,  /REMAINING GAPS/i);
     const gaps = getSection(fullText, /REMAINING GAPS/i,      /READY TO SUBMIT/i);
     const ready= getSection(fullText, /READY TO SUBMIT/i,     null);
 
-    kwOut.textContent   = kw   || fullText;
-    impOut.textContent  = imp  || '';
-    gapsOut.textContent = gaps || '';
-    readyOut.textContent= ready|| '';
+    kwOut.innerHTML   = '<div class="ats-formatted">' + formatResultHtml(kw || fullText) + '</div>';
+    impOut.innerHTML  = '<div class="ats-formatted">' + formatResultHtml(imp || '') + '</div>';
+    gapsOut.innerHTML = '<div class="ats-formatted">' + formatResultHtml(gaps || '') + '</div>';
+    readyOut.innerHTML= '<div class="ats-formatted">' + formatResultHtml(ready || '') + '</div>';
 
     // Wire up static tabs
     document.querySelectorAll('#recheck-tabs .tab').forEach(tab => {
@@ -2491,12 +2708,12 @@ document.querySelectorAll('#interview-stage-tabs .tab').forEach(tab => {
   });
 });
 
-document.querySelectorAll('#interview-resume-pills .pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('#interview-resume-pills .pill').forEach(p => p.classList.remove('selected'));
-    pill.classList.add('selected');
-    selectedInterviewResume = pill.dataset.resume;
-  });
+document.getElementById('interview-resume-pills').addEventListener('click', e => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  document.querySelectorAll('#interview-resume-pills .pill').forEach(p => p.classList.remove('selected'));
+  pill.classList.add('selected');
+  selectedInterviewResume = pill.dataset.resume;
 });
 
 document.getElementById('gen-interview-btn').addEventListener('click', async () => {
@@ -2583,7 +2800,7 @@ document.getElementById('gen-salary-btn').addEventListener('click', async () => 
     const output = document.getElementById('salary-output');
     output.textContent = '';
     document.getElementById('salary-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+    await callClaude(systemPrompt, userMsg, text => { output.innerHTML = '<div class="ats-formatted">' + formatResultHtml(text) + '</div>'; });
   } catch (err) {
     showError('salary-error', 'Error: ' + err.message);
     document.getElementById('salary-result').classList.remove('visible');
@@ -2617,7 +2834,7 @@ document.getElementById('gen-recruiter-btn').addEventListener('click', async () 
     const output = document.getElementById('recruiter-output');
     output.textContent = '';
     document.getElementById('recruiter-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+    await callClaude(systemPrompt, userMsg, text => { output.innerHTML = '<div class="ats-formatted">' + formatResultHtml(text) + '</div>'; });
   } catch (err) {
     showError('recruiter-error', 'Error: ' + err.message);
     document.getElementById('recruiter-result').classList.remove('visible');
@@ -2637,14 +2854,13 @@ let selectedLeResume = 'principal_ds';
 let selectedLeFocus = 'full';
 let atsHighestResume = null; // set by ATS check when it runs
 
-document.querySelectorAll('#le-resume-pills .pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('#le-resume-pills .pill').forEach(p => p.classList.remove('selected'));
-    pill.classList.add('selected');
-    selectedLeResume = pill.dataset.resume;
-    // Hide the auto-hint if user manually picks
-    document.getElementById('le-auto-hint').style.display = 'none';
-  });
+document.getElementById('le-resume-pills').addEventListener('click', e => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  document.querySelectorAll('#le-resume-pills .pill').forEach(p => p.classList.remove('selected'));
+  pill.classList.add('selected');
+  selectedLeResume = pill.dataset.resume;
+  document.getElementById('le-auto-hint').style.display = 'none';
 });
 
 document.querySelectorAll('#le-focus-tabs .tab').forEach(tab => {
@@ -2700,7 +2916,7 @@ EDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+
 
 2. Then produce line-by-line edits. For EVERY line or bullet that needs changing, output a block in this EXACT format:
 
-SECTION: [e.g., Synopsis / Core Competencies / Kroger Bullets / Education]
+SECTION: [Be specific. For Professional History bullets, use the company name: e.g., "Professional History — Kroger" or "Professional History — The RealReal". For other sections use the name: e.g., "Synopsis", "Core Competencies", "Education"]
 BEFORE: [exact original text, copied verbatim]
 AFTER: [your rewritten version — complete, ready to paste]
 WHY: [one sentence explaining the specific ATS improvement this makes]
@@ -2894,6 +3110,10 @@ function copyResult(id) {
     if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
   });
 }
+
+// ─── INIT RESUME PILLS & MANAGER ─────────────────────────────────────────────
+rebuildAllPills();
+renderResumeManager();
 </script>
 </body>
 </html>
