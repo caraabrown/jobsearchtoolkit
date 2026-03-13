@@ -2159,7 +2159,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     let fullText = '';
     await callClaude(systemPrompt, userMsg, (text) => {
       document.getElementById('score-cards-container').innerHTML = '';
-      const scoreMatches = [...text.matchAll(/SCORE:\s*(.+?)\s*=\s*(\d+)%/g)];
+     const scoreMatches = [...text.matchAll(/^SCORE:\s*(.+?)\s*=\s*(\d+)%/gm)];
       if (scoreMatches.length > 0) {
         let highestPct = 0, highestKey = null, highestLabel = null;
         const resumeKeyMap = {};
