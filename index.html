@@ -3158,8 +3158,8 @@ function renderEditBlocks(rawText, container) {
 
     const editId = 'edit-block-' + i;
     html += `<div class="edit-block" id="${editId}">
-      <div class="edit-block-header">
-        <div><strong>Edit ${i + 1}</strong>${section ? '<br><span style="font-size:0.68rem;color:var(--mid);font-weight:400;">' + escHtml(section) + '</span>' : ''}</div>
+   <div class="edit-block-header">
+        <div><strong>Edit ${i + 1}</strong>${section ? `<span style="display:inline-block;margin-left:0.6rem;padding:0.15rem 0.55rem;background:var(--bg);border:1px solid var(--border);border-radius:3px;font-size:0.68rem;font-weight:600;color:var(--ink);letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}${type ? `<span style="display:inline-block;margin-left:0.4rem;padding:0.15rem 0.55rem;background:#e8f0fe;border:1px solid #c5d4f5;border-radius:3px;font-size:0.68rem;font-weight:600;color:#2a4db5;letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}</div>
       </div>
       <div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>
       <div class="edit-row-after" id="after-${i}"><span class="edit-label">Replace with</span><span class="after-text">${escHtml(after)}</span><button class="copy-btn" style="float:right;margin-left:0.5rem;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="var t=this.previousElementSibling.textContent;navigator.clipboard.writeText(t).then(function(){},function(){});this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy'},2000)">Copy</button></div>
