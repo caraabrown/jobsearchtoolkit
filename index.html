@@ -1260,7 +1260,11 @@
         <div id="recheck-improvement-output" class="stream-output" style="display:none;"></div>
         <div id="recheck-gaps-output" class="stream-output" style="display:none;"></div>
         <div id="recheck-ready-output" class="stream-output" style="display:none;"></div>
-        <div class="stream-output" id="recheck-output" style="display:none;"></div>
+       <div class="stream-output" id="recheck-output" style="display:none;"></div>
+        <div id="recheck-to-le-row" style="display:none; margin-top:1rem;">
+          <button class="btn" id="recheck-to-le-btn">Turn Recommendations into Line Edits</button>
+        </div>
+      </div>
       </div>
     </div>
 
@@ -2104,6 +2108,8 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
 
 // ─── API CALL HELPER ─────────────────────────────────────────────────────────
 async function callClaude(systemPrompt, userMessage, onChunk) {
+  const hiringManagerLens = `PERSPECTIVE: You are advising from the point of view of a hiring manager, not a resume coach. For every response, ask yourself: What problems does this role solve at a company like this? How do I advise and empower Cara to position herself as that solution? Frame all edits, scores, cover letters, answers, and advice through that lens — what a hiring manager needs to see, not just what looks good on paper.\n\n`;
+  systemPrompt = hiringManagerLens + systemPrompt;
   const apiKey = localStorage.getItem('cara_api_key') || '';
   if (!apiKey) {
     throw new Error('No API key saved. Click ⚙ API Key in the header to add your key.');
@@ -2326,6 +2332,25 @@ Be specific and direct.`;
         if (active) active.style.display = 'block';
       });
     });
+   // Show recommendations-to-line-edits button
+    document.getElementById('recheck-to-le-row').style.display = 'block';
+    document.getElementById('recheck-to-le-btn').onclick = async () => {
+      const jd = savedJD || document.getElementById('jd-text').value.trim();
+      const resume = updatedResume;
+      if (!jd || !resume) return;
+      const systemPrompt = `You are a senior resume editor. ${`PERSPECTIVE: You are advising from the point of view of a hiring manager. What problems does this role solve at a company like this? How do I empower Cara to position herself as that solution?\n\n`}You produce precise, surgical edits — exact original text, exact replacement, and one-line reason. Never invent experience not in the resume.`;
+      const userMsg = `Based on these recommendations from a revised resume check:\n\n${fullText}\n\nJOB DESCRIPTION:\n${jd}\n\nRESUME:\n${resume}\n\nConvert each recommendation into edit blocks using this EXACT format:\n\nSECTION: [section name, include company if Professional History]\nBEFORE: [exact original text verbatim]\nAFTER: [rewritten version — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nWHY: [one sentence]`;
+      const leOutput = document.getElementById('le-output');
+      document.getElementById('panel-line-edits').scrollIntoView({ behavior: 'smooth' });
+      setTimeout(async () => {
+        leOutput.textContent = '';
+        document.getElementById('le-result').classList.add('visible');
+        let fullLe = '';
+        await callClaude(systemPrompt, userMsg, (text) => { fullLe = text; leOutput.textContent = text; });
+        renderEditBlocks(fullLe, leOutput);
+      }, 600);
+    };
+
     // Show first tab
     [impOut, gapsOut, readyOut].forEach(el => el.style.display = 'none');
     kwOut.style.display = 'block';
@@ -3053,7 +3078,12 @@ EDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+
 
 SECTION: [Be specific. For Professional History bullets, include the company name: e.g., "Professional History — Kroger" or "Professional History — The RealReal". For other sections use the name: e.g., "Synopsis", "Core Competencies", "Education"]
 BEFORE: [exact original text, copied verbatim]
+<<<<<<< fix-le-highlights-subsection-copy
 AFTER: [your rewritten version — complete,AFTER: [your rewritten version — complete, ready to paste. IMPORTANT: If this edit is within a Highlights subsection (e.g. a line that starts with "END-TO-END SERVICE DESIGN & DELIVERY:" or similar), the AFTER field must contain ONLY the pipe-separated content that follows the subsection label — do NOT include the subsection label itself in the AFTER field]ready to paste]
+=======
+AFTER: [your rewritten version — complete, ready to paste. IMPORTANT: If this edit is within a Highlights subsection (e.g. a line that starts with "END-TO-END SERVICE DESIGN & DELIVERY:" or similar), the AFTER field must contain ONLY the pipe-separated content that follows the subsection label — do NOT include the subsection label itself in the AFTER field. Match punctuation exactly to context: if this is a partial replacement, do not add a period unless the original fragment ends with one]
+TYPE: [one of: Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]
+>>>>>>> 5-feat-recheck-score-card
 WHY: [one sentence explaining the specific ATS improvement this makes]
 
 INTEGRITY RULES (non-negotiable):
@@ -3158,18 +3188,18 @@ function renderEditBlocks(rawText, container) {
       return text.substring(start + marker.length, end).trim();
     }
 
-    const section = extractField(block, 'SECTION', ['BEFORE','AFTER','WHY']);
-    const before  = extractField(block, 'BEFORE',  ['AFTER','WHY','SECTION']);
-    const after   = extractField(block, 'AFTER',   ['WHY','SECTION','BEFORE']);
-    const why     = extractField(block, 'WHY',     ['SECTION','BEFORE','AFTER']);
+    const section = extractField(block, 'SECTION', ['BEFORE','AFTER','TYPE','WHY']);
+    const before  = extractField(block, 'BEFORE',  ['AFTER','TYPE','WHY','SECTION']);
+    const after   = extractField(block, 'AFTER',   ['TYPE','WHY','SECTION','BEFORE']);
+    const type    = extractField(block, 'TYPE',    ['WHY','SECTION','BEFORE','AFTER']);
+    const why     = extractField(block, 'WHY',     ['SECTION','BEFORE','AFTER','TYPE']);
 
     if (!before && !after) return;
 
     const editId = 'edit-block-' + i;
     html += `<div class="edit-block" id="${editId}">
       <div class="edit-block-header">
-        <div><strong>Edit ${i + 1}</strong>${section ? '<br><span style="font-size:0.68rem;color:var(--mid);font-weight:400;">' + escHtml(section) + '</span>' : ''}</div>
-      </div>
+      <div><strong>Edit ${i + 1}</strong>${section ? `<span style="display:inline-block;margin-left:0.6rem;padding:0.15rem 0.55rem;background:var(--bg);border:1px solid var(--border);border-radius:3px;font-size:0.68rem;font-weight:600;color:var(--ink);letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}${type ? `<span style="display:inline-block;margin-left:0.4rem;padding:0.15rem 0.55rem;background:#e8f0fe;border:1px solid #c5d4f5;border-radius:3px;font-size:0.68rem;font-weight:600;color:#2a4db5;letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}</div>
       <div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>
       <div class="edit-row-after" id="after-${i}"><span class="edit-label">Replace with</span><span class="after-text">${escHtml(after)}</span><button class="copy-btn" style="float:right;margin-left:0.5rem;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="var t=this.previousElementSibling.textContent;navigator.clipboard.writeText(t).then(function(){},function(){});this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy'},2000)">Copy</button></div>
       ${why ? `<div class="edit-row-why">💡 ${escHtml(why)}</div>` : ''}
