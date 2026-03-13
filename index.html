@@ -2357,7 +2357,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     await callClaude(systemPrompt, userMsg, (text) => {
       // Parse scores for score cards
       document.getElementById('score-cards-container').innerHTML = '';
-      const scoreMatches = [...text.matchAll(/SCORE:\s*(.+?)\s*=\s*(\d+)%/g)];
+  const scoreMatches = [...text.matchAll(/(?<!IMPROVED_)SCORE:\s*(.+?)\s*=\s*(\d+)%/g)];    
       if (scoreMatches.length > 0) {
         let highestPct = 0;
         let highestKey = null;
