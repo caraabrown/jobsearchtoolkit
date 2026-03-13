@@ -2104,6 +2104,8 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
 
 // ─── API CALL HELPER ─────────────────────────────────────────────────────────
 async function callClaude(systemPrompt, userMessage, onChunk) {
+  const hiringManagerLens = `PERSPECTIVE: You are advising from the point of view of a hiring manager, not a resume coach. For every response, ask yourself: What problems does this role solve at a company like this? How do I advise and empower Cara to position herself as that solution? Frame all edits, scores, cover letters, answers, and advice through that lens — what a hiring manager needs to see, not just what looks good on paper.\n\n`;
+  systemPrompt = hiringManagerLens + systemPrompt;
   const apiKey = localStorage.getItem('cara_api_key') || '';
   if (!apiKey) {
     throw new Error('No API key saved. Click ⚙ API Key in the header to add your key.');
