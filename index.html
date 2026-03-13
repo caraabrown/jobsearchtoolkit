@@ -1248,6 +1248,7 @@
       <div class="loading" id="recheck-loading"><div class="spinner"></div>Analyzing revised resume…</div>
       <div class="error-msg" id="recheck-error"></div>
 
+      <div class="score-cards" id="recheck-score-card" style="display:none; margin-bottom:1rem;"></div>
       <div class="result-box" id="recheck-result">
         <div class="tab-row" id="recheck-tabs" style="margin-bottom:1rem;">
           <div class="tab active" data-rcsec="keywords">Missing Keywords</div>
@@ -2249,7 +2250,7 @@ ${updatedResume}
 
 Run a comprehensive ATS check on this revised resume:
 
-1. **Overall ATS Score**: Give a percentage (0-100%)
+1. **Overall ATS Score**: Give a percentage (0-100%). Output it on its own line EXACTLY like this: RECHECK_SCORE: [XX]%
 2. **Keyword Match**: List matched keywords and any still missing
 3. **Score Improvement**: Compare to what a typical unoptimized resume would score
 4. **Remaining Gaps**: Any final tweaks needed to hit 95%+
@@ -2284,9 +2285,17 @@ Be specific and direct.`;
         return '<div class="ats-paragraph">' + html + '</div>';
       }).join('') + '</div>';
     };
-    await callClaude(systemPrompt, userMsg, (text) => {
+   await callClaude(systemPrompt, userMsg, (text) => {
       fullText = text;
       kwOut.innerHTML = formatRecheckContent(text);
+      const sm = text.match(/RECHECK_SCORE:\s*(\d+)%/);
+      if (sm) {
+        const pct = parseInt(sm[1]);
+        const colorClass = pct >= 80 ? 'score-high' : pct >= 60 ? 'score-mid' : 'score-low';
+        const card = document.getElementById('recheck-score-card');
+        card.style.display = 'flex';
+        card.innerHTML = `<div class="score-card"><div class="score-num ${colorClass}">${pct}%</div><div class="score-label">Revised Resume Score</div></div>`;
+      }
     });
 
     // On complete, split into sections and populate tabs
