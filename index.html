@@ -1260,7 +1260,11 @@
         <div id="recheck-improvement-output" class="stream-output" style="display:none;"></div>
         <div id="recheck-gaps-output" class="stream-output" style="display:none;"></div>
         <div id="recheck-ready-output" class="stream-output" style="display:none;"></div>
-        <div class="stream-output" id="recheck-output" style="display:none;"></div>
+       <div class="stream-output" id="recheck-output" style="display:none;"></div>
+        <div id="recheck-to-le-row" style="display:none; margin-top:1rem;">
+          <button class="btn" id="recheck-to-le-btn">Turn Recommendations into Line Edits</button>
+        </div>
+      </div>
       </div>
     </div>
 
@@ -2326,6 +2330,25 @@ Be specific and direct.`;
         if (active) active.style.display = 'block';
       });
     });
+   // Show recommendations-to-line-edits button
+    document.getElementById('recheck-to-le-row').style.display = 'block';
+    document.getElementById('recheck-to-le-btn').onclick = async () => {
+      const jd = savedJD || document.getElementById('jd-text').value.trim();
+      const resume = updatedResume;
+      if (!jd || !resume) return;
+      const systemPrompt = `You are a senior resume editor. ${`PERSPECTIVE: You are advising from the point of view of a hiring manager. What problems does this role solve at a company like this? How do I empower Cara to position herself as that solution?\n\n`}You produce precise, surgical edits — exact original text, exact replacement, and one-line reason. Never invent experience not in the resume.`;
+      const userMsg = `Based on these recommendations from a revised resume check:\n\n${fullText}\n\nJOB DESCRIPTION:\n${jd}\n\nRESUME:\n${resume}\n\nConvert each recommendation into edit blocks using this EXACT format:\n\nSECTION: [section name, include company if Professional History]\nBEFORE: [exact original text verbatim]\nAFTER: [rewritten version — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nWHY: [one sentence]`;
+      const leOutput = document.getElementById('le-output');
+      document.getElementById('panel-line-edits').scrollIntoView({ behavior: 'smooth' });
+      setTimeout(async () => {
+        leOutput.textContent = '';
+        document.getElementById('le-result').classList.add('visible');
+        let fullLe = '';
+        await callClaude(systemPrompt, userMsg, (text) => { fullLe = text; leOutput.textContent = text; });
+        renderEditBlocks(fullLe, leOutput);
+      }, 600);
+    };
+
     // Show first tab
     [impOut, gapsOut, readyOut].forEach(el => el.style.display = 'none');
     kwOut.style.display = 'block';
