@@ -2036,6 +2036,9 @@ function attachPillListeners() {
 let savedJD = '';
 let savedJDUrl = '';
 let savedRoleName = '';
+let savedAtsKeywords = '';
+let savedAtsFlags = '';
+let savedAtsPath = '';
 let selectedResumesForATS = new Set();
 let selectedResumeForCL = 'principal_ds';
 let selectedCLTone = 'strategic';
@@ -2103,6 +2106,9 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
 
 // ─── API CALL HELPER ─────────────────────────────────────────────────────────
 async function callClaude(systemPrompt, userMessage, onChunk) {
+  const hiringManagerLens = `PERSPECTIVE: You are advising from the point of view of a hiring manager, not a resume coach. For every response, ask yourself: What problems does this role solve at a company like this? How do I advise and empower Cara to position herself as that solution? Frame all edits, scores, cover letters, answers, and advice through that lens — what a hiring manager needs to see, not just what looks good on paper.\n\n`;
+  const atsContext = (savedAtsKeywords || savedAtsFlags || savedAtsPath) ? `ATS INSIGHTS FROM PRIOR ANALYSIS (use these to strengthen your response):\n${savedAtsKeywords ? 'MISSING KEYWORDS:\n' + savedAtsKeywords + '\n\n' : ''}${savedAtsFlags ? 'RED FLAGS & WINS:\n' + savedAtsFlags + '\n\n' : ''}${savedAtsPath ? 'FASTEST PATH TO 95%+:\n' + savedAtsPath + '\n\n' : ''}` : '';
+  systemPrompt = hiringManagerLens + atsContext + systemPrompt;
   const apiKey = localStorage.getItem('cara_api_key') || '';
   if (!apiKey) {
     throw new Error('No API key saved. Click ⚙ API Key in the header to add your key.');
@@ -2209,7 +2215,10 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     const bestTxt = atsSection(fullText, /##\s*BEST MATCH/i, /##\s*MISSING KEYWORDS/i);
     const kwTxt = atsSection(fullText, /##\s*MISSING KEYWORDS/i, /##\s*RED FLAGS/i);
     const flagsTxt = atsSection(fullText, /##\s*RED FLAGS/i, /##\s*FASTEST PATH/i);
-    const pathTxt = atsSection(fullText, /##\s*FASTEST PATH/i, null);
+  const pathTxt = atsSection(fullText, /##\s*FASTEST PATH/i, null);
+    savedAtsKeywords = kwTxt;
+    savedAtsFlags = flagsTxt;
+    savedAtsPath = pathTxt;
     document.getElementById('ats-best-output').innerHTML = formatAtsContent(bestTxt || fullText);
     document.getElementById('ats-keywords-output').innerHTML = formatAtsContent(kwTxt);
     document.getElementById('ats-flags-output').innerHTML = formatAtsContent(flagsTxt);
