@@ -2056,12 +2056,18 @@ function attachPillListeners() {
       selectedInterviewResume = pill.dataset.resume;
     });
   });
-  document.querySelectorAll('#le-resume-pills .pill').forEach(pill => {
+ document.querySelectorAll('#le-resume-pills .pill').forEach(pill => {
     pill.addEventListener('click', () => {
-      document.querySelectorAll('#le-resume-pills .pill').forEach(p => p.classList.remove('selected'));
-      pill.classList.add('selected');
-      selectedLeResume = pill.dataset.resume;
-      document.getElementById('le-auto-hint').style.display = 'none';
+      if (pill.classList.contains('selected')) {
+        pill.classList.remove('selected');
+        selectedLeResume = atsHighestResume || null;
+        document.getElementById('le-auto-hint').style.display = atsHighestResume ? 'block' : 'none';
+      } else {
+        document.querySelectorAll('#le-resume-pills .pill').forEach(p => p.classList.remove('selected'));
+        pill.classList.add('selected');
+        selectedLeResume = pill.dataset.resume;
+        document.getElementById('le-auto-hint').style.display = 'none';
+      }
     });
   });
 }
