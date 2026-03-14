@@ -1167,10 +1167,14 @@
         </div>
       </div>
 
-      <div style="margin-top:2rem; border-top:1px solid var(--border); padding-top:1.5rem;">
-        <div class="panel-desc" style="margin-bottom:0.8rem; font-weight:500; color:var(--black);">Add a New Resume</div>
-        <label>Resume Name *</label>
+     <label>Resume Name *</label>
         <input type="text" id="new-resume-name" placeholder="e.g., VP of Strategy">
+        <label>Upload PDF <span style="font-weight:400;color:var(--mid);">— or paste text below</span></label>
+        <div style="margin-bottom:0.75rem;">
+          <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('new-resume-file').click()">&#11014; Upload PDF / TXT</button>
+          <input type="file" accept=".pdf,.txt" id="new-resume-file" style="display:none" onchange="handleNewResumeFile(this.files[0])">
+          <span id="new-resume-file-name" style="font-size:0.78rem;color:var(--mid);margin-left:0.75rem;"></span>
+        </div>
         <label>Resume Text *</label>
         <textarea id="new-resume-text" placeholder="Paste the full text of this resume…" rows="10"></textarea>
         <div class="btn-row" style="margin-top:0.8rem;">
@@ -1994,6 +1998,30 @@ function savePastedResume(key) {
   saveResume(key, text);
   hidePasteArea(key);
   buildUploadSlots();
+}
+
+async function handleNewResumeFile(file) {
+  if (!file) return;
+  const nameEl = document.getElementById('new-resume-file-name');
+  nameEl.textContent = file.name;
+  try {
+    let text = '';
+    if (file.name.endsWith('.pdf')) {
+      if (typeof pdfjsLib === 'undefined') { alert('PDF library not loaded. Paste text instead.'); return; }
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      text = await extractPdfText(file);
+    } else {
+      text = await file.text();
+    }
+    if (text && text.length > 50) {
+      document.getElementById('new-resume-text').value = text;
+      nameEl.textContent = file.name + ' ✓';
+    } else {
+      alert('Could not extract text. Try pasting instead.');
+    }
+  } catch(e) {
+    alert('Error reading file: ' + e.message);
+  }
 }
 
 function clearSlot(key) {
