@@ -3192,10 +3192,11 @@ function renderEditBlocks(rawText, container) {
       return text.substring(start + marker.length, end).trim();
     }
 
-    const section = extractField(block, 'SECTION', ['BEFORE','AFTER','WHY']);
-    const before  = extractField(block, 'BEFORE',  ['AFTER','WHY','SECTION']);
-    const after   = extractField(block, 'AFTER',   ['WHY','SECTION','BEFORE']);
-    const why     = extractField(block, 'WHY',     ['SECTION','BEFORE','AFTER']);
+    const section = extractField(block, 'SECTION', ['BEFORE','AFTER','TYPE','WHY']);
+    const before  = extractField(block, 'BEFORE',  ['AFTER','TYPE','WHY','SECTION']);
+    const after   = extractField(block, 'AFTER',   ['TYPE','WHY','SECTION','BEFORE']);
+    const type    = extractField(block, 'TYPE',    ['WHY','SECTION','BEFORE','AFTER']);
+    const why     = extractField(block, 'WHY',     ['SECTION','BEFORE','AFTER','TYPE']);
 
     if (!before && !after) return;
 
