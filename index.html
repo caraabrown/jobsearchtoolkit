@@ -2385,10 +2385,11 @@ ${updatedResume}
 
 Run a comprehensive ATS check on this revised resume:
 
-1. **Overall ATS Score**: Give a percentage (0-100%). Output it on its own line EXACTLY like this: RECHECK_SCORE: [XX]%2. **Keyword Match**: List matched keywords and any still missing
+1. **Overall ATS Score**: Give a percentage (0-100%). Output it on its own line EXACTLY like this: RECHECK_SCORE: [XX]%
+2. **Keyword Match**: Output as a markdown table with columns: | Keyword | Status | Where to Add |. Status should be ✅ Matched or ❌ Missing.
 3. **Score Improvement**: Compare to what a typical unoptimized resume would score
-4. **Remaining Gaps**: Any final tweaks needed to hit 95%+
-5. **Ready to Submit?**: Yes/No and why
+4. **Remaining Gaps**: Output as a markdown table with columns: | Gap | Priority | Suggested Fix |. Priority should be HIGH, MEDIUM, or LOW.
+5. **Ready to Submit?**: Output as a markdown table with columns: | Item | Status | Action Needed |. Then give a final Yes/No verdict with one sentence explanation.
 
 Be specific and direct.`;
 
@@ -2488,10 +2489,10 @@ Be specific and direct.`;
     const gaps = getSection(fullText, /REMAINING GAPS/i,      /READY TO SUBMIT/i);
     const ready= getSection(fullText, /READY TO SUBMIT/i,     null);
 
-    kwOut.innerHTML   = formatRecheckContent(kw   || fullText);
+   kwOut.innerHTML   = renderRecheckTab(kw   || fullText, 'keywords');
     impOut.innerHTML  = formatRecheckContent(imp  || '');
-    gapsOut.innerHTML = formatRecheckContent(gaps || '');
-    readyOut.innerHTML= formatRecheckContent(ready|| '');
+    gapsOut.innerHTML = renderRecheckTab(gaps || '', 'gaps');
+    readyOut.innerHTML= renderRecheckTab(ready|| '', 'ready');
 
     // Wire up static tabs
     document.querySelectorAll('#recheck-tabs .tab').forEach(tab => {
@@ -3316,6 +3317,64 @@ Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.`
     hideLoading('le-loading');
   }
 });
+
+function addCheckboxesToTable(html, tabId) {
+  const saved = JSON.parse(localStorage.getItem('recheck_checks_' + tabId) || '{}');
+  let rowIndex = 0;
+  return html.replace(/<tr>/g, () => {
+    const id = tabId + '_' + rowIndex;
+    const checked = saved[id] ? 'checked' : '';
+    const bg = saved[id] ? 'background:#f0faf4;' : '';
+    rowIndex++;
+    return `<tr style="${bg}" id="rcrow-${id}">`;
+  }).replace(/<td style="/g, (match, offset, str) => {
+    // Only add checkbox to first td of each data row (not header)
+    return match;
+  }).replace(/(<tbody>[\s\S]*?<\/tbody>)/g, (tbody) => {
+    let ri = 0;
+    return tbody.replace(/<tr>/g, () => {
+      const id = tabId + '_row_' + ri;
+      const checked = saved[id] ? 'checked' : '';
+      const bg = saved[id] ? 'background:#f0faf4;' : '';
+      ri++;
+      return `<tr style="${bg}" data-rcid="${id}">`;
+    }).replace(/<td style="([^"]*)">/g, (match, style, offset, str) => {
+      // Add checkbox before first cell content in each row
+      return match;
+    });
+  });
+}
+
+function addCheckboxRow(html, tabId) {
+  const saved = JSON.parse(localStorage.getItem('recheck_checks_' + tabId) || '{}');
+  let ri = 0;
+  return html.replace(/<tr style="([^"]*)" data-rcid="([^"]*)">(\s*)<td/g, (match, style, id, ws) => {
+    const checked = saved[id] ? 'checked' : '';
+    const bg = saved[id] ? 'background:#f0faf4;' : '';
+    return `<tr style="${bg}" data-rcid="${id}">${ws}<td style="padding:0.4rem 0.5rem;border:1px solid #dedede;width:32px;text-align:center;"><input type="checkbox" ${checked} style="width:15px;height:15px;cursor:pointer;" onchange="(function(el){var id='${id}',tab='${tabId}',saved=JSON.parse(localStorage.getItem('recheck_checks_'+tab)||'{}');saved[id]=el.checked;localStorage.setItem('recheck_checks_'+tab,JSON.stringify(saved));el.closest('tr').style.background=el.checked?'#f0faf4':'';el.closest('tr').style.opacity=el.checked?'0.6':'1';})(this)"></td><td`;
+  });
+}
+
+function renderRecheckTab(raw, tabId) {
+  if (!raw) return '';
+  const formatted = (typeof formatRecheckContent === 'function') ? formatRecheckContent(raw) : raw;
+  // Inject checkboxes into table rows
+  let result = formatted;
+  const saved = JSON.parse(localStorage.getItem('recheck_checks_' + tabId) || '{}');
+  let ri = 0;
+  result = result.replace(/<tbody>([\s\S]*?)<\/tbody>/g, (match, tbody) => {
+    let newTbody = tbody.replace(/<tr>/g, () => {
+      const id = tabId + '_' + ri++;
+      const checked = saved[id] ? 'checked' : '';
+      const bg = saved[id] ? 'background:#f0faf4;opacity:0.6;' : '';
+      return `<tr style="${bg}"><td style="padding:0.4rem 0.5rem;border:1px solid #dedede;width:32px;text-align:center;"><input type="checkbox" ${checked} style="width:15px;height:15px;cursor:pointer;accent-color:#1e6b35;" onchange="(function(el){var id='${id}',tab='${tabId}',saved=JSON.parse(localStorage.getItem('recheck_checks_'+tab)||'{}');saved[id]=el.checked;localStorage.setItem('recheck_checks_'+tab,JSON.stringify(saved));el.closest('tr').style.background=el.checked?'#f0faf4':'';el.closest('tr').style.opacity=el.checked?'0.6':'1';})(this)"></td>`;
+    });
+    return '<tbody>' + newTbody + '</tbody>';
+  });
+  // Add checkbox column to thead
+  result = result.replace(/<thead><tr>/, '<thead><tr><th style="padding:0.4rem 0.5rem;background:#f7f6f4;border:1px solid #dedede;width:32px;"></th>');
+  return result;
+}
 
 function renderEditBlocks(rawText, container) {
   // Parse the summary line
