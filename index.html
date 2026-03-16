@@ -1453,7 +1453,7 @@
       <div id="jobs-empty" class="empty-state">No applications logged yet. Add your first one above.</div>
       <div class="jobs-table-wrap" id="jobs-table-wrap" style="display:none;">
         <table class="jobs-table">
-<thead><tr><th>Company</th><th>Role</th><th>Date</th><th>How Applied</th><th style="text-align:center;">Screening</th><th style="text-align:center;">Interview</th><th style="text-align:center;">Rejected</th><th style="text-align:center;">Hired</th><th>Prep</th><th></th></tr></thead>          <tbody id="jobs-tbody"></tbody>
+<thead><tr><th>Company</th><th>Role</th><th>Date</th><th>How Applied</th><th style="text-align:center;">ATS</th><th style="text-align:center;">Cover Letter</th><th style="text-align:center;">Screening</th><th style="text-align:center;">Interview</th><th style="text-align:center;">Rejected</th><th style="text-align:center;">Hired</th><th>Prep</th><th></th></tr></thead>        <tbody id="jobs-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -2473,13 +2473,16 @@ Be specific and direct.`;
    await callClaude(systemPrompt, userMsg, (text) => {
       fullText = text;
       kwOut.innerHTML = formatRecheckContent(text);
-      const sm = text.match(/RECHECK_SCORE:\s*(\d+)%/);
+    const sm = text.match(/RECHECK_SCORE:\s*(\d+)%/);
       if (sm) {
         const pct = parseInt(sm[1]);
         const colorClass = pct >= 80 ? 'score-high' : pct >= 60 ? 'score-mid' : 'score-low';
         const card = document.getElementById('recheck-score-card');
         card.style.display = 'flex';
         card.innerHTML = `<div class="score-card"><div class="score-label" style="margin-bottom:0.4rem;">Revised Resume Score</div><div class="score-num ${colorClass}">${pct}%</div></div>`;
+        // Save to matching tracker job
+        const matchJob = jobs.find(j => savedRoleName && (j.role + ' at ' + j.company).includes(savedRoleName) || (savedRoleName && savedRoleName.includes(j.role)));
+        if (matchJob) { matchJob.recheckScore = pct; saveJobs(); renderJobs(); }
       }
     });
 
@@ -2634,7 +2637,10 @@ REQUIREMENTS:
     const output = document.getElementById('cl-output');
     output.textContent = '';
     document.getElementById('cl-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+  await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+    // Mark cover letter done on matching tracker job
+    const clMatchJob = jobs.find(j => savedRoleName && (j.role + ' at ' + j.company).includes(savedRoleName) || (savedRoleName && savedRoleName.includes(j.role)));
+    if (clMatchJob) { clMatchJob.coverLetterDone = true; saveJobs(); renderJobs(); }
   } catch (err) { showError('cl-error', 'Something went wrong: ' + err.message); document.getElementById('cl-result').classList.remove('visible');
   } finally { hideLoading('cl-loading'); }
 });
@@ -2899,7 +2905,9 @@ function renderJobs() {
       '<td><strong>' + escHtml(j.company) + '</strong> ' + urlCell + '</td>' +
       '<td>' + escHtml(j.role) + '</td>' +
       '<td><span class="applied-date">' + formatDate(j.dateAdded || j.dateApplied || new Date().toISOString()) + '</span></td>' +
-      '<td style="font-size:0.75rem;color:var(--mid);">' + howApplied + '</td>' +
+    '<td style="font-size:0.75rem;color:var(--mid);">' + howApplied + '</td>' +
+      '<td style="text-align:center;font-size:0.75rem;">' + (j.recheckScore ? '<span style="font-family:\'Cormorant Garamond\',serif;font-size:1.1rem;font-weight:600;color:' + (j.recheckScore >= 80 ? 'var(--green)' : j.recheckScore >= 60 ? 'var(--amber)' : 'var(--red)') + ';">' + j.recheckScore + '%</span>' : '<span style="color:var(--border);">—</span>') + '</td>' +
+      '<td style="text-align:center;font-size:0.75rem;">' + (j.coverLetterDone ? '<span style="color:var(--green);">✓</span>' : '<span style="color:var(--border);">—</span>') + '</td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.screening?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'screening\',this.checked)"><span>Screen</span></div></td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.interview?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'interview\',this.checked)"><span>Interview</span></div></td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.rejected?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'rejected\',this.checked)"><span>Rejected</span></div></td>' +
