@@ -888,6 +888,13 @@
 
   .score-improved { display: block; }
   .score-improved-inline { display: block; }
+  .prep-dropdown-wrap { position: relative; display: inline-block; }
+  .prep-btn { font-family: 'Raleway', sans-serif; font-size: 0.6rem; letter-spacing: 0.06em; padding: 0.25rem 0.6rem; border: 1px solid var(--border); background: transparent; color: var(--mid); cursor: pointer; border-radius: 3px; white-space: nowrap; transition: all 0.15s; text-transform: uppercase; }
+  .prep-btn:hover { border-color: var(--black); color: var(--black); }
+  .prep-menu { position: absolute; right: 0; top: 100%; background: #ffffff; border: 1px solid var(--border); border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100; min-width: 160px; }
+  .prep-menu div { padding: 0.6rem 1rem; font-family: 'Raleway', sans-serif; font-size: 0.72rem; color: var(--black); cursor: pointer; border-bottom: 1px solid var(--border); }
+  .prep-menu div:last-child { border-bottom: none; }
+  .prep-menu div:hover { background: var(--bgoff); }
 
   /* Manual add form */
   .manual-add-wrap { margin-bottom: 1.5rem; }
@@ -1446,8 +1453,7 @@
       <div id="jobs-empty" class="empty-state">No applications logged yet. Add your first one above.</div>
       <div class="jobs-table-wrap" id="jobs-table-wrap" style="display:none;">
         <table class="jobs-table">
-          <thead><tr><th>Company</th><th>Role</th><th>Date</th><th>How Applied</th><th style="text-align:center;">Screening</th><th style="text-align:center;">Interview</th><th style="text-align:center;">Rejected</th><th style="text-align:center;">Hired</th><th></th></tr></thead>
-          <tbody id="jobs-tbody"></tbody>
+<thead><tr><th>Company</th><th>Role</th><th>Date</th><th>How Applied</th><th style="text-align:center;">Screening</th><th style="text-align:center;">Interview</th><th style="text-align:center;">Rejected</th><th style="text-align:center;">Hired</th><th>Prep</th><th></th></tr></thead>          <tbody id="jobs-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -2898,15 +2904,61 @@ function renderJobs() {
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.interview?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'interview\',this.checked)"><span>Interview</span></div></td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.rejected?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'rejected\',this.checked)"><span>Rejected</span></div></td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.hired?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'hired\',this.checked)"><span>Hired!</span></div></td>' +
-      '<td><button class="delete-job-btn" onclick="event.stopPropagation();deleteJob(\'' + j.id + '\')" title="Remove">✕</button></td></tr>' + detailRow;
+'<td style="position:relative;"><div class="prep-dropdown-wrap"><button class="prep-btn" onclick="event.stopPropagation();togglePrepMenu(\'' + j.id + '\')">Prep ▾</button><div class="prep-menu" id="prep-menu-' + j.id + '" style="display:none;"><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'interview-prep\')">Interview Prep</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'company-research\')">Company Research</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'salary-intel\')">Salary Intel</div></div></div></td>' +
+'<td><button class="delete-job-btn" onclick="event.stopPropagation();deleteJob(\'' + j.id + '\')" title="Remove">✕</button></td></tr>' + detailRow;
   }).join('');
+}
+
+function togglePrepMenu(id) {
+  document.querySelectorAll('.prep-menu').forEach(m => {
+    if (m.id !== 'prep-menu-' + id) m.style.display = 'none';
+  });
+  const menu = document.getElementById('prep-menu-' + id);
+  if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', () => {
+  document.querySelectorAll('.prep-menu').forEach(m => m.style.display = 'none');
+});
+
+function prepJob(id, destination) {
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  document.querySelectorAll('.prep-menu').forEach(m => m.style.display = 'none');
+  if (job.role || job.company) {
+    savedRoleName = (job.role || '') + (job.company && job.company !== '(see URL)' ? ' at ' + job.company : '');
+    document.getElementById('job-role-name').value = savedRoleName;
+  }
+  if (job.url) { savedJDUrl = job.url; document.getElementById('jd-url').value = job.url; }
+  if (destination === 'company-research') {
+    const nameEl = document.getElementById('company-name');
+    const urlEl = document.getElementById('company-url');
+    if (nameEl && job.company && job.company !== '(see URL)') nameEl.value = job.company;
+    if (urlEl && job.url) urlEl.value = job.url;
+  }
+  if (destination === 'salary-intel') {
+    const roleEl = document.getElementById('sal-role');
+    const salEl = document.getElementById('sal-offered');
+    const locEl = document.getElementById('sal-location');
+    if (roleEl && job.role) roleEl.value = job.role;
+    if (salEl && job.salary) salEl.value = job.salary;
+    if (locEl && job.location) locEl.value = job.location;
+  }
+  if (destination === 'interview-prep') {
+    const focusEl = document.getElementById('interview-focus');
+    if (focusEl) focusEl.value = 'Role: ' + (job.role || '') + (job.company && job.company !== '(see URL)' ? ' at ' + job.company : '');
+  }
+  document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const link = document.querySelector('nav a[data-panel="' + destination + '"]');
+  if (link) link.classList.add('active');
+  const panel = document.getElementById('panel-' + destination);
+  if (panel) panel.classList.add('active');
 }
 
 function escHtml(str) { return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function toggleStage(id, field, val) { const job = jobs.find(j => j.id === id); if (!job) return; job[field] = val; saveJobs(); renderJobs(); }
 function deleteJob(id) { if (!confirm('Remove this application?')) return; jobs = jobs.filter(j => j.id !== id); saveJobs(); renderJobs(); }
 function toggleDetailRow(id) { const r = document.querySelector('[data-detail-id="' + id + '"]'); if (r) r.style.display = r.style.display === 'none' ? 'table-row' : 'none'; }
-
 document.getElementById('manual-add-btn').addEventListener('click', () => {
   const wrap = document.getElementById('manual-add-wrap');
   wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
