@@ -886,8 +886,8 @@
     letter-spacing: 0.1em;
   }
 
-  .score-improved { display: none; }
-  .score-improved-inline { display: none; }
+  .score-improved { display: block; }
+  .score-improved-inline { display: block; }
 
   /* Manual add form */
   .manual-add-wrap { margin-bottom: 1.5rem; }
@@ -1165,8 +1165,10 @@
             </div>
           </div>
         </div>
-      </div>
+     </div>
 
+      <div style="margin-top:2rem; border-top:1px solid var(--border); padding-top:1.5rem;">
+        <div class="panel-desc" style="margin-bottom:0.8rem; font-weight:500; color:var(--black);">Add a New Resume</div>
      <label>Resume Name *</label>
         <input type="text" id="new-resume-name" placeholder="e.g., VP of Strategy">
         <label>Upload PDF <span style="font-weight:400;color:var(--mid);">— or paste text below</span></label>
@@ -1181,6 +1183,7 @@
           <button class="btn" id="add-resume-btn">Add Resume</button>
         </div>
         <div id="add-resume-msg" style="display:none;margin-top:0.8rem;font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.1em;"></div>
+      </div>
       </div>
     </div>
 
