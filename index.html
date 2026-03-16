@@ -886,8 +886,8 @@
     letter-spacing: 0.1em;
   }
 
-  .score-improved { display: block; }
-  .score-improved-inline { display: block; }
+  .score-improved { display: none; }
+  .score-improved-inline { display: none; }
 
   /* Manual add form */
   .manual-add-wrap { margin-bottom: 1.5rem; }
@@ -1165,7 +1165,7 @@
             </div>
           </div>
         </div>
-     </div>
+      </div>
 
       <div style="margin-top:2rem; border-top:1px solid var(--border); padding-top:1.5rem;">
         <div class="panel-desc" style="margin-bottom:0.8rem; font-weight:500; color:var(--black);">Add a New Resume</div>
@@ -1183,7 +1183,6 @@
           <button class="btn" id="add-resume-btn">Add Resume</button>
         </div>
         <div id="add-resume-msg" style="display:none;margin-top:0.8rem;font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.1em;"></div>
-      </div>
       </div>
     </div>
 
@@ -1258,6 +1257,10 @@
         ✓ Auto-selected <strong id="le-auto-resume-name"></strong> — the highest scorer from your ATS analysis.
       </div>
 
+      <div id="le-resume-confirm" class="step-hint" style="border-color:#1a1a1a;background:#f7f6f4;margin-bottom:1rem;display:none;">
+        Generating edits for: <strong id="le-resume-confirm-name"></strong>
+      </div>
+
       <div class="btn-row">
         <button class="btn" id="gen-edits-btn">Generate Line-by-Line Edits</button>
       </div>
@@ -1289,7 +1292,6 @@
       <div class="loading" id="recheck-loading"><div class="spinner"></div>Analyzing revised resume…</div>
       <div class="error-msg" id="recheck-error"></div>
 
-      <div class="score-cards" id="recheck-score-card" style="display:none; margin-bottom:1rem;"></div>
       <div class="result-box" id="recheck-result">
         <div class="tab-row" id="recheck-tabs" style="margin-bottom:1rem;">
           <div class="tab active" data-rcsec="keywords">Missing Keywords</div>
@@ -1301,11 +1303,10 @@
         <div id="recheck-improvement-output" class="stream-output" style="display:none;"></div>
         <div id="recheck-gaps-output" class="stream-output" style="display:none;"></div>
         <div id="recheck-ready-output" class="stream-output" style="display:none;"></div>
-       <div class="stream-output" id="recheck-output" style="display:none;"></div>
+        <div class="stream-output" id="recheck-output" style="display:none;"></div>
         <div id="recheck-to-le-row" style="display:none; margin-top:1rem;">
-          <button class="btn" id="recheck-to-le-btn">Turn Recommendations into Line Edits</button>
+          <button class="btn" id="recheck-to-le-btn">Turn Recommendations into Line Edits →</button>
         </div>
-      </div>
       </div>
     </div>
 
@@ -1896,6 +1897,8 @@ function loadSavedResumes() {
     if (saved) { RESUMES[key].text = saved; RESUMES[key].custom = true; }
     const savedLabel = localStorage.getItem(LS_PREFIX + key + '_label');
     if (savedLabel) RESUMES[key].label = savedLabel;
+    const hidden = localStorage.getItem(LS_PREFIX + key + '_hidden');
+    if (hidden) RESUMES[key].hidden = true;
   });
   // Load custom-added resumes
   const customKeys = JSON.parse(localStorage.getItem('cara_custom_resume_keys') || '[]');
@@ -1914,12 +1917,30 @@ function saveResume(key, text) {
   localStorage.setItem(LS_PREFIX + key, text);
   RESUMES[key].text = text;
   RESUMES[key].custom = true;
+  RESUMES[key].hidden = false;
+  localStorage.removeItem(LS_PREFIX + key + '_hidden');
 }
 
 function clearResume(key) {
   localStorage.removeItem(LS_PREFIX + key);
   const orig = RESUME_DEFAULTS[key];
-  if (orig) { RESUMES[key].text = orig; RESUMES[key].custom = false; }
+  if (orig) {
+    RESUMES[key].text = orig;
+    RESUMES[key].custom = false;
+    // Mark built-in as hidden so it disappears from pills
+    RESUMES[key].hidden = true;
+    localStorage.setItem(LS_PREFIX + key + '_hidden', '1');
+  } else {
+    // Custom resume — fully delete it
+    delete RESUMES[key];
+    const idx = RESUME_KEYS.findIndex(r => r.key === key);
+    if (idx > -1) RESUME_KEYS.splice(idx, 1);
+    const customKeys = JSON.parse(localStorage.getItem('cara_custom_resume_keys') || '[]');
+    localStorage.setItem('cara_custom_resume_keys', JSON.stringify(customKeys.filter(k => k.key !== key)));
+    localStorage.removeItem(LS_PREFIX + key + '_label');
+    const slotEl = document.getElementById('slot-' + key);
+    if (slotEl) slotEl.remove();
+  }
 }
 
 function renameSlot(key, newName) {
@@ -1950,14 +1971,35 @@ function buildUploadSlots() {
     const removeBtn = document.getElementById('remove-' + key);
     const titleInput = document.getElementById('title-' + key);
     if (statusEl) {
-      statusEl.className = 'resume-slot-status ' + (isCustom ? 'slot-status-custom' : 'slot-status-default');
-      statusEl.textContent = isCustom ? '✓ Your version loaded' : 'Using built-in default';
+      if (RESUMES[key].hidden) {
+        statusEl.className = 'resume-slot-status';
+        statusEl.style.cssText = 'background:#fdf0f0;color:#8b2020;';
+        statusEl.textContent = '✕ Excluded from analysis';
+      } else {
+        statusEl.className = 'resume-slot-status ' + (isCustom ? 'slot-status-custom' : 'slot-status-default');
+        statusEl.textContent = isCustom ? '✓ Your version loaded' : 'Using built-in default';
+        statusEl.style.cssText = '';
+      }
     }
     if (previewEl) {
       if (isCustom) { previewEl.className = 'slot-preview has-text'; previewEl.textContent = RESUMES[key].text.substring(0, 220).replace(/\s+/g, ' ') + '…'; }
       else { previewEl.className = 'slot-preview'; previewEl.textContent = 'No file uploaded yet.'; }
     }
-    if (removeBtn) removeBtn.style.display = isCustom ? 'inline-block' : 'none';
+    if (removeBtn) {
+      if (RESUMES[key].hidden) {
+        removeBtn.style.display = 'inline-block';
+        removeBtn.textContent = '↩ Re-add to Analysis';
+        removeBtn.onclick = () => {
+          RESUMES[key].hidden = false;
+          localStorage.removeItem(LS_PREFIX + key + '_hidden');
+          buildUploadSlots();
+        };
+      } else {
+        removeBtn.style.display = 'inline-block';
+        removeBtn.textContent = '✕ Remove';
+        removeBtn.onclick = () => clearSlot(key);
+      }
+    }
     if (titleInput) titleInput.value = RESUMES[key].label;
   });
   
@@ -1967,6 +2009,7 @@ function buildUploadSlots() {
     if (container) container.innerHTML = '';
   });
   for (const [key, resume] of Object.entries(RESUMES)) {
+    if (resume.hidden) continue;
     const name = resume.label;
     const atsContainer = document.getElementById('ats-resume-pills');
     const leContainer = document.getElementById('le-resume-pills');
@@ -2092,17 +2135,24 @@ function attachPillListeners() {
       selectedInterviewResume = pill.dataset.resume;
     });
   });
- document.querySelectorAll('#le-resume-pills .pill').forEach(pill => {
+  document.querySelectorAll('#le-resume-pills .pill').forEach(pill => {
     pill.addEventListener('click', () => {
+      const confirm = document.getElementById('le-resume-confirm');
+      const confirmName = document.getElementById('le-resume-confirm-name');
       if (pill.classList.contains('selected')) {
         pill.classList.remove('selected');
         selectedLeResume = atsHighestResume || null;
         document.getElementById('le-auto-hint').style.display = atsHighestResume ? 'block' : 'none';
+        if (confirm && confirmName) {
+          confirmName.textContent = atsHighestResume ? RESUMES[atsHighestResume].label : '(none selected)';
+          confirm.style.display = atsHighestResume ? 'block' : 'none';
+        }
       } else {
         document.querySelectorAll('#le-resume-pills .pill').forEach(p => p.classList.remove('selected'));
         pill.classList.add('selected');
         selectedLeResume = pill.dataset.resume;
         document.getElementById('le-auto-hint').style.display = 'none';
+        if (confirm && confirmName) { confirmName.textContent = RESUMES[pill.dataset.resume]?.label || pill.dataset.resume; confirm.style.display = 'block'; }
       }
     });
   });
@@ -2334,7 +2384,7 @@ ${updatedResume}
 
 Run a comprehensive ATS check on this revised resume:
 
-1. **Overall ATS Score**: Give a percentage (0-100%). Output it on its own line EXACTLY like this: RECHECK_SCORE: [XX]%
+1. **Overall ATS Score**: Give a percentage (0-100%)
 2. **Keyword Match**: List matched keywords and any still missing
 3. **Score Improvement**: Compare to what a typical unoptimized resume would score
 4. **Remaining Gaps**: Any final tweaks needed to hit 95%+
@@ -2369,17 +2419,9 @@ Be specific and direct.`;
         return '<div class="ats-paragraph">' + boldify(t) + '</div>';
       }).join('') + '</div>';
     };
-   await callClaude(systemPrompt, userMsg, (text) => {
+    await callClaude(systemPrompt, userMsg, (text) => {
       fullText = text;
       kwOut.innerHTML = formatRecheckContent(text);
-      const sm = text.match(/RECHECK_SCORE:\s*(\d+)%/);
-      if (sm) {
-        const pct = parseInt(sm[1]);
-        const colorClass = pct >= 80 ? 'score-high' : pct >= 60 ? 'score-mid' : 'score-low';
-        const card = document.getElementById('recheck-score-card');
-        card.style.display = 'flex';
-        card.innerHTML = `<div class="score-card"><div class="score-num ${colorClass}">${pct}%</div><div class="score-label">Revised Resume Score</div></div>`;
-      }
     });
 
     // On complete, split into sections and populate tabs
@@ -2410,23 +2452,45 @@ Be specific and direct.`;
         if (active) active.style.display = 'block';
       });
     });
-   // Show recommendations-to-line-edits button
+
+    // Show Turn into Line Edits button
     document.getElementById('recheck-to-le-row').style.display = 'block';
     document.getElementById('recheck-to-le-btn').onclick = async () => {
-      const jd = savedJD || document.getElementById('jd-text').value.trim();
-      const resume = updatedResume;
-      if (!jd || !resume) return;
-      const systemPrompt = `You are a senior resume editor. ${`PERSPECTIVE: You are advising from the point of view of a hiring manager. What problems does this role solve at a company like this? How do I empower Cara to position herself as that solution?\n\n`}You produce precise, surgical edits — exact original text, exact replacement, and one-line reason. Never invent experience not in the resume.`;
-      const userMsg = `Based on these recommendations from a revised resume check:\n\n${fullText}\n\nJOB DESCRIPTION:\n${jd}\n\nRESUME:\n${resume}\n\nConvert each recommendation into edit blocks using this EXACT format:\n\nSECTION: [section name, include company if Professional History]\nBEFORE: [exact original text verbatim]\nAFTER: [rewritten version — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nWHY: [one sentence]`;
+      // Navigate to line edits panel
+      document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      const leLink = document.querySelector('nav a[data-panel="line-edits"]');
+      if (leLink) leLink.classList.add('active');
+      document.getElementById('panel-line-edits').classList.add('active');
+      // Set round 2 indicator
+      let r2 = document.getElementById('le-round2-hint');
+      if (!r2) {
+        r2 = document.createElement('div');
+        r2.id = 'le-round2-hint';
+        r2.className = 'step-hint';
+        r2.style.cssText = 'border-color:#1e6b35;background:#f0f7f2;margin-bottom:1rem;';
+        r2.innerHTML = '🔄 <strong>Round 2:</strong> Generating edits based on your Revised Resume Check recommendations.';
+        document.getElementById('le-result').before(r2);
+      }
+      r2.style.display = 'block';
+      // Run the edits
+      const jd2 = savedJD || document.getElementById('jd-text').value.trim();
+      if (!jd2 || !updatedResume) return;
+      const sp2 = `You are a senior resume editor. PERSPECTIVE: You are advising from the point of view of a hiring manager. What problems does this role solve at a company like this? How do I empower Cara to position herself as that solution?\n\nYou produce precise, surgical edits — exact original text, exact replacement, and one-line reason. Never invent experience not in the resume.`;
+      const um2 = `Based on these recommendations from a revised resume check:\n\n${fullText}\n\nJOB DESCRIPTION:\n${jd2}\n\nRESUME:\n${updatedResume}\n\nConvert each recommendation into edit blocks using this EXACT format:\n\nSECTION: [section name, include company if Professional History]\nBEFORE: [exact original text verbatim]\nAFTER: [rewritten version — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nWHY: [one sentence]`;
       const leOutput = document.getElementById('le-output');
-      document.getElementById('panel-line-edits').scrollIntoView({ behavior: 'smooth' });
-      setTimeout(async () => {
-        leOutput.textContent = '';
-        document.getElementById('le-result').classList.add('visible');
-        let fullLe = '';
-        await callClaude(systemPrompt, userMsg, (text) => { fullLe = text; leOutput.textContent = text; });
+      leOutput.textContent = '';
+      showLoading('le-loading');
+      document.getElementById('le-result').classList.add('visible');
+      let fullLe = '';
+      try {
+        await callClaude(sp2, um2, (text) => { fullLe = text; leOutput.textContent = text; });
         renderEditBlocks(fullLe, leOutput);
-      }, 600);
+      } catch(e) {
+        leOutput.textContent = 'Error: ' + e.message;
+      } finally {
+        hideLoading('le-loading');
+      }
     };
 
     // Show first tab
@@ -3111,14 +3175,15 @@ document.querySelectorAll('#le-focus-tabs .tab').forEach(tab => {
 
 function autoSelectBestResume(resumeKey, resumeLabel) {
   atsHighestResume = resumeKey;
-  // Update pills
   document.querySelectorAll('#le-resume-pills .pill').forEach(p => {
     p.classList.toggle('selected', p.dataset.resume === resumeKey);
   });
   selectedLeResume = resumeKey;
-  // Show hint
   document.getElementById('le-auto-resume-name').textContent = resumeLabel;
   document.getElementById('le-auto-hint').style.display = 'block';
+  const confirm = document.getElementById('le-resume-confirm');
+  const confirmName = document.getElementById('le-resume-confirm-name');
+  if (confirm && confirmName) { confirmName.textContent = resumeLabel; confirm.style.display = 'block'; }
 }
 
 document.getElementById('gen-edits-btn').addEventListener('click', async () => {
@@ -3156,8 +3221,7 @@ EDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+
 
 SECTION: [Be specific. For Professional History bullets, include the company name: e.g., "Professional History — Kroger" or "Professional History — The RealReal". For other sections use the name: e.g., "Synopsis", "Core Competencies", "Education"]
 BEFORE: [exact original text, copied verbatim]
-AFTER: [your rewritten version — complete, ready to paste. IMPORTANT: If this edit is within a Highlights subsection (e.g. a line that starts with "END-TO-END SERVICE DESIGN & DELIVERY:" or similar), the AFTER field must contain ONLY the pipe-separated content that follows the subsection label — do NOT include the subsection label itself in the AFTER field. Match punctuation exactly to context: if this is a partial replacement, do not add a period unless the original fragment ends with one]
-TYPE: [one of: Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]
+AFTER: [your rewritten version — complete, ready to paste]
 WHY: [one sentence explaining the specific ATS improvement this makes]
 
 INTEGRITY RULES (non-negotiable):
@@ -3252,12 +3316,13 @@ function renderEditBlocks(rawText, container) {
     // Parse each field using indexOf-based extraction
     function extractField(text, fieldName, nextFields) {
       const marker = fieldName + ':';
-      const start = text.indexOf(marker);
+      const lineStart = text.search(new RegExp('(^|\\n)' + fieldName + ':', ''));
+      const start = lineStart < 0 ? -1 : text.indexOf(marker, lineStart);
       if (start < 0) return '';
       let end = text.length;
       for (const next of nextFields) {
-        const ni = text.indexOf(next + ':', start + marker.length);
-        if (ni > 0 && ni < end) end = ni;
+        const ni = text.search(new RegExp('(^|\\n)' + next + ':', ''));
+        if (ni > start && ni < end) end = ni;
       }
       return text.substring(start + marker.length, end).trim();
     }
@@ -3273,7 +3338,7 @@ function renderEditBlocks(rawText, container) {
     const editId = 'edit-block-' + i;
     html += `<div class="edit-block" id="${editId}">
    <div class="edit-block-header">
-        <div><strong>Edit ${i + 1}</strong>${section ? `<span style="display:inline-block;margin-left:0.6rem;padding:0.15rem 0.55rem;background:var(--bg);border:1px solid var(--border);border-radius:3px;font-size:0.68rem;font-weight:600;color:var(--ink);letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}${type ? `<span style="display:inline-block;margin-left:0.4rem;padding:0.15rem 0.55rem;background:#e8f0fe;border:1px solid #c5d4f5;border-radius:3px;font-size:0.68rem;font-weight:600;color:#2a4db5;letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}</div>
+        <div><strong>Edit ${i + 1}</strong>${section ? `<span style="display:inline-block;margin-left:0.6rem;padding:0.15rem 0.55rem;background:#1a1a1a;border:1px solid #1a1a1a;border-radius:3px;font-size:0.68rem;font-weight:600;color:#ffffff;letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}${type ? `<span style="display:inline-block;margin-left:0.4rem;padding:0.15rem 0.55rem;background:#e8f0fe;border:1px solid #c5d4f5;border-radius:3px;font-size:0.68rem;font-weight:600;color:#2a4db5;letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}</div>
       </div>
       <div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>
       <div class="edit-row-after" id="after-${i}"><span class="edit-label">Replace with</span><span class="after-text">${escHtml(after)}</span><button class="copy-btn" style="float:right;margin-left:0.5rem;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="var t=this.previousElementSibling.textContent;navigator.clipboard.writeText(t).then(function(){},function(){});this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy'},2000)">Copy</button></div>
