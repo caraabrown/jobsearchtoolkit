@@ -401,68 +401,102 @@
     min-height: 40px;
   }
   .ats-result-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
   .ats-formatted { font-size: 0.88rem; line-height: 1.6; }
   .ats-heading {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--black);
-    margin: 0 0 1.2rem 0;
-    padding-bottom: 0;
-    grid-column: 1 / -1;
-    letter-spacing: -0.01em;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--mid);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 1.5rem 0 0.75rem 0;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
   }
+  .ats-heading:first-child { margin-top: 0; }
   .ats-subhead {
     font-family: 'Open Sans', sans-serif;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: 700;
-    letter-spacing: 0;
-    text-transform: none;
     color: var(--black);
-    margin: 1.2rem 0 0.6rem 0;
-    grid-column: 1 / -1;
+    margin: 1.2rem 0 0.5rem 0;
+    letter-spacing: 0.02em;
   }
   .ats-paragraph {
-    font-family: 'Instrument Sans', sans-serif;
-    font-size: 0.88rem;
-    line-height: 1.7;
-    color: var(--mid);
-    margin-bottom: 0.8rem;
-    grid-column: 1 / -1;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.75;
+    color: var(--black);
+    margin-bottom: 0.5rem;
   }
   .ats-line {
-    padding: 0.6rem 1rem;
-    color: var(--black);
-    margin: 0.5rem 0;
-    border-radius: 3px;
-    font-family: 'Instrument Sans', sans-serif;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-family: 'Open Sans', sans-serif;
     font-size: 0.85rem;
     line-height: 1.5;
+    margin: 0.25rem 0;
+  }
+  .ats-line-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 800;
+    margin-top: 0.1rem;
   }
   .ats-bullet {
-    font-family: 'Instrument Sans', sans-serif;
-    font-size: 0.85rem;
-    line-height: 1.6;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.65;
     color: var(--black);
-    margin: 0.4rem 0 0.4rem 1rem;
-    padding-left: 0.8rem;
-    border-left: 2px solid #e0e0e0;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    background: #f8f8f6;
+    margin: 0.2rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+  .ats-bullet::before {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--mid);
+    flex-shrink: 0;
+    margin-top: 0.55rem;
   }
   .ats-win {
-    background: var(--greenlt);
-    border-left: 3px solid var(--green);
-    color: var(--green);
+    background: #f0faf4;
+    border: 1px solid #b8e6c8;
+    color: var(--black);
+  }
+  .ats-win .ats-line-icon {
+    background: var(--green);
+    color: white;
   }
   .ats-warn {
-    background: #fff8f0;
-    border-left: 3px solid #cc8800;
-    color: #7a5000;
+    background: #fdf6ec;
+    border: 1px solid #f0d49a;
+    color: var(--black);
   }
-
+  .ats-warn .ats-line-icon {
+    background: #cc8800;
+    color: white;
+  }
   /* ─── TABS ─── */
   .tab-row {
     display: flex;
@@ -1028,7 +1062,7 @@
               <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-principal_ds').click()">&#11014; Upload PDF / TXT</button>
               <input type="file" accept=".pdf,.txt" id="file-principal_ds" style="display:none" onchange="handleFileUpload('principal_ds',this.files[0])">
               <button class="slot-btn" onclick="showPasteArea('principal_ds')">&#9998; Paste Text</button>
-              <button class="slot-btn danger" id="remove-principal_ds" onclick="clearSlot('principal_ds')" style="display:none">&#10005; Remove</button>
+              <button class="slot-btn danger" id="remove-principal_ds" onclick="clearSlot('principal_ds')">&#10005; Remove</button>
             </div>
           </div>
           <div class="slot-paste-area" id="paste-area-principal_ds">
@@ -1051,7 +1085,7 @@
               <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-principal_ds_brief').click()">&#11014; Upload PDF / TXT</button>
               <input type="file" accept=".pdf,.txt" id="file-principal_ds_brief" style="display:none" onchange="handleFileUpload('principal_ds_brief',this.files[0])">
               <button class="slot-btn" onclick="showPasteArea('principal_ds_brief')">&#9998; Paste Text</button>
-              <button class="slot-btn danger" id="remove-principal_ds_brief" onclick="clearSlot('principal_ds_brief')" style="display:none">&#10005; Remove</button>
+              <button class="slot-btn danger" id="remove-principal_ds_brief" onclick="clearSlot('principal_ds_brief')">&#10005; Remove</button>
             </div>
           </div>
           <div class="slot-paste-area" id="paste-area-principal_ds_brief">
@@ -1074,7 +1108,7 @@
               <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-service_designer').click()">&#11014; Upload PDF / TXT</button>
               <input type="file" accept=".pdf,.txt" id="file-service_designer" style="display:none" onchange="handleFileUpload('service_designer',this.files[0])">
               <button class="slot-btn" onclick="showPasteArea('service_designer')">&#9998; Paste Text</button>
-              <button class="slot-btn danger" id="remove-service_designer" onclick="clearSlot('service_designer')" style="display:none">&#10005; Remove</button>
+              <button class="slot-btn danger" id="remove-service_designer" onclick="clearSlot('service_designer')">&#10005; Remove</button>
             </div>
           </div>
           <div class="slot-paste-area" id="paste-area-service_designer">
@@ -1097,7 +1131,7 @@
               <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-product_designer').click()">&#11014; Upload PDF / TXT</button>
               <input type="file" accept=".pdf,.txt" id="file-product_designer" style="display:none" onchange="handleFileUpload('product_designer',this.files[0])">
               <button class="slot-btn" onclick="showPasteArea('product_designer')">&#9998; Paste Text</button>
-              <button class="slot-btn danger" id="remove-product_designer" onclick="clearSlot('product_designer')" style="display:none">&#10005; Remove</button>
+              <button class="slot-btn danger" id="remove-product_designer" onclick="clearSlot('product_designer')">&#10005; Remove</button>
             </div>
           </div>
           <div class="slot-paste-area" id="paste-area-product_designer">
@@ -1120,7 +1154,7 @@
               <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-chief_of_staff').click()">&#11014; Upload PDF / TXT</button>
               <input type="file" accept=".pdf,.txt" id="file-chief_of_staff" style="display:none" onchange="handleFileUpload('chief_of_staff',this.files[0])">
               <button class="slot-btn" onclick="showPasteArea('chief_of_staff')">&#9998; Paste Text</button>
-              <button class="slot-btn danger" id="remove-chief_of_staff" onclick="clearSlot('chief_of_staff')" style="display:none">&#10005; Remove</button>
+              <button class="slot-btn danger" id="remove-chief_of_staff" onclick="clearSlot('chief_of_staff')">&#10005; Remove</button>
             </div>
           </div>
           <div class="slot-paste-area" id="paste-area-chief_of_staff">
@@ -1133,10 +1167,14 @@
         </div>
       </div>
 
-      <div style="margin-top:2rem; border-top:1px solid var(--border); padding-top:1.5rem;">
-        <div class="panel-desc" style="margin-bottom:0.8rem; font-weight:500; color:var(--black);">Add a New Resume</div>
-        <label>Resume Name *</label>
+     <label>Resume Name *</label>
         <input type="text" id="new-resume-name" placeholder="e.g., VP of Strategy">
+        <label>Upload PDF <span style="font-weight:400;color:var(--mid);">— or paste text below</span></label>
+        <div style="margin-bottom:0.75rem;">
+          <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('new-resume-file').click()">&#11014; Upload PDF / TXT</button>
+          <input type="file" accept=".pdf,.txt" id="new-resume-file" style="display:none" onchange="handleNewResumeFile(this.files[0])">
+          <span id="new-resume-file-name" style="font-size:0.78rem;color:var(--mid);margin-left:0.75rem;"></span>
+        </div>
         <label>Resume Text *</label>
         <textarea id="new-resume-text" placeholder="Paste the full text of this resume…" rows="10"></textarea>
         <div class="btn-row" style="margin-top:0.8rem;">
@@ -1967,6 +2005,30 @@ function savePastedResume(key) {
   buildUploadSlots();
 }
 
+async function handleNewResumeFile(file) {
+  if (!file) return;
+  const nameEl = document.getElementById('new-resume-file-name');
+  nameEl.textContent = file.name;
+  try {
+    let text = '';
+    if (file.name.endsWith('.pdf')) {
+      if (typeof pdfjsLib === 'undefined') { alert('PDF library not loaded. Paste text instead.'); return; }
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      text = await extractPdfText(file);
+    } else {
+      text = await file.text();
+    }
+    if (text && text.length > 50) {
+      document.getElementById('new-resume-text').value = text;
+      nameEl.textContent = file.name + ' ✓';
+    } else {
+      alert('Could not extract text. Try pasting instead.');
+    }
+  } catch(e) {
+    alert('Error reading file: ' + e.message);
+  }
+}
+
 function clearSlot(key) {
   if (!confirm('Remove your uploaded version and go back to the built-in default?')) return;
   clearResume(key);
@@ -2027,12 +2089,18 @@ function attachPillListeners() {
       selectedInterviewResume = pill.dataset.resume;
     });
   });
-  document.querySelectorAll('#le-resume-pills .pill').forEach(pill => {
+ document.querySelectorAll('#le-resume-pills .pill').forEach(pill => {
     pill.addEventListener('click', () => {
-      document.querySelectorAll('#le-resume-pills .pill').forEach(p => p.classList.remove('selected'));
-      pill.classList.add('selected');
-      selectedLeResume = pill.dataset.resume;
-      document.getElementById('le-auto-hint').style.display = 'none';
+      if (pill.classList.contains('selected')) {
+        pill.classList.remove('selected');
+        selectedLeResume = atsHighestResume || null;
+        document.getElementById('le-auto-hint').style.display = atsHighestResume ? 'block' : 'none';
+      } else {
+        document.querySelectorAll('#le-resume-pills .pill').forEach(p => p.classList.remove('selected'));
+        pill.classList.add('selected');
+        selectedLeResume = pill.dataset.resume;
+        document.getElementById('le-auto-hint').style.display = 'none';
+      }
     });
   });
 }
@@ -2041,6 +2109,9 @@ function attachPillListeners() {
 let savedJD = '';
 let savedJDUrl = '';
 let savedRoleName = '';
+let savedAtsKeywords = '';
+let savedAtsFlags = '';
+let savedAtsPath = '';
 let selectedResumesForATS = new Set();
 let selectedResumeForCL = 'principal_ds';
 let selectedCLTone = 'strategic';
@@ -2109,7 +2180,8 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
 // ─── API CALL HELPER ─────────────────────────────────────────────────────────
 async function callClaude(systemPrompt, userMessage, onChunk) {
   const hiringManagerLens = `PERSPECTIVE: You are advising from the point of view of a hiring manager, not a resume coach. For every response, ask yourself: What problems does this role solve at a company like this? How do I advise and empower Cara to position herself as that solution? Frame all edits, scores, cover letters, answers, and advice through that lens — what a hiring manager needs to see, not just what looks good on paper.\n\n`;
-  systemPrompt = hiringManagerLens + systemPrompt;
+  const atsContext = (savedAtsKeywords || savedAtsFlags || savedAtsPath) ? `ATS INSIGHTS FROM PRIOR ANALYSIS (use these to strengthen your response):\n${savedAtsKeywords ? 'MISSING KEYWORDS:\n' + savedAtsKeywords + '\n\n' : ''}${savedAtsFlags ? 'RED FLAGS & WINS:\n' + savedAtsFlags + '\n\n' : ''}${savedAtsPath ? 'FASTEST PATH TO 95%+:\n' + savedAtsPath + '\n\n' : ''}` : '';
+  systemPrompt = hiringManagerLens + atsContext + systemPrompt;
   const apiKey = localStorage.getItem('cara_api_key') || '';
   if (!apiKey) {
     throw new Error('No API key saved. Click ⚙ API Key in the header to add your key.');
@@ -2160,7 +2232,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     let fullText = '';
     await callClaude(systemPrompt, userMsg, (text) => {
       document.getElementById('score-cards-container').innerHTML = '';
-      const scoreMatches = [...text.matchAll(/SCORE:\s*(.+?)\s*=\s*(\d+)%/g)];
+     const scoreMatches = [...text.matchAll(/^SCORE:\s*(.+?)\s*=\s*(\d+)%/gm)];
       if (scoreMatches.length > 0) {
         let highestPct = 0, highestKey = null, highestLabel = null;
         const resumeKeyMap = {};
@@ -2181,9 +2253,9 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
           const improvedHtml = improved ? `<div class="score-improved-inline">↑ ${improved}% with edits</div>` : '';
           document.getElementById('score-cards-container').innerHTML += `
             <div class="score-card">
+              <div class="score-label" style="margin-bottom:0.4rem;">${name}</div>
               <div class="score-num ${colorClass}">${pct}%</div>
               ${improvedHtml}
-              <div class="score-label">${name}</div>
             </div>`;
           if (pct > highestPct) { highestPct = pct; highestLabel = name;
             for (const [label, key] of Object.entries(resumeKeyMap)) { if (name.includes(label) || label.includes(name)) { highestKey = key; break; } }
@@ -2201,22 +2273,25 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     }
     function formatAtsContent(raw) {
       if (!raw) return '';
+      function boldify(t) { return t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*\*/g,''); }
       return '<div class="ats-result-section">' + raw.split('\n').map(line => {
         const t = line.trim(); if (!t) return '';
-        if (/^#{1,3}\s/.test(t)) return '<div class="ats-heading">' + t.replace(/^#+\s*/,'').replace(/\*\*/g,'') + '</div>';
-        if (t.startsWith('**') && t.endsWith('**')) return '<div class="ats-subhead">' + t.replace(/\*\*/g,'') + '</div>';
-        if (/^[\u2713\u2714\u2705✅]/.test(t)) return '<div class="ats-line ats-win">' + t + '</div>';
-        if (/^[\u2717\u2718\u274C❌⚠️🚩]/.test(t)) return '<div class="ats-line ats-warn">' + t + '</div>';
-        if (/^[-•*]\s/.test(t)) return '<div class="ats-bullet">' + t.replace(/^[-•*]\s*/,'') + '</div>';
-        if (/^\d+\.\s*\*\*/.test(t)) return '<div class="ats-subhead">' + t.replace(/^\d+\.\s*/,'').replace(/\*\*/g,'') + '</div>';
-        let html = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        return '<div class="ats-paragraph">' + html + '</div>';
+        if (/^#{1,3}\s/.test(t)) return '<div class="ats-heading">' + boldify(t.replace(/^#+\s*/,'')) + '</div>';
+        if (t.startsWith('**') && t.endsWith('**')) return '<div class="ats-subhead">' + boldify(t) + '</div>';
+        if (/^\d+\.\s*\*\*/.test(t)) return '<div class="ats-subhead">' + boldify(t.replace(/^\d+\.\s*/,'')) + '</div>';
+        if (/^[\u2713\u2714\u2705✅]/.test(t)) return '<div class="ats-line ats-win"><span class="ats-line-icon">✓</span><span>' + boldify(t.replace(/^[\u2713\u2714\u2705✅]\s*/,'')) + '</span></div>';
+        if (/^[\u2717\u2718\u274C❌⚠️🚩]/.test(t)) return '<div class="ats-line ats-warn"><span class="ats-line-icon">✕</span><span>' + boldify(t.replace(/^[\u2717\u2718\u274C❌⚠️🚩]\s*/,'')) + '</span></div>';
+        if (/^[-•*]\s/.test(t)) return '<div class="ats-bullet"><span>' + boldify(t.replace(/^[-•*]\s*/,'')) + '</span></div>';
+        return '<div class="ats-paragraph">' + boldify(t) + '</div>';
       }).join('') + '</div>';
     }
     const bestTxt = atsSection(fullText, /##\s*BEST MATCH/i, /##\s*MISSING KEYWORDS/i);
     const kwTxt = atsSection(fullText, /##\s*MISSING KEYWORDS/i, /##\s*RED FLAGS/i);
     const flagsTxt = atsSection(fullText, /##\s*RED FLAGS/i, /##\s*FASTEST PATH/i);
-    const pathTxt = atsSection(fullText, /##\s*FASTEST PATH/i, null);
+  const pathTxt = atsSection(fullText, /##\s*FASTEST PATH/i, null);
+    savedAtsKeywords = kwTxt;
+    savedAtsFlags = flagsTxt;
+    savedAtsPath = pathTxt;
     document.getElementById('ats-best-output').innerHTML = formatAtsContent(bestTxt || fullText);
     document.getElementById('ats-keywords-output').innerHTML = formatAtsContent(kwTxt);
     document.getElementById('ats-flags-output').innerHTML = formatAtsContent(flagsTxt);
@@ -2277,18 +2352,18 @@ Be specific and direct.`;
     readyOut.textContent = '';
 
     let fullText = '';
-    let formatRecheckContent = function(raw) {
+   let formatRecheckContent = function(raw) {
       if (!raw) return '';
+      function boldify(t) { return t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*\*/g,''); }
       return '<div class="ats-result-section">' + raw.split('\n').map(line => {
         const t = line.trim(); if (!t) return '';
-        if (/^#{1,3}\s/.test(t)) return '<div class="ats-heading">' + t.replace(/^#+\s*/,'').replace(/\*\*/g,'') + '</div>';
-        if (t.startsWith('**') && t.endsWith('**')) return '<div class="ats-subhead">' + t.replace(/\*\*/g,'') + '</div>';
-        if (/^[\u2713\u2714\u2705✅]/.test(t)) return '<div class="ats-line ats-win">' + t + '</div>';
-        if (/^[\u2717\u2718\u274C❌⚠️🚩]/.test(t)) return '<div class="ats-line ats-warn">' + t + '</div>';
-        if (/^[-•*]\s/.test(t)) return '<div class="ats-bullet">' + t.replace(/^[-•*]\s*/,'') + '</div>';
-        if (/^\d+\.\s*\*\*/.test(t)) return '<div class="ats-subhead">' + t.replace(/^\d+\.\s*/,'').replace(/\*\*/g,'') + '</div>';
-        let html = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        return '<div class="ats-paragraph">' + html + '</div>';
+        if (/^#{1,3}\s/.test(t)) return '<div class="ats-heading">' + boldify(t.replace(/^#+\s*/,'')) + '</div>';
+        if (t.startsWith('**') && t.endsWith('**')) return '<div class="ats-subhead">' + boldify(t) + '</div>';
+        if (/^\d+\.\s*\*\*/.test(t)) return '<div class="ats-subhead">' + boldify(t.replace(/^\d+\.\s*/,'')) + '</div>';
+        if (/^[\u2713\u2714\u2705✅]/.test(t)) return '<div class="ats-line ats-win"><span class="ats-line-icon">✓</span><span>' + boldify(t.replace(/^[\u2713\u2714\u2705✅]\s*/,'')) + '</span></div>';
+        if (/^[\u2717\u2718\u274C❌⚠️🚩]/.test(t)) return '<div class="ats-line ats-warn"><span class="ats-line-icon">✕</span><span>' + boldify(t.replace(/^[\u2717\u2718\u274C❌⚠️🚩]\s*/,'')) + '</span></div>';
+        if (/^[-•*]\s/.test(t)) return '<div class="ats-bullet"><span>' + boldify(t.replace(/^[-•*]\s*/,'')) + '</span></div>';
+        return '<div class="ats-paragraph">' + boldify(t) + '</div>';
       }).join('') + '</div>';
     };
    await callClaude(systemPrompt, userMsg, (text) => {
@@ -3078,12 +3153,8 @@ EDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+
 
 SECTION: [Be specific. For Professional History bullets, include the company name: e.g., "Professional History — Kroger" or "Professional History — The RealReal". For other sections use the name: e.g., "Synopsis", "Core Competencies", "Education"]
 BEFORE: [exact original text, copied verbatim]
-<<<<<<< fix-le-highlights-subsection-copy
-AFTER: [your rewritten version — complete,AFTER: [your rewritten version — complete, ready to paste. IMPORTANT: If this edit is within a Highlights subsection (e.g. a line that starts with "END-TO-END SERVICE DESIGN & DELIVERY:" or similar), the AFTER field must contain ONLY the pipe-separated content that follows the subsection label — do NOT include the subsection label itself in the AFTER field]ready to paste]
-=======
 AFTER: [your rewritten version — complete, ready to paste. IMPORTANT: If this edit is within a Highlights subsection (e.g. a line that starts with "END-TO-END SERVICE DESIGN & DELIVERY:" or similar), the AFTER field must contain ONLY the pipe-separated content that follows the subsection label — do NOT include the subsection label itself in the AFTER field. Match punctuation exactly to context: if this is a partial replacement, do not add a period unless the original fragment ends with one]
 TYPE: [one of: Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]
->>>>>>> 5-feat-recheck-score-card
 WHY: [one sentence explaining the specific ATS improvement this makes]
 
 INTEGRITY RULES (non-negotiable):
@@ -3198,8 +3269,9 @@ function renderEditBlocks(rawText, container) {
 
     const editId = 'edit-block-' + i;
     html += `<div class="edit-block" id="${editId}">
-      <div class="edit-block-header">
-      <div><strong>Edit ${i + 1}</strong>${section ? `<span style="display:inline-block;margin-left:0.6rem;padding:0.15rem 0.55rem;background:var(--bg);border:1px solid var(--border);border-radius:3px;font-size:0.68rem;font-weight:600;color:var(--ink);letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}${type ? `<span style="display:inline-block;margin-left:0.4rem;padding:0.15rem 0.55rem;background:#e8f0fe;border:1px solid #c5d4f5;border-radius:3px;font-size:0.68rem;font-weight:600;color:#2a4db5;letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}</div>
+   <div class="edit-block-header">
+        <div><strong>Edit ${i + 1}</strong>${section ? `<span style="display:inline-block;margin-left:0.6rem;padding:0.15rem 0.55rem;background:var(--bg);border:1px solid var(--border);border-radius:3px;font-size:0.68rem;font-weight:600;color:var(--ink);letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}${type ? `<span style="display:inline-block;margin-left:0.4rem;padding:0.15rem 0.55rem;background:#e8f0fe;border:1px solid #c5d4f5;border-radius:3px;font-size:0.68rem;font-weight:600;color:#2a4db5;letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}</div>
+      </div>
       <div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>
       <div class="edit-row-after" id="after-${i}"><span class="edit-label">Replace with</span><span class="after-text">${escHtml(after)}</span><button class="copy-btn" style="float:right;margin-left:0.5rem;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="var t=this.previousElementSibling.textContent;navigator.clipboard.writeText(t).then(function(){},function(){});this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy'},2000)">Copy</button></div>
       ${why ? `<div class="edit-row-why">💡 ${escHtml(why)}</div>` : ''}
@@ -3312,20 +3384,6 @@ setInterval(showQuote, 8000);
 // ─── PAGE INIT ───────────────────────────────────────────────────────────────
 loadSavedResumes();
 buildUploadSlots();
-
-// Regenerate pills from RESUMES object
-for (const [key, resume] of Object.entries(RESUMES)) {
-  const name = resume.label;
-  const atsContainer = document.getElementById('ats-resume-pills');
-  const leContainer = document.getElementById('le-resume-pills');
-  const clContainer = document.getElementById('cl-resume-pills');
-  const intContainer = document.getElementById('interview-resume-pills');
-  if (atsContainer) atsContainer.insertAdjacentHTML('beforeend', `<div class="pill" data-resume="${key}">${escHtml(name)}</div>`);
-  if (leContainer) leContainer.insertAdjacentHTML('beforeend', `<div class="pill" data-resume="${key}">${escHtml(name)}</div>`);
-  if (clContainer) clContainer.insertAdjacentHTML('beforeend', `<div class="pill" data-resume="${key}">${escHtml(name)}</div>`);
-  if (intContainer) intContainer.insertAdjacentHTML('beforeend', `<div class="pill" data-resume="${key}">${escHtml(name)}</div>`);
-}
-attachPillListeners();
 
 const savedGoal = localStorage.getItem('cara_daily_goal');
 if (savedGoal) { const goalEl = document.getElementById('daily-goal-input'); if (goalEl) goalEl.value = savedGoal; }
