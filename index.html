@@ -3435,7 +3435,7 @@ function renderEditBlocks(rawText, container) {
         const ni = text.search(new RegExp('(^|\\n)' + next + ':', ''));
         if (ni > start && ni < end) end = ni;
       }
-      return text.substring(start + marker.length, end).trim();
+      return text.substring(start + marker.length, end).trim().replace(/^`+|`+$/g, '').trim();
     }
 
     const section = extractField(block, 'SECTION', ['BEFORE','AFTER','TYPE','WHY']);
