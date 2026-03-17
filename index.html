@@ -1383,8 +1383,8 @@
 
       <div class="result-box" id="cl-result">
         <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;">
-          <button class="copy-btn" style="float:none;margin:0;" onclick="copyResult('cl-output')">Copy</button>
-          <button class="copy-btn" style="float:none;margin:0;" onclick="downloadCLasPDF()">Download PDF</button>
+          <button class="copy-btn" style="float:none;margin:0;" onclick="copyCoverLetter(this)">Copy</button>
+          <button class="copy-btn" style="float:none;margin:0;" onclick="downloadCLasDocx(this)">Download .docx</button>
         </div>
         <div class="stream-output" id="cl-output"></div>
       </div>
@@ -2689,8 +2689,7 @@ CRITICAL FORMATTING RULES:
 - After the table, write one closing paragraph
 - End with EXACTLY this sign-off block (no asterisks, no bold, plain text only):
 Respectfully,
-
-Cara A. Brown, MBA
+- Do NOT write "Cara A. Brown, MBA" in the sign-off — the footer handles the name and contact info
 - Do NOT include contact info in the sign-off — it will appear in the footer
 - Do not use [Date] or any placeholder — use the actual date provided`;
   const anecdoteBlock = anecdote ? '\n\nPERSONAL CONTEXT TO FOLD IN NATURALLY:\n' + anecdote + '\n(Weave this into the letter where it fits — do not quote it verbatim)' : '';
@@ -3794,24 +3793,137 @@ document.getElementById('recheck-tabs').addEventListener('click', e => {
 });
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
-function downloadCLasPDF() {
-  const text = document.getElementById('cl-output').innerText;
-  if (!text.trim()) { alert('Generate a cover letter first.'); return; }
-  const win = window.open('', '_blank');
-  win.document.write('<html><head><title>Cover Letter</title><style>body{font-family:Georgia,serif;max-width:700px;margin:60px auto;font-size:14px;line-height:1.8;color:#222;}p{margin:0 0 1em;}pre{font-family:"Courier New",monospace;font-size:12px;line-height:1.6;margin:1.5em 0;white-space:pre;}</style></head><body>');
-  let inTable = false;
-  text.split('\n').forEach(line => {
-    const esc = line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const isTableLine = /[─━═\-]{5,}/.test(line) || /YOUR NEEDS/i.test(line) || /MY PROVEN/i.test(line) || (/^\s{4,}/.test(line) && line.trim().length > 0);
-    if (isTableLine && !inTable) { win.document.write('<pre>'); inTable = true; }
-    if (inTable && !isTableLine && line.trim() === '') { win.document.write('</pre>'); inTable = false; win.document.write('<p>' + esc + '</p>'); return; }
-    if (inTable) { win.document.write(esc + '\n'); }
-    else { win.document.write('<p>' + esc + '</p>'); }
+function copyCoverLetter(btn) {
+  const output = document.getElementById('cl-output');
+  if (!output || !output.innerHTML.trim()) return;
+  // Build clean HTML — skip the footer div (last child with flex display)
+  const clone = output.cloneNode(true);
+  const footer = clone.querySelector('div[style*="border-top"]');
+  if (footer) footer.remove();
+  // Wrap in basic letter styles for paste fidelity
+  const html = `<div style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.6;max-width:680px;">${clone.innerHTML}</div>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const plain = new Blob([clone.innerText || clone.textContent], { type: 'text/plain' });
+  try {
+    navigator.clipboard.write([new ClipboardItem({ 'text/html': blob, 'text/plain': plain })]).then(() => {
+      if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
+    });
+  } catch(e) {
+    // Fallback to plain text with line breaks
+    const text = (clone.innerText || clone.textContent).replace(/\n{3,}/g, '\n\n');
+    navigator.clipboard.writeText(text).then(() => {
+      if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
+    });
+  }
+}
+
+async function downloadCLasDocx(btn) {
+  const output = document.getElementById('cl-output');
+  if (!output || !output.innerHTML.trim()) { alert('Generate a cover letter first.'); return; }
+  if (btn) btn.textContent = 'Building…';
+
+  // Load docx library from CDN if not already loaded
+  if (!window.docx) {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+          BorderStyle, WidthType } = window.docx;
+
+  const clone = output.cloneNode(true);
+  // Remove footer div
+  const footerDiv = clone.querySelector('div[style*="border-top"]');
+  if (footerDiv) footerDiv.remove();
+
+  const noBorder = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
+
+  function parseRuns(el, defaultSize) {
+    const runs = [];
+    for (const node of el.childNodes) {
+      if (node.nodeType === 3) { // text node
+        if (node.textContent) runs.push(new TextRun({ text: node.textContent, size: defaultSize, font: 'Calibri' }));
+      } else if (node.tagName === 'STRONG' || node.tagName === 'B') {
+        runs.push(new TextRun({ text: node.textContent, bold: true, size: defaultSize, font: 'Calibri' }));
+      } else if (node.textContent) {
+        runs.push(new TextRun({ text: node.textContent, size: defaultSize, font: 'Calibri' }));
+      }
+    }
+    return runs.length ? runs : [new TextRun({ text: el.textContent, size: defaultSize, font: 'Calibri' })];
+  }
+
+  const children = [];
+
+  for (const el of clone.children) {
+    if (el.tagName === 'P') {
+      const runs = parseRuns(el, 22);
+      children.push(new Paragraph({ children: runs, spacing: { after: 160 } }));
+    } else if (el.tagName === 'TABLE') {
+      const rows = [];
+      for (const tr of el.querySelectorAll('tr')) {
+        const isHeader = !!tr.querySelector('th');
+        const cells = [...tr.querySelectorAll('th, td')];
+        rows.push(new TableRow({
+          children: cells.map(cell => new TableCell({
+            width: { size: 4680, type: WidthType.DXA },
+            borders: {
+              top: noBorder, left: noBorder, right: noBorder,
+              bottom: isHeader ? { style: BorderStyle.SINGLE, size: 8, color: '222222' } : noBorder
+            },
+            margins: { top: 80, bottom: 80, left: 0, right: 100 },
+            children: [new Paragraph({
+              children: [new TextRun({
+                text: cell.textContent.trim(),
+                bold: isHeader, size: isHeader ? 18 : 20,
+                font: 'Calibri', allCaps: isHeader
+              })],
+              spacing: { after: 60 }
+            })]
+          }))
+        }));
+      }
+      if (rows.length) {
+        children.push(new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: [4680, 4680], rows }));
+        children.push(new Paragraph({ children: [], spacing: { after: 160 } }));
+      }
+    } else if (el.style && el.style.height) {
+      children.push(new Paragraph({ children: [], spacing: { after: 60 } }));
+    }
+  }
+
+  // Footer rule + contact block
+  children.push(new Paragraph({
+    children: [],
+    border: { top: { style: BorderStyle.SINGLE, size: 4, color: 'CCCCCC', space: 8 } },
+    spacing: { before: 400, after: 120 }
+  }));
+  children.push(new Paragraph({ children: [new TextRun({ text: 'Cara A. Brown, MBA', bold: true, size: 22, font: 'Calibri' })], spacing: { after: 60 } }));
+  children.push(new Paragraph({ children: [new TextRun({ text: '(202) 489-9901  ·  hi@caraabrown.com', size: 20, font: 'Calibri', color: '555555' })], spacing: { after: 60 } }));
+  children.push(new Paragraph({ children: [new TextRun({ text: 'linkedin.com/in/caraabrown  ·  caraabrown.com', size: 20, font: 'Calibri', color: '555555' })], spacing: { after: 0 } }));
+
+  const doc = new Document({
+    sections: [{
+      properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } },
+      children
+    }]
   });
-  if (inTable) win.document.write('</pre>');
-  win.document.write('</body></html>');
-  win.document.close();
-  win.print();
+
+  try {
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'CoverLetter_CaraBrown.docx';
+    a.click();
+    URL.revokeObjectURL(url);
+    if (btn) { btn.textContent = 'Downloaded!'; setTimeout(() => btn.textContent = 'Download .docx', 2000); }
+  } catch(e) {
+    alert('Download failed: ' + e.message);
+    if (btn) btn.textContent = 'Download .docx';
+  }
 }
 function showLoading(id) { document.getElementById(id).classList.add('visible'); }
 function hideLoading(id) { document.getElementById(id).classList.remove('visible'); }
