@@ -1174,6 +1174,22 @@
         </div>
       </div>
 
+      <div style="margin-top:2rem; border-top:2px solid var(--border); padding-top:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+          <div>
+            <div style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;color:var(--black);">Impactful Resume Optimizers</div>
+            <div style="font-size:0.78rem;color:var(--mid);margin-top:0.2rem;">Edits suggested 3+ times or worth 5+ ATS points — surfaced automatically as you run Line-by-Line Edits.</div>
+          </div>
+        </div>
+        <div id="optimizers-principal_ds" style="display:none;margin-bottom:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Principal Design Strategist</div><div class="optimizer-accordion"></div></div>
+        <div id="optimizers-principal_ds_brief" style="display:none;margin-bottom:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Design Strategist (Brief)</div><div class="optimizer-accordion"></div></div>
+        <div id="optimizers-service_designer" style="display:none;margin-bottom:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Principal Service Designer</div><div class="optimizer-accordion"></div></div>
+        <div id="optimizers-product_designer" style="display:none;margin-bottom:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Lead Product Designer</div><div class="optimizer-accordion"></div></div>
+        <div id="optimizers-chief_of_staff" style="display:none;margin-bottom:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Chief of Staff</div><div class="optimizer-accordion"></div></div>
+        <div id="optimizers-custom" style="display:none;margin-bottom:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Custom Resumes</div><div class="optimizer-accordion"></div></div>
+        <div id="optimizers-empty" style="font-size:0.82rem;color:var(--mid);padding:0.5rem 0;">Run Line-by-Line Edits on any resume to start building your optimizer list.</div>
+      </div>
+
       <div style="margin-top:2rem; border-top:1px solid var(--border); padding-top:1.5rem;">
         <div class="panel-desc" style="margin-bottom:0.8rem; font-weight:500; color:var(--black);">Add a New Resume</div>
      <label>Resume Name *</label>
@@ -1194,9 +1210,14 @@
     </div>
 
     <div class="panel active" id="panel-job-input">
-      <div class="panel-title">Job <em>Description</em></div>
-      <div class="divider"></div>
-      <div class="panel-desc">Paste the job description and add the posting URL. This becomes the foundation for every other tool on this microsite.</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+        <div>
+          <div class="panel-title">Job <em>Description</em></div>
+          <div class="divider"></div>
+          <div class="panel-desc">Paste the job description and add the posting URL. This becomes the foundation for every other tool on this microsite.</div>
+        </div>
+        <button class="slot-btn" id="new-application-btn" title="Clear JD and reset analysis — does not delete saved resumes or tracker" style="white-space:nowrap;margin-top:0.5rem;flex-shrink:0;">↺ New Application</button>
+      </div>
 
       <label>Job Description *</label>
       <textarea id="jd-text" placeholder="Paste the full job description here…" rows="14"></textarea>
@@ -1272,12 +1293,23 @@
         <button class="btn" id="gen-edits-btn">Generate Line-by-Line Edits</button>
       </div>
 
+      <div style="margin-top:1.2rem;">
+        <label style="display:flex;align-items:center;gap:0.5rem;">Additional Experience to Incorporate <span style="font-size:0.72rem;color:var(--mid);font-weight:400;">(optional)</span></label>
+        <div class="step-hint" style="margin-bottom:0.5rem;">Add any experience, accomplishments, or context not currently in your resume. The AI will generate INSERT edit blocks showing exactly where to add this content.</div>
+        <textarea id="le-additional-exp" placeholder="e.g., I also led a $4M digital transformation at a federal agency in 2023 that cut processing time by 40%. I have 3 years of experience with Figma and design systems. I have an active Secret clearance." rows="4"></textarea>
+      </div>
+
       <div class="loading" id="le-loading"><div class="spinner"></div>Analyzing and rewriting for maximum ATS score…</div>
       <div class="error-msg" id="le-error"></div>
 
       <div class="result-box" id="le-result">
-        <div style="margin-bottom:1rem;">
+        <div style="margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
           <h3 style="margin:0;">Edits to Apply</h3>
+          <div id="le-score-tracker" style="display:none;align-items:center;gap:0.75rem;background:#f7f6f4;border:1px solid #e0e0e0;border-radius:6px;padding:0.5rem 1rem;font-size:0.82rem;">
+            <span style="color:#555;">Applying <strong id="le-checked-count">0</strong> of <strong id="le-total-count">0</strong> edits</span>
+            <span style="color:#888;">·</span>
+            <span>Projected score: <strong id="le-projected-score" style="color:#1e6b35;">—</strong></span>
+          </div>
         </div>
         <div class="stream-output" id="le-output"></div>
       </div>
@@ -1378,6 +1410,12 @@
         <button class="copy-btn" onclick="copyResult('why-output')">Copy</button>
         <div class="stream-output" id="why-output"></div>
       </div>
+
+      <div class="loading" id="why-qc-loading"><div class="spinner"></div>Running quality check…</div>
+      <div id="why-qc-result" style="display:none;margin-top:1rem;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+        <div style="background:var(--bgoff);padding:0.6rem 1rem;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:var(--black);">Quality Check</div>
+        <div id="why-qc-output" style="padding:0.85rem 1rem;font-size:0.85rem;line-height:1.7;"></div>
+      </div>
     </div>
 
     <!-- ── PANEL 6: CUSTOM Q&A ── -->
@@ -1453,7 +1491,7 @@
       <div id="jobs-empty" class="empty-state">No applications logged yet. Add your first one above.</div>
       <div class="jobs-table-wrap" id="jobs-table-wrap" style="display:none;">
         <table class="jobs-table">
-<thead><tr><th>Company</th><th>Role</th><th>Date</th><th>How Applied</th><th style="text-align:center;">ATS</th><th style="text-align:center;">Cover Letter</th><th style="text-align:center;">Screening</th><th style="text-align:center;">Interview</th><th style="text-align:center;">Rejected</th><th style="text-align:center;">Hired</th><th>Prep</th><th></th></tr></thead>        <tbody id="jobs-tbody"></tbody>
+<thead><tr><th>Company</th><th>Role</th><th>Date</th><th>How Applied</th><th style="text-align:center;">Screening</th><th style="text-align:center;">Interview</th><th style="text-align:center;">Rejected</th><th style="text-align:center;">Hired</th><th>Prep</th><th></th></tr></thead>          <tbody id="jobs-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -1531,6 +1569,28 @@
       <div class="result-box" id="interview-result">
         <button class="copy-btn" onclick="copyResult('interview-output')">Copy</button>
         <div class="stream-output" id="interview-output"></div>
+      </div>
+
+      <!-- STAR Story Bank -->
+      <div style="margin-top:2rem;border-top:2px solid var(--border);padding-top:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <div>
+            <div class="panel-title" style="font-size:1.1rem;margin:0;">STAR Story <em>Bank</em></div>
+            <div style="font-size:0.8rem;color:var(--mid);margin-top:0.2rem;">Save your best STAR stories and tag them for quick retrieval before interviews.</div>
+          </div>
+          <button class="btn" style="padding:0.4rem 1rem;font-size:0.8rem;" onclick="addStarStory()">+ Add Story</button>
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;" id="star-tag-filters">
+          <span class="star-tag-filter active" data-tag="all" onclick="filterStarStories('all',this)" style="cursor:pointer;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-family:'Raleway',sans-serif;letter-spacing:0.06em;text-transform:uppercase;background:var(--black);color:var(--white);border:1px solid var(--black);">All</span>
+          <span class="star-tag-filter" data-tag="leadership" onclick="filterStarStories('leadership',this)" style="cursor:pointer;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-family:'Raleway',sans-serif;letter-spacing:0.06em;text-transform:uppercase;background:transparent;color:var(--mid);border:1px solid var(--border);">Leadership</span>
+          <span class="star-tag-filter" data-tag="strategy" onclick="filterStarStories('strategy',this)" style="cursor:pointer;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-family:'Raleway',sans-serif;letter-spacing:0.06em;text-transform:uppercase;background:transparent;color:var(--mid);border:1px solid var(--border);">Strategy</span>
+          <span class="star-tag-filter" data-tag="data" onclick="filterStarStories('data',this)" style="cursor:pointer;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-family:'Raleway',sans-serif;letter-spacing:0.06em;text-transform:uppercase;background:transparent;color:var(--mid);border:1px solid var(--border);">Data &amp; Metrics</span>
+          <span class="star-tag-filter" data-tag="collaboration" onclick="filterStarStories('collaboration',this)" style="cursor:pointer;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-family:'Raleway',sans-serif;letter-spacing:0.06em;text-transform:uppercase;background:transparent;color:var(--mid);border:1px solid var(--border);">Collaboration</span>
+          <span class="star-tag-filter" data-tag="conflict" onclick="filterStarStories('conflict',this)" style="cursor:pointer;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-family:'Raleway',sans-serif;letter-spacing:0.06em;text-transform:uppercase;background:transparent;color:var(--mid);border:1px solid var(--border);">Conflict</span>
+          <span class="star-tag-filter" data-tag="failure" onclick="filterStarStories('failure',this)" style="cursor:pointer;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-family:'Raleway',sans-serif;letter-spacing:0.06em;text-transform:uppercase;background:transparent;color:var(--mid);border:1px solid var(--border);">Failure &amp; Recovery</span>
+          <span class="star-tag-filter" data-tag="change" onclick="filterStarStories('change',this)" style="cursor:pointer;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-family:'Raleway',sans-serif;letter-spacing:0.06em;text-transform:uppercase;background:transparent;color:var(--mid);border:1px solid var(--border);">Change Mgmt</span>
+        </div>
+        <div id="star-stories-list"></div>
       </div>
     </div>
 
@@ -1887,6 +1947,9 @@ EDUCATION: MBA Design Strategy, California College of the Arts | BBA, Howard Uni
 const RESUME_DEFAULTS = {};
 Object.keys(RESUMES).forEach(k => { RESUME_DEFAULTS[k] = RESUMES[k].text; });
 
+// ─── GLOBAL FORMAT FUNCTION (set inside recheck handler, used by renderRecheckTab) ───
+var formatRecheckContent = null;
+
 // ─── RESUME UPLOAD SYSTEM ─────────────────────────────────────────────────────
 const RESUME_KEYS = [
   { key: 'principal_ds', label: 'Principal Design Strategist' },
@@ -2047,7 +2110,15 @@ async function handleFileUpload(key, file) {
   if (fi) fi.value = '';
 }
 
-function showPasteArea(key) { const a = document.getElementById('paste-area-' + key); if (a) a.style.display = 'block'; }
+function showPasteArea(key) {
+  const a = document.getElementById('paste-area-' + key);
+  if (!a) return;
+  a.style.display = 'block';
+  const ta = a.querySelector('textarea');
+  if (ta && RESUMES[key] && RESUMES[key].text && !ta.value) {
+    ta.value = RESUMES[key].text;
+  }
+}
 function hidePasteArea(key) { const a = document.getElementById('paste-area-' + key); if (a) a.style.display = 'none'; }
 
 function savePastedResume(key) {
@@ -2166,12 +2237,12 @@ function attachPillListeners() {
 }
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
-let savedJD = '';
-let savedJDUrl = '';
-let savedRoleName = '';
-let savedAtsKeywords = '';
-let savedAtsFlags = '';
-let savedAtsPath = '';
+let savedJD        = localStorage.getItem('cara_sess_jd') || '';
+let savedJDUrl     = localStorage.getItem('cara_sess_jdurl') || '';
+let savedRoleName  = localStorage.getItem('cara_sess_rolename') || '';
+let savedAtsKeywords = localStorage.getItem('cara_sess_ats_kw') || '';
+let savedAtsFlags  = localStorage.getItem('cara_sess_ats_flags') || '';
+let savedAtsPath   = localStorage.getItem('cara_sess_ats_path') || '';
 let selectedResumesForATS = new Set();
 let selectedResumeForCL = 'principal_ds';
 let selectedCLTone = 'strategic';
@@ -2203,6 +2274,22 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
   savedJDUrl = document.getElementById('jd-url').value.trim();
   savedRoleName = document.getElementById('job-role-name').value.trim();
   if (!savedJD) { alert('Please paste a job description first.'); return; }
+  localStorage.setItem('cara_sess_jd', savedJD);
+  localStorage.setItem('cara_sess_jdurl', savedJDUrl);
+  localStorage.setItem('cara_sess_rolename', savedRoleName);
+
+  // Auto-pull salary range from JD
+  const salMatch = savedJD.match(/\$[\d,]+(?:K|k)?(?:\s*[-–—to]+\s*\$[\d,]+(?:K|k)?)?(?:\s*(?:per year|\/yr|annually|a year))?/i);
+  if (salMatch) {
+    const salEl = document.getElementById('sal-offered');
+    if (salEl && !salEl.value) salEl.value = salMatch[0].trim();
+  }
+  // Auto-fill sal-role from role name
+  if (savedRoleName) {
+    const roleEl = document.getElementById('sal-role');
+    const rolePart = savedRoleName.replace(/\s+at\s+.+$/i, '').trim();
+    if (roleEl && !roleEl.value && rolePart) roleEl.value = rolePart;
+  }
   document.getElementById('jd-saved-msg').style.display = 'block';
 
   // Auto-add to job tracker
@@ -2256,7 +2343,7 @@ async function callClaude(systemPrompt, userMessage, onChunk) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 4096,
+      max_tokens: 8192,
       system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }]
     })
@@ -2352,6 +2439,9 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     savedAtsKeywords = kwTxt;
     savedAtsFlags = flagsTxt;
     savedAtsPath = pathTxt;
+    localStorage.setItem('cara_sess_ats_kw', kwTxt);
+    localStorage.setItem('cara_sess_ats_flags', flagsTxt);
+    localStorage.setItem('cara_sess_ats_path', pathTxt);
     document.getElementById('ats-best-output').innerHTML = formatAtsContent(bestTxt || fullText);
     document.getElementById('ats-keywords-output').innerHTML = formatAtsContent(kwTxt);
     document.getElementById('ats-flags-output').innerHTML = formatAtsContent(flagsTxt);
@@ -2393,7 +2483,7 @@ Run a comprehensive ATS check on this revised resume:
 
 1. **Overall ATS Score**: Give a percentage (0-100%). Output it on its own line EXACTLY like this: RECHECK_SCORE: [XX]%
 2. **Keyword Match**: Output as a markdown table with columns: | Keyword | Status | Where to Add |. Status should be ✅ Matched or ❌ Missing.
-3. **Score Improvement**: Compare to what a typical unoptimized resume would score
+3. **Score Improvement**: Output as a markdown table with columns: | Metric | Before | After |. Show old score vs new score, keyword coverage change, and overall improvement summary.
 4. **Remaining Gaps**: Output as a markdown table with columns: | Gap | Priority | Suggested Fix |. Priority should be HIGH, MEDIUM, or LOW.
 5. **Ready to Submit?**: Output as a markdown table with columns: | Item | Status | Action Needed |. Then give a final Yes/No verdict with one sentence explanation.
 
@@ -2412,7 +2502,7 @@ Be specific and direct.`;
     readyOut.textContent = '';
 
     let fullText = '';
-  let formatRecheckContent = function(raw) {
+  formatRecheckContent = function(raw) {
       if (!raw) return '';
       function boldify(t) { return t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*\*/g,''); }
       // Handle markdown tables
@@ -2472,17 +2562,14 @@ Be specific and direct.`;
     };
    await callClaude(systemPrompt, userMsg, (text) => {
       fullText = text;
-      kwOut.innerHTML = formatRecheckContent(text);
-    const sm = text.match(/RECHECK_SCORE:\s*(\d+)%/);
+      kwOut.textContent = text; // plain text while streaming; formatted render fires on complete below
+      const sm = text.match(/RECHECK_SCORE:\s*(\d+)%/);
       if (sm) {
         const pct = parseInt(sm[1]);
         const colorClass = pct >= 80 ? 'score-high' : pct >= 60 ? 'score-mid' : 'score-low';
         const card = document.getElementById('recheck-score-card');
         card.style.display = 'flex';
         card.innerHTML = `<div class="score-card"><div class="score-label" style="margin-bottom:0.4rem;">Revised Resume Score</div><div class="score-num ${colorClass}">${pct}%</div></div>`;
-        // Save to matching tracker job
-        const matchJob = jobs.find(j => savedRoleName && (j.role + ' at ' + j.company).includes(savedRoleName) || (savedRoleName && savedRoleName.includes(j.role)));
-        if (matchJob) { matchJob.recheckScore = pct; saveJobs(); renderJobs(); }
       }
     });
 
@@ -2491,7 +2578,7 @@ Be specific and direct.`;
       const sm = txt.search(startRe);
       if (sm < 0) return '';
       const em = endRe ? txt.search(endRe) : -1;
-      return (em > sm ? txt.substring(sm, em) : txt.substring(sm)).replace(/^#+\s*/gm,'').replace(/\*\*/g,'').trim();
+      return (em > sm ? txt.substring(sm, em) : txt.substring(sm)).trim();
     }
     const kw   = getSection(fullText, /KEYWORD|MISSING/i,    /SCORE IMPROVEMENT/i);
     const imp  = getSection(fullText, /SCORE IMPROVEMENT/i,  /REMAINING GAPS/i);
@@ -2499,7 +2586,7 @@ Be specific and direct.`;
     const ready= getSection(fullText, /READY TO SUBMIT/i,     null);
 
    kwOut.innerHTML   = renderRecheckTab(kw   || fullText, 'keywords');
-    impOut.innerHTML  = formatRecheckContent(imp  || '');
+    impOut.innerHTML  = renderRecheckTab(imp  || '', 'improvement');
     gapsOut.innerHTML = renderRecheckTab(gaps || '', 'gaps');
     readyOut.innerHTML= renderRecheckTab(ready|| '', 'ready');
 
@@ -2539,7 +2626,7 @@ Be specific and direct.`;
       const jd2 = savedJD || document.getElementById('jd-text').value.trim();
       if (!jd2 || !updatedResume) return;
       const sp2 = `You are a senior resume editor. PERSPECTIVE: You are advising from the point of view of a hiring manager. What problems does this role solve at a company like this? How do I empower Cara to position herself as that solution?\n\nYou produce precise, surgical edits — exact original text, exact replacement, and one-line reason. Never invent experience not in the resume.`;
-const um2 = `You are given a resume, a job description, and a set of recommendations from an ATS analysis. Your job is to translate each recommendation into a precise, surgical edit block.\n\nFor each recommendation:\n1. Find the EXACT line in the resume it refers to\n2. Rewrite only what needs changing\n3. Output in the structured format below\n\nRESUME:\n${updatedResume}\n\nJOB DESCRIPTION:\n${jd2}\n\nRECOMMENDATIONS TO TRANSLATE:\n${fullText}\n\nFirst output this exact summary line:\nEDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+\n\nThen for each recommendation output a block in this EXACT format:\n\nSECTION: [section name — for Professional History include company name e.g. "Professional History — Kroger"]\nBEFORE: [copy the exact original line from the resume verbatim — do not paraphrase]\nAFTER: [your rewritten version, ready to paste — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nWHY: [one sentence explaining the specific improvement]\n\nRULES:\n- BEFORE must be copied verbatim from the resume — never invented\n- AFTER must be complete and ready to paste with no placeholders\n- Only make changes that are honest wordsmithing of existing experience\n- Never invent titles, companies, credentials or skills not in the resume`;      const leOutput = document.getElementById('le-output');
+const um2 = `You are given a resume, a job description, and a set of recommendations from an ATS analysis. Your job is to translate each recommendation into a precise, surgical edit block.\n\nFor each recommendation:\n1. Find the EXACT line in the resume it refers to\n2. Rewrite only what needs changing\n3. Output in the structured format below\n\nRESUME:\n${updatedResume}\n\nJOB DESCRIPTION:\n${jd2}\n\nRECOMMENDATIONS TO TRANSLATE:\n${fullText}\n\nFirst output this exact summary line:\nEDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+\n\nThen for each recommendation output a block in this EXACT format:\n\nSECTION: [section name — for Professional History include company name e.g. "Professional History — Kroger"]\nCONTEXT: [copy the 1-2 lines immediately surrounding the BEFORE line in the resume]\nBEFORE: [copy the exact original line from the resume verbatim — do not paraphrase]\nAFTER: [your rewritten version, ready to paste — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nSCORE_IMPACT: [estimated ATS point gain for this single edit, whole number]\nWHY: [one sentence explaining the specific improvement]\n\nRULES:\n- BEFORE must be copied verbatim from the resume — never invented\n- AFTER must be complete and ready to paste with no placeholders\n- Only make changes that are honest wordsmithing of existing experience\n- Never invent titles, companies, credentials or skills not in the resume`;      const leOutput = document.getElementById('le-output');
       leOutput.textContent = '';
       showLoading('le-loading');
       document.getElementById('le-result').classList.add('visible');
@@ -2591,19 +2678,20 @@ document.getElementById('gen-cl-btn').addEventListener('click', async () => {
   const systemPrompt = `You are an expert cover letter writer for senior design strategy professionals. Every sentence is specific and grounded in actual accomplishments.
 
 CRITICAL FORMATTING RULES:
-- NEVER use asterisks (**) anywhere
-- Use this exact greeting: ${greeting}
-- After 2-3 body paragraphs, insert a plain-text skills alignment table:
+- NEVER use asterisks (**) anywhere in the letter — not in the greeting, not in the closing, not in the body
+- The opening line must be EXACTLY: To the hiring team at [Company Name],
+- After 2-3 body paragraphs, insert the skills alignment table using this EXACT pipe format:
+| YOUR NEEDS | MY PROVEN ABILITIES |
+|---|---|
+| [top need from JD] | [specific accomplishment from resume] |
+| [second need from JD] | [specific accomplishment from resume] |
+| [third need from JD] | [specific accomplishment from resume] |
+- After the table, write one closing paragraph
+- End with EXACTLY this sign-off block (no asterisks, no bold, plain text only):
+Respectfully,
 
-YOUR NEEDS                          MY PROVEN ABILITIES
-─────────────────────────────────   ─────────────────────────────────────────
-[top need from JD]                  [specific accomplishment from resume]
-[second need from JD]               [specific accomplishment from resume]
-[third need from JD]                [specific accomplishment from resume]
-
-- After the table, write one closing paragraph then the sign-off
-- Sign off: Respectfully,\\n\\nCara A. Brown, MBA\\n(202) 489-9901\\nhi@caraabrown.com\\nlinkedin.com/in/caraabrown\\ncaraabrown.com
-- Do NOT double-space the signature block
+Cara A. Brown, MBA
+- Do NOT include contact info in the sign-off — it will appear in the footer
 - Do not use [Date] or any placeholder — use the actual date provided`;
   const anecdoteBlock = anecdote ? '\n\nPERSONAL CONTEXT TO FOLD IN NATURALLY:\n' + anecdote + '\n(Weave this into the letter where it fits — do not quote it verbatim)' : '';
   const userMsg = `Write a compelling cover letter for Cara Brown.
@@ -2625,22 +2713,58 @@ TONE: ${toneMap[selectedCLTone]}
 DATE: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}
 
 REQUIREMENTS:
-- Start with the date, then a blank line, then the greeting: ${greeting}
+- Start with the date, then a blank line, then: To the hiring team at [Company Name],
+- Company name is: ${companyName}
 - Address the specific requirements in the JD directly
 - Reference 2-3 specific, quantified accomplishments from the resume
-- Insert the skills alignment table between the body paragraphs and closing paragraph
-- Mention caraabrown.com naturally
+- Insert the pipe-format skills alignment table between the body paragraphs and closing paragraph
+- Mention caraabrown.com naturally in the body
 - Do NOT use clichés like "I am excited to apply" or "I am a perfect fit"
-- Do NOT use asterisks anywhere
+- Do NOT use asterisks anywhere — not in greeting, not in closing, not around names
 - Length: 3-4 tight paragraphs + table + closing`;
   try {
     const output = document.getElementById('cl-output');
-    output.textContent = '';
+    output.innerHTML = '';
     document.getElementById('cl-result').classList.add('visible');
-  await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
-    // Mark cover letter done on matching tracker job
-    const clMatchJob = jobs.find(j => savedRoleName && (j.role + ' at ' + j.company).includes(savedRoleName) || (savedRoleName && savedRoleName.includes(j.role)));
-    if (clMatchJob) { clMatchJob.coverLetterDone = true; saveJobs(); renderJobs(); }
+    const LOGO_DATA = 'data:image/png;base64,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';
+    function formatCoverLetter(raw) {
+      if (!raw) return '';
+      const lines = raw.split('\n');
+      let html = '';
+      let inTable = false, tableHtml = '', headerDone = false;
+      for (const line of lines) {
+        const t = line.trim();
+        if (t.startsWith('|') && t.endsWith('|')) {
+          if (/^[\|\s\-:]+$/.test(t)) continue;
+          const cells = t.split('|').slice(1,-1).map(c => c.trim());
+          if (!inTable) {
+            inTable = true;
+            tableHtml = '<table style="width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.88rem;">'
+              + '<thead><tr>'
+              + cells.map(c => '<th style="text-align:left;padding:0.6rem 1rem;font-family:\'Raleway\',sans-serif;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;border-bottom:2px solid #222;color:#222;">' + c + '</th>').join('')
+              + '</tr></thead><tbody>';
+          } else {
+            tableHtml += '<tr>' + cells.map(c => '<td style="padding:0.55rem 1rem;border-bottom:1px solid transparent;vertical-align:top;line-height:1.6;">' + c + '</td>').join('') + '</tr>';
+          }
+          continue;
+        }
+        if (inTable) { html += tableHtml + '</tbody></table>'; inTable = false; tableHtml = ''; headerDone = false; }
+        if (!t) { html += '<div style="height:0.9rem;"></div>'; continue; }
+        const clean = t.replace(/^\*+\s*|\s*\*+$/g, '').replace(/\*\*([^*]+)\*\*/g, '$1');
+        html += '<p style="margin:0 0 0.75rem;line-height:1.75;font-size:0.92rem;">' + clean + '</p>';
+      }
+      if (inTable) html += tableHtml + '</tbody></table>';
+      html += '<div style="margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid #ddd;display:flex;align-items:center;gap:1.2rem;">'
+        + '<img src="' + LOGO_DATA + '" style="width:44px;height:44px;opacity:0.85;flex-shrink:0;" alt="">'
+        + '<div style="font-size:0.8rem;line-height:1.8;color:#444;"><strong style="font-size:0.88rem;color:#111;">Cara A. Brown, MBA</strong><br>(202) 489-9901 &nbsp;&middot;&nbsp; hi@caraabrown.com<br>linkedin.com/in/caraabrown &nbsp;&middot;&nbsp; caraabrown.com</div>'
+        + '</div>';
+      return html;
+    }
+    let clRaw = '';
+    await callClaude(systemPrompt, userMsg, text => {
+      clRaw = text;
+      output.innerHTML = formatCoverLetter(text);
+    });
   } catch (err) { showError('cl-error', 'Something went wrong: ' + err.message); document.getElementById('cl-result').classList.remove('visible');
   } finally { hideLoading('cl-loading'); }
 });
@@ -2693,7 +2817,37 @@ WHY I WILL BE A GREAT FIT:
     const output = document.getElementById('why-output');
     output.textContent = '';
     document.getElementById('why-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+    document.getElementById('why-qc-result').style.display = 'none';
+    let whyText = '';
+    await callClaude(systemPrompt, userMsg, text => { whyText = text; output.textContent = text; });
+
+    // Quality check second pass
+    if (whyText && whyText.length > 100) {
+      document.getElementById('why-qc-loading').classList.add('visible');
+      const qcPrompt = `You are a quality reviewer for job application essays. Evaluate this "Why This Job / Why I'm a Great Fit" response on two dimensions only.`;
+      const qcMsg = `JOB DESCRIPTION:\n${jd}\n\nRESPONSE TO EVALUATE:\n${whyText}\n\nScore this response on:\n1. SPECIFICITY (0-10): Does it reference actual language, requirements, or context from the JD? Or is it generic?\n2. AUTHENTICITY (0-10): Does it draw on real, specific accomplishments? Or rely on vague claims?\n\nOutput EXACTLY this format:\nSPECIFICITY: [score]/10 — [one sentence]\nAUTHENTICITY: [score]/10 — [one sentence]\nGENERIC PHRASES: [comma-separated list of any generic phrases found, or "None"]\nSUGGESTIONS:\n1. [specific improvement]\n2. [specific improvement]`;
+      try {
+        let qcText = '';
+        await callClaude(qcPrompt, qcMsg, text => { qcText = text; });
+        const qcOut = document.getElementById('why-qc-output');
+        // Format the QC output
+        const lines = qcText.split('\n').filter(l => l.trim());
+        qcOut.innerHTML = lines.map(l => {
+          const t = l.trim();
+          if (/^(SPECIFICITY|AUTHENTICITY):/.test(t)) {
+            const score = t.match(/(\d+)\/10/);
+            const color = score && parseInt(score[1]) >= 7 ? '#1e6b35' : score && parseInt(score[1]) >= 5 ? '#a05000' : '#c0392b';
+            return `<div style="margin-bottom:0.5rem;"><strong style="color:${color};">${t.split('—')[0].trim()}</strong>${t.includes('—') ? ' — ' + t.split('—').slice(1).join('—').trim() : ''}</div>`;
+          }
+          if (/^GENERIC PHRASES:/.test(t)) return `<div style="margin-bottom:0.5rem;color:var(--mid);">${t}</div>`;
+          if (/^SUGGESTIONS:/.test(t)) return `<div style="margin-top:0.75rem;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.4rem;">Suggestions</div>`;
+          if (/^\d+\./.test(t)) return `<div style="margin-bottom:0.35rem;padding-left:0.5rem;border-left:3px solid var(--border);">${t.replace(/^\d+\.\s*/,'')}</div>`;
+          return `<div>${t}</div>`;
+        }).join('');
+        document.getElementById('why-qc-result').style.display = 'block';
+      } catch(qcErr) { /* silent fail on QC */ }
+      finally { hideLoading('why-qc-loading'); }
+    }
   } catch (err) {
     showError('why-error', 'Something went wrong: ' + err.message);
     document.getElementById('why-result').classList.remove('visible');
@@ -2900,14 +3054,25 @@ function renderJobs() {
     const isRejected = j.rejected ? 'style="opacity:0.5;"' : '';
     const howApplied = escHtml(j.howApplied || '—');
     const detailParts = [j.salary ? '<span class="detail-chip">' + escHtml(j.salary) + '</span>' : '', j.location ? '<span class="detail-chip">' + escHtml(j.location) + '</span>' : '', j.workType ? '<span class="detail-chip">' + escHtml(j.workType) + '</span>' : ''].filter(Boolean).join('');
-    const detailRow = detailParts ? '<tr class="job-detail-row ' + isHired + '" data-detail-id="' + j.id + '" style="display:none;"><td colspan="9"><div class="job-detail-chips">' + detailParts + '</div></td></tr>' : '';
+    const chipsHtml = detailParts ? '<div class="job-detail-chips" style="margin-bottom:0.75rem;">' + detailParts + '</div>' : '';
+    const hubFields = [
+      { key: 'hub_coverletter', label: 'Cover Letter' },
+      { key: 'hub_resume', label: 'Tailored Resume' },
+      { key: 'hub_whythisjob', label: 'Why This Job' },
+      { key: 'hub_interviewanswers', label: 'Interview Answers' },
+      { key: 'hub_qa', label: 'Q&A / Notes' }
+    ];
+    const hubHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.5rem;">' +
+      hubFields.map(f => {
+        const val = escHtml(j[f.key] || '');
+        return `<div><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.3rem;">${f.label}</div><textarea rows="4" style="width:100%;box-sizing:border-box;font-size:0.8rem;line-height:1.5;padding:0.5rem 0.6rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--black);resize:vertical;" placeholder="Paste or type ${f.label.toLowerCase()} here…" onchange="event.stopPropagation();saveJobHubField('${j.id}','${f.key}',this.value)">${val}</textarea></div>`;
+      }).join('') + '</div>';
+    const detailRow = '<tr class="job-detail-row ' + isHired + '" data-detail-id="' + j.id + '" style="display:none;"><td colspan="10" style="padding:1rem 1.2rem;background:var(--bgoff);">' + chipsHtml + hubHtml + '</td></tr>';
     return '<tr class="' + isHired + ' job-main-row" data-id="' + j.id + '" ' + isRejected + ' onclick="toggleDetailRow(\'' + j.id + '\')">' +
       '<td><strong>' + escHtml(j.company) + '</strong> ' + urlCell + '</td>' +
       '<td>' + escHtml(j.role) + '</td>' +
       '<td><span class="applied-date">' + formatDate(j.dateAdded || j.dateApplied || new Date().toISOString()) + '</span></td>' +
-    '<td style="font-size:0.75rem;color:var(--mid);">' + howApplied + '</td>' +
-      '<td style="text-align:center;font-size:0.75rem;">' + (j.recheckScore ? '<span style="font-family:\'Cormorant Garamond\',serif;font-size:1.1rem;font-weight:600;color:' + (j.recheckScore >= 80 ? 'var(--green)' : j.recheckScore >= 60 ? 'var(--amber)' : 'var(--red)') + ';">' + j.recheckScore + '%</span>' : '<span style="color:var(--border);">—</span>') + '</td>' +
-      '<td style="text-align:center;font-size:0.75rem;">' + (j.coverLetterDone ? '<span style="color:var(--green);">✓</span>' : '<span style="color:var(--border);">—</span>') + '</td>' +
+      '<td style="font-size:0.75rem;color:var(--mid);">' + howApplied + '</td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.screening?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'screening\',this.checked)"><span>Screen</span></div></td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.interview?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'interview\',this.checked)"><span>Interview</span></div></td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.rejected?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'rejected\',this.checked)"><span>Rejected</span></div></td>' +
@@ -2967,6 +3132,7 @@ function escHtml(str) { return String(str || '').replace(/&/g,'&amp;').replace(/
 function toggleStage(id, field, val) { const job = jobs.find(j => j.id === id); if (!job) return; job[field] = val; saveJobs(); renderJobs(); }
 function deleteJob(id) { if (!confirm('Remove this application?')) return; jobs = jobs.filter(j => j.id !== id); saveJobs(); renderJobs(); }
 function toggleDetailRow(id) { const r = document.querySelector('[data-detail-id="' + id + '"]'); if (r) r.style.display = r.style.display === 'none' ? 'table-row' : 'none'; }
+function saveJobHubField(id, field, value) { const job = jobs.find(j => j.id === id); if (!job) return; job[field] = value; saveJobs(); }
 document.getElementById('manual-add-btn').addEventListener('click', () => {
   const wrap = document.getElementById('manual-add-wrap');
   wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
@@ -3272,10 +3438,44 @@ document.getElementById('gen-recruiter-btn').addEventListener('click', async () 
 renderJobs();
 
 
-// ─── LINE-BY-LINE EDITS ──────────────────────────────────────────────────────
+// ─── NEW APPLICATION ──────────────────────────────────────────────────────────
+document.getElementById('new-application-btn').addEventListener('click', () => {
+  if (!confirm('Start a new application? This clears the current JD and ATS results. Your saved resumes and job tracker are not affected.')) return;
+  // Clear JD fields
+  ['jd-text','jd-url','job-role-name'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('jd-saved-msg').style.display = 'none';
+  // Clear session vars
+  savedJD = ''; savedJDUrl = ''; savedRoleName = '';
+  savedAtsKeywords = ''; savedAtsFlags = ''; savedAtsPath = '';
+  atsHighestResume = null;
+  ['cara_sess_jd','cara_sess_jdurl','cara_sess_rolename','cara_sess_ats_kw','cara_sess_ats_flags','cara_sess_ats_path','cara_sess_ats_highest'].forEach(k => localStorage.removeItem(k));
+  // Clear ATS outputs
+  ['ats-best-output','ats-keywords-output','ats-flags-output','ats-path-output','score-cards-container'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+  // Clear recheck
+  ['recheck-keywords-output','recheck-improvement-output','recheck-gaps-output','recheck-ready-output'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+  const rcResult = document.getElementById('recheck-result'); if (rcResult) rcResult.classList.remove('visible');
+  const rcScore = document.getElementById('recheck-score-card'); if (rcScore) { rcScore.style.display = 'none'; rcScore.innerHTML = ''; }
+  const updatedTA = document.getElementById('updated-resume-text'); if (updatedTA) updatedTA.value = '';
+  // Clear line edits
+  const leOut = document.getElementById('le-output'); if (leOut) leOut.innerHTML = '';
+  const leResult = document.getElementById('le-result'); if (leResult) leResult.classList.remove('visible');
+  const tracker = document.getElementById('le-score-tracker'); if (tracker) tracker.style.display = 'none';
+  // Clear cover letter
+  const clOut = document.getElementById('cl-output'); if (clOut) clOut.innerHTML = '';
+  const clResult = document.getElementById('cl-result'); if (clResult) clResult.classList.remove('visible');
+  // Reset resume pill selections
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
+  const leHint = document.getElementById('le-auto-hint'); if (leHint) leHint.style.display = 'none';
+  // Navigate to JD panel
+  document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const jdLink = document.querySelector('nav a[data-panel="job-input"]');
+  if (jdLink) jdLink.classList.add('active');
+  document.getElementById('panel-job-input').classList.add('active');
+});
 let selectedLeResume = 'principal_ds';
 let selectedLeFocus = 'full';
-let atsHighestResume = null; // set by ATS check when it runs
+let atsHighestResume = localStorage.getItem('cara_sess_ats_highest') || null;
 
 document.querySelectorAll('#le-focus-tabs .tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -3287,6 +3487,7 @@ document.querySelectorAll('#le-focus-tabs .tab').forEach(tab => {
 
 function autoSelectBestResume(resumeKey, resumeLabel) {
   atsHighestResume = resumeKey;
+  localStorage.setItem('cara_sess_ats_highest', resumeKey);
   document.querySelectorAll('#le-resume-pills .pill').forEach(p => {
     p.classList.toggle('selected', p.dataset.resume === resumeKey);
   });
@@ -3303,6 +3504,7 @@ document.getElementById('gen-edits-btn').addEventListener('click', async () => {
   if (!jd) { showError('le-error', 'Please save a job description in Step 01 first.'); return; }
 
   const resume = RESUMES[selectedLeResume];
+  const additionalExp = (document.getElementById('le-additional-exp').value || '').trim();
   const focusMap = {
     full: 'every section of the resume — synopsis, core competencies, and all experience bullets',
     summary: 'only the Synopsis / professional summary section at the top',
@@ -3332,9 +3534,11 @@ EDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+
 2. Then produce line-by-line edits. For EVERY line or bullet that needs changing, output a block in this EXACT format:
 
 SECTION: [Be specific. For Professional History bullets, include the company name: e.g., "Professional History — Kroger" or "Professional History — The RealReal". For other sections use the name: e.g., "Synopsis", "Core Competencies", "Education"]
+CONTEXT: [copy the 1-2 lines immediately surrounding the BEFORE line in the resume — the line before it and/or after it — so the edit can be located in context. If BEFORE is the first or last line of a section, just include the one adjacent line.]
 BEFORE: [exact original text, copied verbatim]
 AFTER: [your rewritten version — complete, ready to paste. IMPORTANT: If this edit is within a Highlights subsection (e.g. a line that starts with "END-TO-END SERVICE DESIGN & DELIVERY:" or similar), the AFTER field must contain ONLY the pipe-separated content that follows the subsection label — do NOT include the subsection label itself in the AFTER field. Match punctuation exactly to context: if this is a partial replacement, do not add a period unless the original fragment ends with one]
-TYPE: [one of: Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]
+TYPE: [one of: Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry | Insert]
+SCORE_IMPACT: [estimated ATS point gain for this single edit, as a whole number e.g. 3]
 WHY: [one sentence explaining the specific ATS improvement this makes]
 
 INTEGRITY RULES (non-negotiable):
@@ -3354,7 +3558,7 @@ EDITING RULES:
 - If a bullet needs a keyword added, work it in naturally at the start or end
 - For competencies, add missing keyword clusters as new pipe-separated entries only if they reflect actual skills
 
-Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.`;
+Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.${additionalExp ? `\n\nADDITIONAL EXPERIENCE TO INCORPORATE:\nThe candidate has provided additional experience not currently in the resume. For each item below, generate an INSERT block showing exactly where and how to add it. Use this format:\n\nSECTION: [best section to insert into]\nCONTEXT: [the line it should appear near]\nBEFORE: INSERT\nAFTER: [the new line or bullet, complete and ready to paste]\nTYPE: [Insert]\nWHY: [one sentence on why this addition improves ATS match]\n\nAdditional experience:\n${additionalExp}` : ''}`;
 
   try {
     const output = document.getElementById('le-output');
@@ -3369,6 +3573,10 @@ Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.`
     });
     // Now render the full structured diff view
     renderEditBlocks(fullText, output);
+    // Initialize score tracker
+    initLeScoreTracker(fullText);
+    // Save impactful edits to resume optimizer store
+    saveEditsForOptimizers(fullText, selectedLeResume);
 
   } catch (err) {
     showError('le-error', 'Something went wrong: ' + err.message);
@@ -3498,21 +3706,34 @@ function renderEditBlocks(rawText, container) {
       return text.substring(start + marker.length, end).trim().replace(/^`+|`+$/g, '').trim();
     }
 
-    const section = extractField(block, 'SECTION', ['BEFORE','AFTER','TYPE','WHY']);
-    const before  = extractField(block, 'BEFORE',  ['AFTER','TYPE','WHY','SECTION']);
-    const after   = extractField(block, 'AFTER',   ['TYPE','WHY','SECTION','BEFORE']);
-    const type    = extractField(block, 'TYPE',    ['WHY','SECTION','BEFORE','AFTER']);
-    const why     = extractField(block, 'WHY',     ['SECTION','BEFORE','AFTER','TYPE']);
+    const section     = extractField(block, 'SECTION',      ['CONTEXT','BEFORE','AFTER','TYPE','SCORE_IMPACT','WHY']);
+    const context     = extractField(block, 'CONTEXT',      ['BEFORE','AFTER','TYPE','SCORE_IMPACT','WHY','SECTION']);
+    const before      = extractField(block, 'BEFORE',       ['AFTER','TYPE','SCORE_IMPACT','WHY','SECTION','CONTEXT']);
+    const after       = extractField(block, 'AFTER',        ['TYPE','SCORE_IMPACT','WHY','SECTION','BEFORE','CONTEXT']);
+    const type        = extractField(block, 'TYPE',         ['SCORE_IMPACT','WHY','SECTION','BEFORE','AFTER','CONTEXT']);
+    const scoreImpact = extractField(block, 'SCORE_IMPACT', ['WHY','SECTION','BEFORE','AFTER','TYPE','CONTEXT']);
+    const why         = extractField(block, 'WHY',          ['SECTION','BEFORE','AFTER','TYPE','SCORE_IMPACT','CONTEXT']);
 
     if (!before && !after) return;
 
+    const impact = parseInt(scoreImpact) || 0;
     const editId = 'edit-block-' + i;
-    html += `<div class="edit-block" id="${editId}">
+    const isInsert = before === 'INSERT' || (type || '').toLowerCase() === 'insert';
+    html += `<div class="edit-block" id="${editId}" data-impact="${impact}" data-checked="false">
    <div class="edit-block-header">
-        <div><strong>Edit ${i + 1}</strong>${section ? `<span style="display:inline-block;margin-left:0.6rem;padding:0.15rem 0.55rem;background:#1a1a1a;border:1px solid #1a1a1a;border-radius:3px;font-size:0.68rem;font-weight:600;color:#ffffff;letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}${type ? `<span style="display:inline-block;margin-left:0.4rem;padding:0.15rem 0.55rem;background:#e8f0fe;border:1px solid #c5d4f5;border-radius:3px;font-size:0.68rem;font-weight:600;color:#2a4db5;letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}</div>
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;margin:0;">
+            <input type="checkbox" style="width:15px;height:15px;cursor:pointer;accent-color:#1e6b35;" onchange="updateLeScoreTracker(this,${i})">
+            <strong>Edit ${i + 1}</strong>
+          </label>
+          ${section ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#1a1a1a;border-radius:3px;font-size:0.68rem;font-weight:600;color:#fff;letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}
+          ${type ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:${isInsert ? '#fff3e0' : '#e8f0fe'};border:1px solid ${isInsert ? '#f0c080' : '#c5d4f5'};border-radius:3px;font-size:0.68rem;font-weight:600;color:${isInsert ? '#a05000' : '#2a4db5'};letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}
+          ${impact > 0 ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#eaf7ee;border:1px solid #b2dfc0;border-radius:3px;font-size:0.68rem;font-weight:700;color:#1e6b35;">+${impact} pts</span>` : ''}
+        </div>
       </div>
-      <div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>
-      <div class="edit-row-after" id="after-${i}"><span class="edit-label">Replace with</span><span class="after-text">${escHtml(after)}</span><button class="copy-btn" style="float:right;margin-left:0.5rem;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="var t=this.previousElementSibling.textContent;navigator.clipboard.writeText(t).then(function(){},function(){});this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy'},2000)">Copy</button></div>
+      ${isInsert ? `<div class="edit-row-before" style="background:#fff8ee;border-color:#f0c080;"><span class="edit-label" style="color:#a05000;">Insert new</span>${escHtml(after)}</div>` : `<div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>`}
+      ${context ? `<div style="font-size:0.75rem;color:#888;font-style:italic;padding:0.35rem 0.75rem;background:#f9f9f9;border-left:3px solid #ddd;margin:0 0 0.25rem;line-height:1.5;"><span style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:#aaa;display:block;margin-bottom:0.2rem;">Surrounding context</span>${escHtml(context)}</div>` : ''}
+      ${!isInsert ? `<div class="edit-row-after" id="after-${i}"><span class="edit-label">Replace with</span><span class="after-text">${escHtml(after)}</span><button class="copy-btn" style="float:right;margin-left:0.5rem;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="var t=this.previousElementSibling.textContent;navigator.clipboard.writeText(t).then(function(){},function(){});this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy'},2000)">Copy</button></div>` : ''}
       ${why ? `<div class="edit-row-why">💡 ${escHtml(why)}</div>` : ''}
     </div>`;
   });
@@ -3529,6 +3750,38 @@ function renderEditBlocks(rawText, container) {
 
 // ─── ATS OUTPUT TABS ──────────────────────────────────────────────────────────
 // ATS static tabs handled inline in ATS handler above
+
+// ─── LINE EDITS SCORE TRACKER ─────────────────────────────────────────────────
+let leBaseScore = 0;
+function initLeScoreTracker(rawText) {
+  const projMatch = rawText.match(/(\d+)%\s*[→\-]+\s*([\d]+)%/);
+  leBaseScore = projMatch ? parseInt(projMatch[1]) : 0;
+  const blocks = document.querySelectorAll('#le-output .edit-block');
+  const tracker = document.getElementById('le-score-tracker');
+  const totalEl = document.getElementById('le-total-count');
+  if (blocks.length === 0) { if (tracker) tracker.style.display = 'none'; return; }
+  if (tracker) tracker.style.display = 'flex';
+  if (totalEl) totalEl.textContent = blocks.length;
+  document.getElementById('le-checked-count').textContent = '0';
+  document.getElementById('le-projected-score').textContent = leBaseScore ? leBaseScore + '%' : '—';
+}
+function updateLeScoreTracker(checkbox, idx) {
+  const block = document.getElementById('edit-block-' + idx);
+  if (block) {
+    block.style.opacity = checkbox.checked ? '0.55' : '1';
+    block.style.background = checkbox.checked ? '#f0faf4' : '';
+  }
+  const blocks = document.querySelectorAll('#le-output .edit-block');
+  let checked = 0, totalImpact = 0;
+  blocks.forEach(b => {
+    const cb = b.querySelector('input[type="checkbox"]');
+    const impact = parseInt(b.dataset.impact) || 0;
+    if (cb && cb.checked) { checked++; totalImpact += impact; }
+  });
+  document.getElementById('le-checked-count').textContent = checked;
+  const projected = leBaseScore ? Math.min(leBaseScore + totalImpact, 100) + '%' : (totalImpact ? '+' + totalImpact + ' pts' : '—');
+  document.getElementById('le-projected-score').textContent = projected;
+}
 
 // ─── RECHECK OUTPUT TABS ──────────────────────────────────────────────────────
 document.getElementById('recheck-tabs').addEventListener('click', e => {
@@ -3620,9 +3873,217 @@ function showQuote() {
 showQuote();
 setInterval(showQuote, 8000);
 
+// ─── IMPACTFUL RESUME OPTIMIZERS ──────────────────────────────────────────────
+function getOptimizerStore(key) {
+  return JSON.parse(localStorage.getItem('cara_optimizers_' + key) || '[]');
+}
+function saveOptimizerStore(key, data) {
+  localStorage.setItem('cara_optimizers_' + key, JSON.stringify(data));
+}
+
+function saveEditsForOptimizers(rawText, resumeKey) {
+  const lines = rawText.split('\n');
+  let blocks = [], currentBlock = [];
+  for (const line of lines) {
+    const t = line.trim();
+    if ((t.startsWith('SECTION:') || t.startsWith('BEFORE:')) && currentBlock.length > 0) {
+      if (currentBlock.some(l => l.trim().startsWith('BEFORE:'))) blocks.push(currentBlock.join('\n'));
+      currentBlock = [line];
+    } else { currentBlock.push(line); }
+  }
+  if (currentBlock.some(l => l.trim().startsWith('BEFORE:'))) blocks.push(currentBlock.join('\n'));
+
+  function extractF(text, field, next) {
+    const marker = field + ':';
+    const ls = text.search(new RegExp('(^|\\n)' + field + ':'));
+    const start = ls < 0 ? -1 : text.indexOf(marker, ls);
+    if (start < 0) return '';
+    let end = text.length;
+    for (const n of next) { const ni = text.search(new RegExp('(^|\\n)' + n + ':')); if (ni > start && ni < end) end = ni; }
+    return text.substring(start + marker.length, end).trim();
+  }
+
+  const store = getOptimizerStore(resumeKey);
+  let changed = false;
+  for (const block of blocks) {
+    const before = extractF(block, 'BEFORE', ['AFTER','TYPE','SCORE_IMPACT','WHY','SECTION','CONTEXT']);
+    const after  = extractF(block, 'AFTER',  ['TYPE','SCORE_IMPACT','WHY','SECTION','BEFORE','CONTEXT']);
+    const section= extractF(block, 'SECTION',['CONTEXT','BEFORE','AFTER','TYPE','SCORE_IMPACT','WHY']);
+    const why    = extractF(block, 'WHY',    ['SECTION','BEFORE','AFTER','TYPE','SCORE_IMPACT','CONTEXT']);
+    const impact = parseInt(extractF(block, 'SCORE_IMPACT', ['WHY','SECTION','BEFORE','AFTER','TYPE','CONTEXT'])) || 0;
+    if (!before || !after) continue;
+    const fingerprint = before.trim().substring(0, 80);
+    const existing = store.find(e => e.fingerprint === fingerprint);
+    if (existing) {
+      existing.count = (existing.count || 1) + 1;
+      existing.impact = Math.max(existing.impact || 0, impact);
+      changed = true;
+    } else {
+      store.push({ fingerprint, section, before, after, why, impact, count: 1, ts: Date.now() });
+      changed = true;
+    }
+  }
+  if (changed) {
+    saveOptimizerStore(resumeKey, store);
+    renderOptimizersForSlot(resumeKey);
+  }
+}
+
+function getImpactfulEdits(resumeKey) {
+  const store = getOptimizerStore(resumeKey);
+  return store.filter(e => e.impact >= 5 || e.count >= 3);
+}
+
+function renderOptimizersForSlot(key) {
+  const container = document.getElementById('optimizers-' + key);
+  if (!container) return;
+  const edits = getImpactfulEdits(key);
+  if (edits.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'block';
+  const accordion = container.querySelector('.optimizer-accordion');
+  if (!accordion) return;
+  accordion.innerHTML = edits.map((e, i) => `
+    <div style="border:1px solid var(--border);border-radius:5px;margin-bottom:0.5rem;overflow:hidden;">
+      <div style="background:var(--bgoff);padding:0.55rem 0.85rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">
+        ${e.section ? `<span style="font-size:0.68rem;font-weight:600;background:#1a1a1a;color:#fff;padding:0.12rem 0.45rem;border-radius:3px;">${escHtml(e.section)}</span>` : ''}
+        ${e.impact >= 5 ? `<span style="font-size:0.65rem;background:#eaf7ee;color:#1e6b35;border:1px solid #b2dfc0;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700;">+${e.impact} pts</span>` : ''}
+        ${e.count >= 3 ? `<span style="font-size:0.65rem;background:#e8f0fe;color:#2a4db5;border:1px solid #c5d4f5;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700;">Suggested ${e.count}×</span>` : ''}
+        <span style="font-size:0.78rem;color:var(--mid);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml((e.before || '').substring(0, 60))}…</span>
+      </div>
+      <div style="padding:0.6rem 0.85rem;font-size:0.8rem;line-height:1.6;">
+        <div style="margin-bottom:0.3rem;"><span style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);">Remove</span><div style="margin-top:0.2rem;color:#888;text-decoration:line-through;">${escHtml(e.before)}</div></div>
+        <div style="margin-bottom:0.3rem;"><span style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:#1e6b35;">Replace with</span><div style="margin-top:0.2rem;color:var(--black);">${escHtml(e.after)}<button onclick="navigator.clipboard.writeText(${JSON.stringify(e.after)});this.textContent='Copied!';var b=this;setTimeout(()=>b.textContent='Copy',2000)" style="margin-left:0.5rem;font-size:0.68rem;padding:0.1rem 0.4rem;border:1px solid var(--border);border-radius:3px;background:transparent;cursor:pointer;color:var(--mid);">Copy</button></div></div>
+        ${e.why ? `<div style="font-size:0.75rem;color:var(--mid);font-style:italic;">💡 ${escHtml(e.why)}</div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function renderAllOptimizers() {
+  Object.keys(RESUMES).forEach(key => renderOptimizersForSlot(key));
+}
+
+// ─── STAR STORY BANK ──────────────────────────────────────────────────────────
+let starStories = JSON.parse(localStorage.getItem('cara_star_stories') || '[]');
+let starTagFilter = 'all';
+
+function saveStarStories() { localStorage.setItem('cara_star_stories', JSON.stringify(starStories)); }
+
+function addStarStory() {
+  const id = 'star_' + Date.now();
+  starStories.unshift({ id, title: '', situation: '', task: '', action: '', result: '', tags: [] });
+  saveStarStories();
+  renderStarStories();
+  // Scroll to first story
+  const el = document.getElementById('star-card-' + id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function deleteStarStory(id) {
+  if (!confirm('Remove this story?')) return;
+  starStories = starStories.filter(s => s.id !== id);
+  saveStarStories();
+  renderStarStories();
+}
+
+function updateStarField(id, field, value) {
+  const story = starStories.find(s => s.id === id);
+  if (!story) return;
+  story[field] = value;
+  saveStarStories();
+}
+
+function toggleStarTag(id, tag) {
+  const story = starStories.find(s => s.id === id);
+  if (!story) return;
+  if (story.tags.includes(tag)) { story.tags = story.tags.filter(t => t !== tag); }
+  else { story.tags.push(tag); }
+  saveStarStories();
+  renderStarStories();
+}
+
+function addCustomStarTag(id) {
+  const input = document.getElementById('star-custom-tag-input-' + id);
+  const tag = (input ? input.value.trim().toLowerCase() : '');
+  if (!tag) return;
+  const story = starStories.find(s => s.id === id);
+  if (!story || story.tags.includes(tag)) return;
+  story.tags.push(tag);
+  // Add to filter bar if new
+  const filterBar = document.getElementById('star-tag-filters');
+  if (filterBar && !filterBar.querySelector('[data-tag="' + tag + '"]')) {
+    const span = document.createElement('span');
+    span.className = 'star-tag-filter';
+    span.dataset.tag = tag;
+    span.setAttribute('onclick', 'filterStarStories("' + tag + '",this)');
+    span.style.cssText = 'cursor:pointer;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-family:\'Raleway\',sans-serif;letter-spacing:0.06em;text-transform:uppercase;background:transparent;color:var(--mid);border:1px solid var(--border);';
+    span.textContent = tag;
+    filterBar.appendChild(span);
+  }
+  if (input) input.value = '';
+  saveStarStories();
+  renderStarStories();
+}
+
+function filterStarStories(tag, el) {
+  starTagFilter = tag;
+  document.querySelectorAll('.star-tag-filter').forEach(t => {
+    t.style.background = 'transparent'; t.style.color = 'var(--mid)'; t.style.borderColor = 'var(--border)';
+  });
+  if (el) { el.style.background = 'var(--black)'; el.style.color = 'var(--white)'; el.style.borderColor = 'var(--black)'; }
+  renderStarStories();
+}
+
+const PRESET_TAGS = ['leadership','strategy','data','collaboration','conflict','failure','change'];
+
+function renderStarStories() {
+  const container = document.getElementById('star-stories-list');
+  if (!container) return;
+  const filtered = starTagFilter === 'all' ? starStories : starStories.filter(s => s.tags.includes(starTagFilter));
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="color:var(--mid);font-size:0.85rem;padding:1rem 0;">No stories yet. Click "+ Add Story" to get started.</div>';
+    return;
+  }
+  container.innerHTML = filtered.map(s => {
+    const tagPills = PRESET_TAGS.map(t => {
+      const active = s.tags.includes(t);
+      return `<span onclick="toggleStarTag('${s.id}','${t}')" style="cursor:pointer;padding:0.15rem 0.5rem;border-radius:20px;font-size:0.68rem;font-family:'Raleway',sans-serif;letter-spacing:0.05em;text-transform:uppercase;background:${active ? 'var(--black)' : 'transparent'};color:${active ? 'var(--white)' : 'var(--mid)'};border:1px solid ${active ? 'var(--black)' : 'var(--border)'};">${t}</span>`;
+    }).join('');
+    return `<div id="star-card-${s.id}" style="border:1px solid var(--border);border-radius:6px;margin-bottom:1rem;overflow:hidden;">
+      <div style="background:var(--bgoff);padding:0.7rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
+        <input type="text" value="${escHtml(s.title)}" placeholder="Story title (e.g. Kroger NPS turnaround, $270M trailer finding)" style="flex:1;border:none;background:transparent;font-size:0.9rem;font-weight:600;color:var(--black);outline:none;" onchange="updateStarField('${s.id}','title',this.value)">
+        <button onclick="deleteStarStory('${s.id}')" style="background:none;border:none;cursor:pointer;color:var(--mid);font-size:0.85rem;padding:0.2rem 0.4rem;" title="Delete">✕</button>
+      </div>
+      <div style="padding:0.85rem 1rem;display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+        ${['situation','task','action','result'].map(f => `<div><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.25rem;">${f.charAt(0).toUpperCase()+f.slice(1)}</div><textarea rows="3" style="width:100%;box-sizing:border-box;font-size:0.8rem;line-height:1.5;padding:0.4rem 0.6rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--black);resize:vertical;" placeholder="${f === 'situation' ? 'What was the context?' : f === 'task' ? 'What were you responsible for?' : f === 'action' ? 'What did you do specifically?' : 'What was the measurable outcome?'}" onchange="updateStarField('${s.id}','${f}',this.value)">${escHtml(s[f] || '')}</textarea></div>`).join('')}
+      </div>
+      <div style="padding:0.5rem 1rem 0.85rem;border-top:1px solid var(--border);">
+        <div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.4rem;">Tags</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center;">
+          ${tagPills}
+          <input id="star-custom-tag-input-${s.id}" type="text" placeholder="+ custom tag" style="border:1px solid var(--border);border-radius:20px;padding:0.15rem 0.5rem;font-size:0.7rem;background:transparent;color:var(--black);outline:none;width:100px;" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomStarTag('${s.id}');}">
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+renderStarStories();
+
 // ─── PAGE INIT ───────────────────────────────────────────────────────────────
 loadSavedResumes();
 buildUploadSlots();
+renderAllOptimizers();
+
+// Restore session state
+if (savedJD) {
+  document.getElementById('jd-text').value = savedJD;
+  document.getElementById('jd-saved-msg').style.display = 'block';
+}
+if (savedJDUrl) document.getElementById('jd-url').value = savedJDUrl;
+if (savedRoleName) document.getElementById('job-role-name').value = savedRoleName;
 
 const savedGoal = localStorage.getItem('cara_daily_goal');
 if (savedGoal) { const goalEl = document.getElementById('daily-goal-input'); if (goalEl) goalEl.value = savedGoal; }
