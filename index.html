@@ -1972,8 +1972,9 @@ function loadSavedResumes() {
     const hidden = localStorage.getItem(LS_PREFIX + key + '_hidden');
     if (hidden) RESUMES[key].hidden = true;
   });
-  // Load custom-added resumes
+  // Load custom-added resumes — skip any whose text was deleted
   const customKeys = JSON.parse(localStorage.getItem('cara_custom_resume_keys') || '[]');
+  const validCustomKeys = [];
   customKeys.forEach(ck => {
     const text = localStorage.getItem(LS_PREFIX + ck.key);
     if (text) {
@@ -1981,8 +1982,13 @@ function loadSavedResumes() {
       if (!RESUME_KEYS.find(r => r.key === ck.key)) {
         RESUME_KEYS.push({ key: ck.key, label: ck.label });
       }
+      validCustomKeys.push(ck);
     }
   });
+  // Prune stale entries from the key list
+  if (validCustomKeys.length !== customKeys.length) {
+    localStorage.setItem('cara_custom_resume_keys', JSON.stringify(validCustomKeys));
+  }
 }
 
 function saveResume(key, text) {
@@ -2009,7 +2015,9 @@ function clearResume(key) {
     if (idx > -1) RESUME_KEYS.splice(idx, 1);
     const customKeys = JSON.parse(localStorage.getItem('cara_custom_resume_keys') || '[]');
     localStorage.setItem('cara_custom_resume_keys', JSON.stringify(customKeys.filter(k => k.key !== key)));
+    localStorage.removeItem(LS_PREFIX + key);
     localStorage.removeItem(LS_PREFIX + key + '_label');
+    localStorage.removeItem(LS_PREFIX + key + '_hidden');
     const slotEl = document.getElementById('slot-' + key);
     if (slotEl) slotEl.remove();
   }
@@ -2490,6 +2498,16 @@ document.getElementById('recheck-btn').addEventListener('click', async () => {
   if (!jd) { showError('recheck-error', 'Please save a job description in Step 01 first.'); return; }
   if (!updatedResume) { showError('recheck-error', 'Please paste your updated resume text.'); return; }
 
+  // Update panel title with round number
+  const titleEl = document.querySelector('#panel-resume-update .panel-title');
+  if (titleEl) {
+    const currentRound = parseInt(titleEl.dataset.round || '0') + 1;
+    titleEl.dataset.round = currentRound;
+    const ordinals = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th'];
+    const label = ordinals[currentRound - 1] || (currentRound + 'th');
+    titleEl.innerHTML = `Revised Resume <em>Check</em> <span style="font-size:0.65rem;font-family:'Raleway',sans-serif;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);font-style:normal;margin-left:0.5rem;">${label} round</span>`;
+  }
+
   showLoading('recheck-loading');
   hideError('recheck-error');
   document.getElementById('recheck-result').classList.remove('visible');
@@ -2633,16 +2651,20 @@ Be specific and direct.`;
       const leLink = document.querySelector('nav a[data-panel="line-edits"]');
       if (leLink) leLink.classList.add('active');
       document.getElementById('panel-line-edits').classList.add('active');
-      // Set round 2 indicator
+      // Set round N indicator
       let r2 = document.getElementById('le-round2-hint');
       if (!r2) {
         r2 = document.createElement('div');
         r2.id = 'le-round2-hint';
         r2.className = 'step-hint';
         r2.style.cssText = 'border-color:#1e6b35;background:#f0f7f2;margin-bottom:1rem;';
-        r2.innerHTML = '🔄 <strong>Round 2:</strong> Generating edits based on your Revised Resume Check recommendations.';
         document.getElementById('le-result').before(r2);
       }
+      const roundNum = (parseInt(r2.dataset.round || '1')) + 1;
+      r2.dataset.round = roundNum;
+      const ordinals = ['','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th'];
+      const label = ordinals[roundNum] || (roundNum + 'th');
+      r2.innerHTML = `🔄 <strong>Round ${label}:</strong> Generating edits based on your Revised Resume Check recommendations.`;
       r2.style.display = 'block';
       // Run the edits
       const jd2 = savedJD || document.getElementById('jd-text').value.trim();
