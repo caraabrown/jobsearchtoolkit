@@ -3669,16 +3669,14 @@ function renderEditBlocks(rawText, container) {
     </div>`;
   }
 
-  // Split into blocks by splitting on lines that start with SECTION: or BEFORE:
-  // Use string splitting instead of regex to avoid newline-in-regex issues
+  // Split into blocks — only split on SECTION: so BEFORE: never orphans the section label
   const lines = rawText.split('\n');
   let blocks = [];
   let currentBlock = [];
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if ((trimmed.startsWith('SECTION:') || trimmed.startsWith('BEFORE:')) && currentBlock.length > 0) {
-      // Check if currentBlock has a BEFORE: — if so it's a real block
+    if (trimmed.startsWith('SECTION:') && currentBlock.length > 0) {
       if (currentBlock.some(l => l.trim().startsWith('BEFORE:'))) {
         blocks.push(currentBlock.join('\n'));
       }
