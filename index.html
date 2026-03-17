@@ -1175,19 +1175,21 @@
       </div>
 
       <div style="margin-top:2rem; border-top:2px solid var(--border); padding-top:1.5rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;cursor:pointer;" onclick="var b=document.getElementById('optimizers-body');var a=document.getElementById('optimizers-toggle');b.style.display=b.style.display==='none'?'block':'none';a.textContent=b.style.display==='none'?'▸':'▾';">
           <div>
-            <div style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;color:var(--black);">Impactful Resume Optimizers</div>
-            <div style="font-size:0.78rem;color:var(--mid);margin-top:0.2rem;">Edits suggested 3+ times or worth 5+ ATS points — surfaced automatically as you run Line-by-Line Edits.</div>
+            <div style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;color:var(--black);">Impactful Resume Optimizers <span id="optimizers-toggle" style="font-size:0.7rem;margin-left:0.4rem;">▾</span></div>
+            <div style="font-size:0.78rem;color:var(--mid);margin-top:0.2rem;">Edits suggested 2+ times worth 7+ ATS points — surfaced automatically as you run Line-by-Line Edits.</div>
           </div>
         </div>
-        <div id="optimizers-principal_ds" style="display:none;margin-bottom:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Principal Design Strategist</div><div class="optimizer-accordion"></div></div>
-        <div id="optimizers-principal_ds_brief" style="display:none;margin-bottom:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Design Strategist (Brief)</div><div class="optimizer-accordion"></div></div>
-        <div id="optimizers-service_designer" style="display:none;margin-bottom:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Principal Service Designer</div><div class="optimizer-accordion"></div></div>
-        <div id="optimizers-product_designer" style="display:none;margin-bottom:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Lead Product Designer</div><div class="optimizer-accordion"></div></div>
-        <div id="optimizers-chief_of_staff" style="display:none;margin-bottom:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Chief of Staff</div><div class="optimizer-accordion"></div></div>
-        <div id="optimizers-custom" style="display:none;margin-bottom:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Custom Resumes</div><div class="optimizer-accordion"></div></div>
+        <div id="optimizers-body" style="display:none;">
+        <div id="optimizers-principal_ds" style="display:none;margin-bottom:0.5rem;"><div class="optimizer-accordion"></div></div>
+        <div id="optimizers-principal_ds_brief" style="display:none;margin-bottom:0.5rem;"><div class="optimizer-accordion"></div></div>
+        <div id="optimizers-service_designer" style="display:none;margin-bottom:0.5rem;"><div class="optimizer-accordion"></div></div>
+        <div id="optimizers-product_designer" style="display:none;margin-bottom:0.5rem;"><div class="optimizer-accordion"></div></div>
+        <div id="optimizers-chief_of_staff" style="display:none;margin-bottom:0.5rem;"><div class="optimizer-accordion"></div></div>
+        <div id="optimizers-custom" style="display:none;margin-bottom:0.5rem;"><div class="optimizer-accordion"></div></div>
         <div id="optimizers-empty" style="font-size:0.82rem;color:var(--mid);padding:0.5rem 0;">Run Line-by-Line Edits on any resume to start building your optimizer list.</div>
+        </div><!-- /optimizers-body -->
       </div>
 
       <div style="margin-top:2rem; border-top:1px solid var(--border); padding-top:1.5rem;">
@@ -2372,7 +2374,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
   const systemPrompt = 'You are an expert ATS analyst. Be precise, data-driven, and honest. Never inflate scores or suggest fabricating experience.';
   const resumeBlock = resumeTexts.map(r => r.label + '\n---\n' + r.text).join('\n\n======\n\n');
   const userMsg = ['JOB DESCRIPTION:', jd, savedRoleName ? 'Role: ' + savedRoleName : null, 'RESUMES TO ANALYZE:', resumeBlock, 'IMPORTANT: Use these exact resume names in your SCORE and IMPROVED_SCORE lines: ' + resumeTexts.map(r => r.label).join(', '),
-    'For each resume give an ATS score 0-100% based strictly on what is actually in the resume. Output each score on its own line EXACTLY like this (use the exact resume name as listed above): SCORE: [Exact Resume Name] = [XX]%\n\nFor each resume also output the realistic improved score if honest keyword wordsmithing were applied: IMPROVED_SCORE: [Exact Resume Name] = [XX]%\n\nThen output the following four sections with EXACTLY these headers:\n\n## BEST MATCH\n[Which resume scored highest and a 2-3 sentence explanation of why it fits best]\n\n## MISSING KEYWORDS\n[Bulleted list of keywords from the JD not present in the resumes]\n\n## RED FLAGS & WINS\n[Use ✅ for strengths and ❌ for gaps — one per line]\n\n## FASTEST PATH TO 95%+\n[Specific, honest edits that could raise the score using only wordsmithing of existing experience]\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume.'
+    'For each resume give an ATS score 0-100% based strictly on what is actually in the resume. Output each score on its own line EXACTLY like this (use the exact resume name as listed above): SCORE: [Exact Resume Name] = [XX]%\n\nFor each resume also output the realistic improved score if honest keyword wordsmithing were applied: IMPROVED_SCORE: [Exact Resume Name] = [XX]%\n\nThen output the following four sections with EXACTLY these headers:\n\n## BEST MATCH\n[Which resume scored highest and a 2-3 sentence explanation of why it fits best]\n\n## MISSING KEYWORDS\nOutput as a markdown pipe table with these exact columns:\n| Keyword | Status | Priority | Where to Add |\nStatus = ✅ Matched or ❌ Missing. Priority = HIGH, MEDIUM, or LOW.\n\n## RED FLAGS & WINS\n[Use ✅ for strengths and ❌ for gaps — one per line]\n\n## FASTEST PATH TO 95%+\nOutput as a markdown pipe table with these exact columns:\n| Edit | Section | Impact | Action |\nImpact = HIGH, MEDIUM, or LOW. Action = specific honest wordsmithing instruction.\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume.'
   ].filter(Boolean).join('\n\n');
   try {
     document.getElementById('ats-result').classList.add('visible');
@@ -2421,16 +2423,36 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     function formatAtsContent(raw) {
       if (!raw) return '';
       function boldify(t) { return t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*\*/g,''); }
-      return '<div class="ats-result-section">' + raw.split('\n').map(line => {
-        const t = line.trim(); if (!t) return '';
-        if (/^#{1,3}\s/.test(t)) return '<div class="ats-heading">' + boldify(t.replace(/^#+\s*/,'')) + '</div>';
-        if (t.startsWith('**') && t.endsWith('**')) return '<div class="ats-subhead">' + boldify(t) + '</div>';
-        if (/^\d+\.\s*\*\*/.test(t)) return '<div class="ats-subhead">' + boldify(t.replace(/^\d+\.\s*/,'')) + '</div>';
-        if (/^[\u2713\u2714\u2705✅]/.test(t)) return '<div class="ats-line ats-win"><span class="ats-line-icon">✓</span><span>' + boldify(t.replace(/^[\u2713\u2714\u2705✅]\s*/,'')) + '</span></div>';
-        if (/^[\u2717\u2718\u274C❌⚠️🚩]/.test(t)) return '<div class="ats-line ats-warn"><span class="ats-line-icon">✕</span><span>' + boldify(t.replace(/^[\u2717\u2718\u274C❌⚠️🚩]\s*/,'')) + '</span></div>';
-        if (/^[-•*]\s/.test(t)) return '<div class="ats-bullet"><span>' + boldify(t.replace(/^[-•*]\s*/,'')) + '</span></div>';
-        return '<div class="ats-paragraph">' + boldify(t) + '</div>';
-      }).join('') + '</div>';
+      const lines = raw.split('\n');
+      let out = '<div class="ats-result-section">';
+      let inTable = false, tableHtml = '';
+      for (const line of lines) {
+        const t = line.trim();
+        if (!t) { if (inTable) { out += tableHtml + '</tbody></table></div>'; inTable = false; tableHtml = ''; } continue; }
+        if (t.startsWith('|') && t.endsWith('|')) {
+          if (/^[\|\s\-:]+$/.test(t)) continue;
+          const cells = t.split('|').slice(1,-1).map(c => c.trim());
+          if (!inTable) {
+            inTable = true;
+            tableHtml = '<div style="overflow-x:auto;margin:0.75rem 0;"><table style="width:100%;border-collapse:collapse;font-size:0.82rem;"><thead><tr>' +
+              cells.map(c => `<th style="text-align:left;padding:0.5rem 0.75rem;background:#f7f6f4;border:1px solid #dedede;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:#555;">${boldify(c)}</th>`).join('') +
+              '</tr></thead><tbody>';
+          } else {
+            tableHtml += '<tr>' + cells.map(c => `<td style="padding:0.5rem 0.75rem;border:1px solid #dedede;vertical-align:top;line-height:1.5;">${boldify(c)}</td>`).join('') + '</tr>';
+          }
+          continue;
+        }
+        if (inTable) { out += tableHtml + '</tbody></table></div>'; inTable = false; tableHtml = ''; }
+        if (/^#{1,3}\s/.test(t)) { out += '<div class="ats-heading">' + boldify(t.replace(/^#+\s*/,'')) + '</div>'; continue; }
+        if (t.startsWith('**') && t.endsWith('**')) { out += '<div class="ats-subhead">' + boldify(t) + '</div>'; continue; }
+        if (/^\d+\.\s*\*\*/.test(t)) { out += '<div class="ats-subhead">' + boldify(t.replace(/^\d+\.\s*/,'')) + '</div>'; continue; }
+        if (/^[\u2713\u2714\u2705✅]/.test(t)) { out += `<div class="ats-line ats-win"><span class="ats-line-icon">✓</span><span>${boldify(t.replace(/^[\u2713\u2714\u2705✅]\s*/,''))}</span></div>`; continue; }
+        if (/^[\u2717\u2718\u274C❌⚠️🚩]/.test(t)) { out += `<div class="ats-line ats-warn"><span class="ats-line-icon">✕</span><span>${boldify(t.replace(/^[\u2717\u2718\u274C❌⚠️🚩]\s*/,''))}</span></div>`; continue; }
+        if (/^[-•*]\s/.test(t)) { out += '<div class="ats-bullet"><span>' + boldify(t.replace(/^[-•*]\s*/,'')) + '</span></div>'; continue; }
+        out += '<div class="ats-paragraph">' + boldify(t) + '</div>';
+      }
+      if (inTable) out += tableHtml + '</tbody></table></div>';
+      return out + '</div>';
     }
     const bestTxt = atsSection(fullText, /##\s*BEST MATCH/i, /##\s*MISSING KEYWORDS/i);
     const kwTxt = atsSection(fullText, /##\s*MISSING KEYWORDS/i, /##\s*RED FLAGS/i);
@@ -3796,10 +3818,7 @@ document.getElementById('recheck-tabs').addEventListener('click', e => {
 function copyCoverLetter(btn) {
   const output = document.getElementById('cl-output');
   if (!output || !output.innerHTML.trim()) return;
-  // Build clean HTML — skip the footer div (last child with flex display)
   const clone = output.cloneNode(true);
-  const footer = clone.querySelector('div[style*="border-top"]');
-  if (footer) footer.remove();
   // Wrap in basic letter styles for paste fidelity
   const html = `<div style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.6;max-width:680px;">${clone.innerHTML}</div>`;
   const blob = new Blob([html], { type: 'text/html' });
@@ -3841,6 +3860,7 @@ async function downloadCLasDocx(btn) {
   if (footerDiv) footerDiv.remove();
 
   const noBorder = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
+  const allNoBorders = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder };
 
   function parseRuns(el, defaultSize) {
     const runs = [];
@@ -3870,10 +3890,9 @@ async function downloadCLasDocx(btn) {
         rows.push(new TableRow({
           children: cells.map(cell => new TableCell({
             width: { size: 4680, type: WidthType.DXA },
-            borders: {
-              top: noBorder, left: noBorder, right: noBorder,
-              bottom: isHeader ? { style: BorderStyle.SINGLE, size: 8, color: '222222' } : noBorder
-            },
+            borders: isHeader
+              ? { top: noBorder, left: noBorder, right: noBorder, bottom: { style: BorderStyle.SINGLE, size: 8, color: '222222' } }
+              : allNoBorders,
             margins: { top: 80, bottom: 80, left: 0, right: 100 },
             children: [new Paragraph({
               children: [new TextRun({
@@ -3887,7 +3906,7 @@ async function downloadCLasDocx(btn) {
         }));
       }
       if (rows.length) {
-        children.push(new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: [4680, 4680], rows }));
+        children.push(new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: [4680, 4680], borders: { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder, insideH: noBorder, insideV: noBorder }, rows }));
         children.push(new Paragraph({ children: [], spacing: { after: 160 } }));
       }
     } else if (el.style && el.style.height) {
@@ -4041,34 +4060,58 @@ function saveEditsForOptimizers(rawText, resumeKey) {
 
 function getImpactfulEdits(resumeKey) {
   const store = getOptimizerStore(resumeKey);
-  return store.filter(e => e.impact >= 5 || e.count >= 3);
+  return store.filter(e => e.impact >= 7 && e.count >= 2 && !e.dismissed);
+}
+
+function dismissOptimizer(resumeKey, fingerprint, verdict) {
+  const store = getOptimizerStore(resumeKey);
+  const edit = store.find(e => e.fingerprint === fingerprint);
+  if (!edit) return;
+  edit.dismissed = verdict;
+  saveOptimizerStore(resumeKey, store);
+  renderOptimizersForSlot(resumeKey);
+  updateOptimizerEmptyState();
+}
+
+function updateOptimizerEmptyState() {
+  const anyVisible = Object.keys(RESUMES).some(k => getImpactfulEdits(k).length > 0);
+  const emptyEl = document.getElementById('optimizers-empty');
+  if (emptyEl) emptyEl.style.display = anyVisible ? 'none' : 'block';
 }
 
 function renderOptimizersForSlot(key) {
   const container = document.getElementById('optimizers-' + key);
   if (!container) return;
   const edits = getImpactfulEdits(key);
-  if (edits.length === 0) {
-    container.style.display = 'none';
-    return;
-  }
+  if (edits.length === 0) { container.style.display = 'none'; updateOptimizerEmptyState(); return; }
   container.style.display = 'block';
+  const label = RESUMES[key] ? RESUMES[key].label : key;
   const accordion = container.querySelector('.optimizer-accordion');
   if (!accordion) return;
-  accordion.innerHTML = edits.map((e, i) => `
-    <div style="border:1px solid var(--border);border-radius:5px;margin-bottom:0.5rem;overflow:hidden;">
-      <div style="background:var(--bgoff);padding:0.55rem 0.85rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">
-        ${e.section ? `<span style="font-size:0.68rem;font-weight:600;background:#1a1a1a;color:#fff;padding:0.12rem 0.45rem;border-radius:3px;">${escHtml(e.section)}</span>` : ''}
-        ${e.impact >= 5 ? `<span style="font-size:0.65rem;background:#eaf7ee;color:#1e6b35;border:1px solid #b2dfc0;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700;">+${e.impact} pts</span>` : ''}
-        ${e.count >= 3 ? `<span style="font-size:0.65rem;background:#e8f0fe;color:#2a4db5;border:1px solid #c5d4f5;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700;">Suggested ${e.count}×</span>` : ''}
-        <span style="font-size:0.78rem;color:var(--mid);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml((e.before || '').substring(0, 60))}…</span>
+  accordion.innerHTML = edits.map((e) => {
+    const fp = (e.fingerprint || '').replace(/'/g, '&#39;');
+    return `<div style="border:1px solid var(--border);border-radius:5px;margin-bottom:0.6rem;overflow:hidden;">
+      <div style="background:var(--bgoff);padding:0.55rem 0.85rem;display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+        <span style="font-size:0.65rem;font-weight:700;background:#2a4db5;color:#fff;padding:0.12rem 0.5rem;border-radius:3px;">${escHtml(label)}</span>
+        ${e.section ? `<span style="font-size:0.65rem;font-weight:600;background:#1a1a1a;color:#fff;padding:0.12rem 0.45rem;border-radius:3px;">${escHtml(e.section)}</span>` : ''}
+        <span style="font-size:0.65rem;background:#eaf7ee;color:#1e6b35;border:1px solid #b2dfc0;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700;">+${e.impact} pts</span>
+        <span style="font-size:0.65rem;background:#e8f0fe;color:#2a4db5;border:1px solid #c5d4f5;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700;">Suggested ${e.count}×</span>
+        <span style="font-size:0.75rem;color:var(--mid);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml((e.before||'').substring(0,55))}…</span>
+        <button onclick="dismissOptimizer('${key}','${fp}','applied')" title="Applied — hide this" style="background:#1e6b35;color:#fff;border:none;border-radius:3px;padding:0.2rem 0.55rem;font-size:0.8rem;cursor:pointer;flex-shrink:0;line-height:1;">✓</button>
+        <button onclick="dismissOptimizer('${key}','${fp}','skipped')" title="Won't apply — hide this" style="background:#cc4444;color:#fff;border:none;border-radius:3px;padding:0.2rem 0.55rem;font-size:0.8rem;cursor:pointer;flex-shrink:0;line-height:1;">✕</button>
       </div>
       <div style="padding:0.6rem 0.85rem;font-size:0.8rem;line-height:1.6;">
-        <div style="margin-bottom:0.3rem;"><span style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);">Remove</span><div style="margin-top:0.2rem;color:#888;text-decoration:line-through;">${escHtml(e.before)}</div></div>
-        <div style="margin-bottom:0.3rem;"><span style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:#1e6b35;">Replace with</span><div style="margin-top:0.2rem;color:var(--black);">${escHtml(e.after)}<button onclick="navigator.clipboard.writeText(${JSON.stringify(e.after)});this.textContent='Copied!';var b=this;setTimeout(()=>b.textContent='Copy',2000)" style="margin-left:0.5rem;font-size:0.68rem;padding:0.1rem 0.4rem;border:1px solid var(--border);border-radius:3px;background:transparent;cursor:pointer;color:var(--mid);">Copy</button></div></div>
-        ${e.why ? `<div style="font-size:0.75rem;color:var(--mid);font-style:italic;">💡 ${escHtml(e.why)}</div>` : ''}
+        <div style="margin-bottom:0.4rem;"><span style="font-family:'Raleway',sans-serif;font-size:0.57rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);">Remove</span><div style="margin-top:0.2rem;color:#888;text-decoration:line-through;">${escHtml(e.before)}</div></div>
+        <div style="margin-bottom:0.35rem;"><span style="font-family:'Raleway',sans-serif;font-size:0.57rem;letter-spacing:0.08em;text-transform:uppercase;color:#1e6b35;">Replace with</span>
+          <div style="margin-top:0.2rem;color:var(--black);display:flex;align-items:flex-start;gap:0.5rem;">
+            <span style="flex:1;">${escHtml(e.after)}</span>
+            <button data-copy="${escHtml(e.after)}" onclick="navigator.clipboard.writeText(this.dataset.copy);this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy';},2000);" style="flex-shrink:0;font-size:0.68rem;padding:0.15rem 0.5rem;border:1px solid var(--border);border-radius:3px;background:transparent;cursor:pointer;color:var(--mid);">Copy</button>
+          </div>
+        </div>
+        ${e.why ? `<div style="font-size:0.74rem;color:var(--mid);font-style:italic;">💡 ${escHtml(e.why)}</div>` : ''}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function renderAllOptimizers() {
