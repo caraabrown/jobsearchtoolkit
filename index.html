@@ -1043,7 +1043,8 @@
       <li><a href="#" data-panel="company-research"><span class="num">08</span> Company Research</a></li>
       <li><a href="#" data-panel="interview-prep"><span class="num">09</span> Interview Prep</a></li>
       <li><a href="#" data-panel="linkedin-outreach"><span class="num">10</span> LinkedIn Outreach</a></li>
-      <li><a href="#" data-panel="salary-intel"><span class="num">11</span> Salary &amp; Recruiter Intel</a></li>
+      <li><a href="#" data-panel="referral-engine"><span class="num">11</span> Referral Engine</a></li>
+      <li><a href="#" data-panel="salary-intel"><span class="num">12</span> Salary &amp; Recruiter Intel</a></li>
     </ul>
   </nav>
 
@@ -1654,33 +1655,59 @@
       <div class="divider"></div>
       <div class="panel-desc">Craft warm, specific outreach messages — connection requests, informational interview asks, referral requests, or follow-ups after applying. These are written to feel human and earn a reply, not generic InMail.</div>
 
-      <div class="form-row">
-        <div>
-          <label>Their Name *</label>
-          <input type="text" id="li-name" placeholder="e.g., Jordan Reeves">
+      <div class="tab-row" id="li-mode-tabs">
+        <div class="tab active" data-limode="message">Write a Message</div>
+        <div class="tab" data-limode="hm-finder">Hiring Manager Finder</div>
+      </div>
+
+      <div id="li-message-sub">
+        <div class="form-row">
+          <div>
+            <label>Their Name *</label>
+            <input type="text" id="li-name" placeholder="e.g., Jordan Reeves">
+          </div>
+          <div>
+            <label>Their Title & Company *</label>
+            <input type="text" id="li-title" placeholder="e.g., VP of Design Strategy at Accenture Federal">
+          </div>
         </div>
-        <div>
-          <label>Their Title & Company *</label>
-          <input type="text" id="li-title" placeholder="e.g., VP of Design Strategy at Accenture Federal">
+
+        <label>What do you know about them? (LinkedIn bio, mutual connections, recent posts, etc.)</label>
+        <textarea id="li-context" placeholder="e.g., We have 3 mutual connections, she recently posted about human-centered design in government, previously at USDS…" rows="4"></textarea>
+
+        <label>Message type</label>
+        <div class="tab-row" id="li-type-tabs">
+          <div class="tab active" data-litype="connect">Connection Request</div>
+          <div class="tab" data-litype="info">Informational Ask</div>
+          <div class="tab" data-litype="referral">Referral Request</div>
+          <div class="tab" data-litype="followup">Post-Application Follow-Up</div>
+        </div>
+
+        <label>Goal of this outreach</label>
+        <textarea id="li-goal" placeholder="e.g., I want to get on her radar before I formally apply, ask for a 20-minute call, learn about the team culture…" rows="3"></textarea>
+
+        <div class="btn-row">
+          <button class="btn" id="gen-li-btn">Generate Message</button>
         </div>
       </div>
 
-      <label>What do you know about them? (LinkedIn bio, mutual connections, recent posts, etc.)</label>
-      <textarea id="li-context" placeholder="e.g., We have 3 mutual connections, she recently posted about human-centered design in government, previously at USDS…" rows="4"></textarea>
-
-      <label>Message type</label>
-      <div class="tab-row" id="li-type-tabs">
-        <div class="tab active" data-litype="connect">Connection Request</div>
-        <div class="tab" data-litype="info">Informational Ask</div>
-        <div class="tab" data-litype="referral">Referral Request</div>
-        <div class="tab" data-litype="followup">Post-Application Follow-Up</div>
-      </div>
-
-      <label>Goal of this outreach</label>
-      <textarea id="li-goal" placeholder="e.g., I want to get on her radar before I formally apply, ask for a 20-minute call, learn about the team culture…" rows="3"></textarea>
-
-      <div class="btn-row">
-        <button class="btn" id="gen-li-btn">Generate Message</button>
+      <div id="li-hm-finder-sub" style="display:none;">
+        <div class="step-hint">Enter the company and role. This tool generates exact LinkedIn search strings to find the hiring manager, tells you what to look for on their profile, and writes a targeted first message.</div>
+        <div class="form-row">
+          <div>
+            <label>Company *</label>
+            <input type="text" id="hm-company" placeholder="e.g., UnitedHealth Group">
+          </div>
+          <div>
+            <label>Role you're applying for</label>
+            <input type="text" id="hm-role" placeholder="e.g., Design Director, Medicare Experience">
+          </div>
+        </div>
+        <label>Anything you already know? (optional)</label>
+        <textarea id="hm-context" placeholder="e.g., The JD mentions the team sits within Consumer Experience. I think it reports to a VP or SVP. I saw one person on LinkedIn who might be the HM but I'm not sure." rows="3"></textarea>
+        <div class="btn-row">
+          <button class="btn" id="gen-hm-btn">Find Hiring Manager</button>
+        </div>
       </div>
 
       <div class="loading" id="li-loading"><div class="spinner"></div>Crafting your message…</div>
@@ -1689,6 +1716,66 @@
       <div class="result-box" id="li-result">
         <button class="copy-btn" onclick="copyResult('li-output')">Copy</button>
         <div class="stream-output" id="li-output"></div>
+      </div>
+    </div>
+
+    <!-- ── PANEL 11: REFERRAL ENGINE ── -->
+    <div class="panel" id="panel-referral-engine">
+      <div class="panel-title">Referral <em>Engine</em></div>
+      <div class="divider"></div>
+      <div class="panel-desc">Referred candidates are 4× more likely to get hired. This tool helps you identify who to reach out to, what to say, and how to ask for a referral — without being awkward about it.</div>
+
+      <div class="step-hint">Works best after saving a job description. Add context about anyone you already know at this company.</div>
+
+      <div class="tab-row" id="referral-mode-tabs">
+        <div class="tab active" data-refmode="finder">Who to Target</div>
+        <div class="tab" data-refmode="outreach">Outreach Sequence</div>
+        <div class="tab" data-refmode="ask">Referral Ask</div>
+      </div>
+
+      <div id="referral-finder-sub">
+        <label>Company name *</label>
+        <input type="text" id="ref-company" placeholder="e.g., Accenture Federal Services">
+        <label>Role you're applying for</label>
+        <input type="text" id="ref-role" placeholder="e.g., Principal Service Designer">
+        <label>Anyone you already know there? (optional)</label>
+        <textarea id="ref-known" placeholder="e.g., I went to Howard with someone who works in their design org. I don't know their title. Also connected on LinkedIn with a PM there." rows="3"></textarea>
+        <div class="btn-row">
+          <button class="btn" id="gen-ref-finder-btn">Generate Target Strategy</button>
+        </div>
+      </div>
+
+      <div id="referral-outreach-sub" style="display:none;">
+        <label>Who are you reaching out to? *</label>
+        <input type="text" id="ref-target-name" placeholder="e.g., Marcus Webb, Senior Designer at Accenture">
+        <label>What do you know about them? (optional)</label>
+        <textarea id="ref-target-context" placeholder="e.g., We have 2 mutual connections. He posts about service design and gov tech. Was at USDS before Accenture." rows="3"></textarea>
+        <label>Your connection to them</label>
+        <div class="tab-row" id="ref-connection-tabs" style="margin-bottom:1rem;">
+          <div class="tab active" data-refconn="stranger">Total Stranger</div>
+          <div class="tab" data-refconn="weak">Weak Tie</div>
+          <div class="tab" data-refconn="mutual">Mutual Connection</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="gen-ref-outreach-btn">Generate Outreach Sequence</button>
+        </div>
+      </div>
+
+      <div id="referral-ask-sub" style="display:none;">
+        <label>Who are you asking for a referral?</label>
+        <input type="text" id="ref-ask-person" placeholder="e.g., Janelle from my Howard alumni network, works in UX at the company">
+        <label>Your relationship</label>
+        <textarea id="ref-ask-context" placeholder="e.g., We've stayed in touch over the years, met for coffee last spring, she knows my work…" rows="3"></textarea>
+        <div class="btn-row">
+          <button class="btn" id="gen-ref-ask-btn">Generate Referral Ask</button>
+        </div>
+      </div>
+
+      <div class="loading" id="ref-loading"><div class="spinner"></div>Building your referral strategy…</div>
+      <div class="error-msg" id="ref-error"></div>
+      <div class="result-box" id="ref-result">
+        <button class="copy-btn" onclick="copyResult('ref-output')">Copy</button>
+        <div class="stream-output" id="ref-output"></div>
       </div>
     </div>
 
@@ -3324,6 +3411,50 @@ renderJobs();
 
 // ─── LINKEDIN OUTREACH ────────────────────────────────────────────────────────
 let selectedLIType = 'connect';
+let selectedLIMode = 'message';
+
+document.querySelectorAll('#li-mode-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#li-mode-tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedLIMode = tab.dataset.limode;
+    document.getElementById('li-message-sub').style.display = selectedLIMode === 'message' ? 'block' : 'none';
+    document.getElementById('li-hm-finder-sub').style.display = selectedLIMode === 'hm-finder' ? 'block' : 'none';
+    // Auto-populate HM finder from session
+    if (selectedLIMode === 'hm-finder') {
+      const compEl = document.getElementById('hm-company');
+      const roleEl = document.getElementById('hm-role');
+      if (compEl && !compEl.value && savedRoleName) { const i = savedRoleName.lastIndexOf(' at '); if (i > -1) compEl.value = savedRoleName.substring(i + 4).trim(); }
+      if (roleEl && !roleEl.value && savedRoleName) { const i = savedRoleName.lastIndexOf(' at '); roleEl.value = i > -1 ? savedRoleName.substring(0, i).trim() : savedRoleName; }
+    }
+  });
+});
+
+document.getElementById('gen-hm-btn').addEventListener('click', async () => {
+  const company = document.getElementById('hm-company').value.trim();
+  if (!company) { showError('li-error', 'Please enter a company name.'); return; }
+  const role = document.getElementById('hm-role').value.trim();
+  const context = document.getElementById('hm-context').value.trim();
+  showLoading('li-loading'); hideError('li-error');
+  document.getElementById('li-result').classList.remove('visible');
+  const sys = 'You are an expert at helping senior professionals find and strategically reach hiring managers on LinkedIn. You give precise, actionable search strategies and write outreach that earns replies.';
+  const msg = [
+    'Help Cara Brown find the hiring manager for a ' + (role || 'senior design') + ' role at ' + company + '.',
+    context ? 'Context: ' + context : null,
+    savedJD ? 'Job description: ' + savedJD.substring(0, 1000) : null,
+    'CARA BIO: ' + CARA_BIO,
+    'Provide: 1. SEARCH STRINGS — 3 exact LinkedIn search queries to find this person (use Boolean search, title variations, department logic). 2. WHO TO LOOK FOR — likely title, seniority, department based on company size and role. 3. PROFILE SIGNALS — 5 things to check on their profile before reaching out. 4. FIRST MESSAGE — a targeted connection request (under 300 chars) once you find them. 5. FOLLOW-UP — a Day 3 message if they connect but don't respond.'
+  ].filter(Boolean).join('\n\n');
+  try {
+    const out = document.getElementById('li-output');
+    out.textContent = '';
+    document.getElementById('li-result').classList.add('visible');
+    let full = '';
+    await callClaude(sys, msg, t => { full = t; out.textContent = t; });
+    out.innerHTML = formatMarkdown(full);
+  } catch(e) { showError('li-error', e.message); document.getElementById('li-result').classList.remove('visible'); }
+  finally { hideLoading('li-loading'); }
+});
 
 document.querySelectorAll('#li-type-tabs .tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -3670,7 +3801,126 @@ document.getElementById('gen-recruiter-btn').addEventListener('click', async () 
   }
 });
 
+// ─── REFERRAL ENGINE ──────────────────────────────────────────────────────────
+let selectedRefMode = 'finder';
+let selectedRefConn = 'stranger';
 
+document.querySelectorAll('#referral-mode-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#referral-mode-tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedRefMode = tab.dataset.refmode;
+    ['finder','outreach','ask'].forEach(m => {
+      document.getElementById('referral-' + m + '-sub').style.display = m === selectedRefMode ? 'block' : 'none';
+    });
+  });
+});
+
+document.querySelectorAll('#ref-connection-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#ref-connection-tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedRefConn = tab.dataset.refconn;
+  });
+});
+
+// Auto-populate from session when panel opens
+document.querySelector('nav a[data-panel="referral-engine"]').addEventListener('click', () => {
+  const compEl = document.getElementById('ref-company');
+  const roleEl = document.getElementById('ref-role');
+  if (compEl && !compEl.value && savedRoleName) {
+    const atIdx = savedRoleName.lastIndexOf(' at ');
+    if (atIdx > -1) compEl.value = savedRoleName.substring(atIdx + 4).trim();
+  }
+  if (roleEl && !roleEl.value && savedRoleName) {
+    const atIdx = savedRoleName.lastIndexOf(' at ');
+    roleEl.value = atIdx > -1 ? savedRoleName.substring(0, atIdx).trim() : savedRoleName;
+  }
+});
+
+document.getElementById('gen-ref-finder-btn').addEventListener('click', async () => {
+  const company = document.getElementById('ref-company').value.trim();
+  if (!company) { showError('ref-error', 'Please enter a company name.'); return; }
+  const role = document.getElementById('ref-role').value.trim();
+  const known = document.getElementById('ref-known').value.trim();
+  showLoading('ref-loading'); hideError('ref-error');
+  document.getElementById('ref-result').classList.remove('visible');
+  const sys = 'You are a strategic career coach specializing in networking and referral-based job searches. You help senior professionals identify and engage the right people at target companies.';
+  const msg = [
+    'Help Cara Brown identify who to target for referrals and networking at ' + company + (role ? ' for a ' + role + ' role' : '') + '.',
+    known ? 'People she already knows there: ' + known : null,
+    savedJD ? 'Job description context: ' + savedJD.substring(0, 800) : null,
+    'CARA BIO: ' + CARA_BIO,
+    'Provide: 1. SEARCH STRATEGY — exact LinkedIn search strings and filters to find the right people (team, title, tenure). 2. PRIORITY TARGETS — ranked list of who to find first and why. 3. WARM LEADS — how to leverage any existing connections. 4. PROFILE SIGNALS — what to look for on their profiles to personalize outreach. Keep it specific and actionable.'
+  ].filter(Boolean).join('\n\n');
+  try {
+    const out = document.getElementById('ref-output');
+    out.textContent = '';
+    document.getElementById('ref-result').classList.add('visible');
+    let full = '';
+    await callClaude(sys, msg, t => { full = t; out.textContent = t; });
+    out.innerHTML = formatMarkdown(full);
+  } catch(e) { showError('ref-error', e.message); document.getElementById('ref-result').classList.remove('visible'); }
+  finally { hideLoading('ref-loading'); }
+});
+
+document.getElementById('gen-ref-outreach-btn').addEventListener('click', async () => {
+  const target = document.getElementById('ref-target-name').value.trim();
+  if (!target) { showError('ref-error', 'Please enter the person you are reaching out to.'); return; }
+  const context = document.getElementById('ref-target-context').value.trim();
+  const company = document.getElementById('ref-company').value.trim();
+  const role = document.getElementById('ref-role').value.trim();
+  const connMap = { stranger: 'no prior connection', weak: 'a weak tie (met once or have a thin connection)', mutual: 'mutual connections in common' };
+  showLoading('ref-loading'); hideError('ref-error');
+  document.getElementById('ref-result').classList.remove('visible');
+  const sys = 'You are an expert at crafting warm, human LinkedIn outreach that actually gets replies. You write like a real person, not a recruiter.';
+  const msg = [
+    'Write a 3-message outreach sequence for Cara Brown reaching out to ' + target + ' at ' + (company || 'the target company') + '.',
+    'Cara is applying for: ' + (role || 'a senior design role'),
+    'Connection type: ' + connMap[selectedRefConn],
+    context ? 'What Cara knows about them: ' + context : null,
+    'CARA BIO: ' + CARA_BIO,
+    savedJD ? 'Role context: ' + savedJD.substring(0, 600) : null,
+    'Write: MESSAGE 1 (connection request, under 300 chars), MESSAGE 2 (sent 2 days after connecting, value-add, no ask yet), MESSAGE 3 (Day 7, soft ask for a 15-min call). Each should feel personal, specific, and genuinely human. No generic lines.'
+  ].filter(Boolean).join('\n\n');
+  try {
+    const out = document.getElementById('ref-output');
+    out.textContent = '';
+    document.getElementById('ref-result').classList.add('visible');
+    let full = '';
+    await callClaude(sys, msg, t => { full = t; out.textContent = t; });
+    out.innerHTML = formatMarkdown(full);
+  } catch(e) { showError('ref-error', e.message); document.getElementById('ref-result').classList.remove('visible'); }
+  finally { hideLoading('ref-loading'); }
+});
+
+document.getElementById('gen-ref-ask-btn').addEventListener('click', async () => {
+  const person = document.getElementById('ref-ask-person').value.trim();
+  if (!person) { showError('ref-error', 'Please describe who you are asking.'); return; }
+  const rel = document.getElementById('ref-ask-context').value.trim();
+  const company = document.getElementById('ref-company').value.trim();
+  const role = document.getElementById('ref-role').value.trim();
+  showLoading('ref-loading'); hideError('ref-error');
+  document.getElementById('ref-result').classList.remove('visible');
+  const sys = 'You are a career strategist who helps people ask for referrals in a way that feels genuine, makes it easy to say yes, and protects the relationship.';
+  const msg = [
+    'Write a referral ask for Cara Brown to send to ' + person + '.',
+    'Company: ' + (company || 'the target company') + (role ? ', Role: ' + role : ''),
+    rel ? 'Relationship context: ' + rel : null,
+    'CARA BIO: ' + CARA_BIO,
+    savedJD ? 'Role context: ' + savedJD.substring(0, 600) : null,
+    'Write: 1. A SHORT EMAIL VERSION (subject line + 150 words max). 2. A LINKEDIN MESSAGE VERSION (under 300 chars). 3. A LONGER EMAIL if they need more context (250 words). Each should make it extremely easy for them to say yes — include a line they can forward directly to HR if needed.'
+  ].filter(Boolean).join('\n\n');
+  try {
+    const out = document.getElementById('ref-output');
+    out.textContent = '';
+    document.getElementById('ref-result').classList.add('visible');
+    let full = '';
+    await callClaude(sys, msg, t => { full = t; out.textContent = t; });
+    out.innerHTML = formatMarkdown(full);
+  } catch(e) { showError('ref-error', e.message); document.getElementById('ref-result').classList.remove('visible'); }
+  finally { hideLoading('ref-loading'); }
+});
 
 // Init tracker on load
 renderJobs();
