@@ -931,6 +931,8 @@
   .slot-btn.danger:hover { border-color: var(--red); color: var(--red); }
   .slot-paste-area { width: 100%; margin-top: 0.5rem; display: none; }
   .slot-paste-area textarea { margin-bottom: 0.5rem; min-height: 120px; font-size: 0.8rem; }
+  .slot-view-area { display:none; border-top: 1px solid var(--border); padding: 1rem 1.2rem; }
+  .slot-view-area textarea { min-height: 200px; font-size: 0.78rem; width: 100%; box-sizing: border-box; margin-bottom: 0.5rem; }
 
   /* Tracker extras */
   .tracker-section-label { font-family: 'Raleway', sans-serif; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.6rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
@@ -1040,7 +1042,7 @@
     <ul>
       <li><a href="#" data-panel="company-research"><span class="num">08</span> Company Research</a></li>
       <li><a href="#" data-panel="interview-prep"><span class="num">09</span> Interview Prep</a></li>
-      <li><a href="#" data-panel="linkedin-outreach"><span class="num">10</span> Outreach &amp; Referral</a></li>
+      <li><a href="#" data-panel="linkedin-outreach"><span class="num">10</span> LinkedIn Outreach</a></li>
       <li><a href="#" data-panel="salary-intel"><span class="num">11</span> Salary &amp; Recruiter Intel</a></li>
     </ul>
   </nav>
@@ -1069,7 +1071,15 @@
               <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-principal_ds').click()">&#11014; Upload PDF / TXT</button>
               <input type="file" accept=".pdf,.txt" id="file-principal_ds" style="display:none" onchange="handleFileUpload('principal_ds',this.files[0])">
               <button class="slot-btn" onclick="showPasteArea('principal_ds')">&#9998; Paste Text</button>
+              <button class="slot-btn" onclick="toggleViewArea('principal_ds')">&#128065; View / Edit</button>
               <button class="slot-btn danger" id="remove-principal_ds" onclick="clearSlot('principal_ds')">&#10005; Remove</button>
+            </div>
+          </div>
+          <div class="slot-view-area" id="view-area-principal_ds">
+            <textarea id="view-text-principal_ds" placeholder="No resume text loaded yet."></textarea>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="slot-btn upload-trigger-btn" onclick="saveViewArea('principal_ds')">Save Changes</button>
+              <button class="slot-btn" onclick="toggleViewArea('principal_ds')">Close</button>
             </div>
           </div>
           <div class="slot-paste-area" id="paste-area-principal_ds">
@@ -1092,7 +1102,15 @@
               <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-principal_ds_brief').click()">&#11014; Upload PDF / TXT</button>
               <input type="file" accept=".pdf,.txt" id="file-principal_ds_brief" style="display:none" onchange="handleFileUpload('principal_ds_brief',this.files[0])">
               <button class="slot-btn" onclick="showPasteArea('principal_ds_brief')">&#9998; Paste Text</button>
+              <button class="slot-btn" onclick="toggleViewArea('principal_ds_brief')">&#128065; View / Edit</button>
               <button class="slot-btn danger" id="remove-principal_ds_brief" onclick="clearSlot('principal_ds_brief')">&#10005; Remove</button>
+            </div>
+          </div>
+          <div class="slot-view-area" id="view-area-principal_ds_brief">
+            <textarea id="view-text-principal_ds_brief" placeholder="No resume text loaded yet."></textarea>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="slot-btn upload-trigger-btn" onclick="saveViewArea('principal_ds_brief')">Save Changes</button>
+              <button class="slot-btn" onclick="toggleViewArea('principal_ds_brief')">Close</button>
             </div>
           </div>
           <div class="slot-paste-area" id="paste-area-principal_ds_brief">
@@ -1115,7 +1133,15 @@
               <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-service_designer').click()">&#11014; Upload PDF / TXT</button>
               <input type="file" accept=".pdf,.txt" id="file-service_designer" style="display:none" onchange="handleFileUpload('service_designer',this.files[0])">
               <button class="slot-btn" onclick="showPasteArea('service_designer')">&#9998; Paste Text</button>
+              <button class="slot-btn" onclick="toggleViewArea('service_designer')">&#128065; View / Edit</button>
               <button class="slot-btn danger" id="remove-service_designer" onclick="clearSlot('service_designer')">&#10005; Remove</button>
+            </div>
+          </div>
+          <div class="slot-view-area" id="view-area-service_designer">
+            <textarea id="view-text-service_designer" placeholder="No resume text loaded yet."></textarea>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="slot-btn upload-trigger-btn" onclick="saveViewArea('service_designer')">Save Changes</button>
+              <button class="slot-btn" onclick="toggleViewArea('service_designer')">Close</button>
             </div>
           </div>
           <div class="slot-paste-area" id="paste-area-service_designer">
@@ -1138,7 +1164,15 @@
               <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-product_designer').click()">&#11014; Upload PDF / TXT</button>
               <input type="file" accept=".pdf,.txt" id="file-product_designer" style="display:none" onchange="handleFileUpload('product_designer',this.files[0])">
               <button class="slot-btn" onclick="showPasteArea('product_designer')">&#9998; Paste Text</button>
+              <button class="slot-btn" onclick="toggleViewArea('product_designer')">&#128065; View / Edit</button>
               <button class="slot-btn danger" id="remove-product_designer" onclick="clearSlot('product_designer')">&#10005; Remove</button>
+            </div>
+          </div>
+          <div class="slot-view-area" id="view-area-product_designer">
+            <textarea id="view-text-product_designer" placeholder="No resume text loaded yet."></textarea>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="slot-btn upload-trigger-btn" onclick="saveViewArea('product_designer')">Save Changes</button>
+              <button class="slot-btn" onclick="toggleViewArea('product_designer')">Close</button>
             </div>
           </div>
           <div class="slot-paste-area" id="paste-area-product_designer">
@@ -1161,7 +1195,15 @@
               <button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-chief_of_staff').click()">&#11014; Upload PDF / TXT</button>
               <input type="file" accept=".pdf,.txt" id="file-chief_of_staff" style="display:none" onchange="handleFileUpload('chief_of_staff',this.files[0])">
               <button class="slot-btn" onclick="showPasteArea('chief_of_staff')">&#9998; Paste Text</button>
+              <button class="slot-btn" onclick="toggleViewArea('chief_of_staff')">&#128065; View / Edit</button>
               <button class="slot-btn danger" id="remove-chief_of_staff" onclick="clearSlot('chief_of_staff')">&#10005; Remove</button>
+            </div>
+          </div>
+          <div class="slot-view-area" id="view-area-chief_of_staff">
+            <textarea id="view-text-chief_of_staff" placeholder="No resume text loaded yet."></textarea>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="slot-btn upload-trigger-btn" onclick="saveViewArea('chief_of_staff')">Save Changes</button>
+              <button class="slot-btn" onclick="toggleViewArea('chief_of_staff')">Close</button>
             </div>
           </div>
           <div class="slot-paste-area" id="paste-area-chief_of_staff">
@@ -1257,19 +1299,16 @@
       <div class="result-box" id="ats-result">
         <h3>ATS Score Summary</h3>
         <div class="score-cards" id="score-cards-container"></div>
-        <div id="ats-hm-badge" style="display:none;margin-bottom:1rem;padding:0.6rem 1rem;background:#f0f4ff;border:1px solid #c5d4f5;border-radius:6px;font-size:0.82rem;font-family:'Open Sans',sans-serif;color:#1a2e6e;"></div>
         <div class="tab-row" id="ats-static-tabs" style="margin-top:1.5rem;">
           <div class="tab active" data-atsstatic="best">Best Match</div>
           <div class="tab" data-atsstatic="keywords">Missing Keywords</div>
           <div class="tab" data-atsstatic="flags">Red Flags &amp; Wins</div>
           <div class="tab" data-atsstatic="path">Fastest Path to 95%+</div>
-          <div class="tab" data-atsstatic="trim">Trim Candidates</div>
         </div>
         <div id="ats-best-output" class="stream-output"></div>
         <div id="ats-keywords-output" class="stream-output" style="display:none;"></div>
         <div id="ats-flags-output" class="stream-output" style="display:none;"></div>
         <div id="ats-path-output" class="stream-output" style="display:none;"></div>
-        <div id="ats-trim-output" class="stream-output" style="display:none;"></div>
         <div id="ats-detail-output" class="stream-output" style="display:none;"></div>
       </div>
     </div>
@@ -1300,13 +1339,8 @@
 
       <div style="margin-top:1.2rem;">
         <label style="display:flex;align-items:center;gap:0.5rem;">Additional Experience to Incorporate <span style="font-size:0.72rem;color:var(--mid);font-weight:400;">(optional)</span></label>
-        <div class="step-hint" style="margin-bottom:0.5rem;">Describe experience, accomplishments, or context not in your resume. The site will strategically weave this into existing bullets where it strengthens them, or INSERT it as new content where no existing bullet fits — never just parroting your notes.</div>
+        <div class="step-hint" style="margin-bottom:0.5rem;">Add any experience, accomplishments, or context not currently in your resume. The AI will generate INSERT edit blocks showing exactly where to add this content.</div>
         <textarea id="le-additional-exp" placeholder="e.g., I also led a $4M digital transformation at a federal agency in 2023 that cut processing time by 40%. I have 3 years of experience with Figma and design systems. I have an active Secret clearance." rows="4"></textarea>
-        <div class="btn-row" style="margin-top:0;">
-          <button class="btn" id="incorporate-exp-btn" style="background:#a05000;">Incorporate Additional Experience →</button>
-        </div>
-        <div class="loading" id="incorporate-loading" style="margin-top:0.75rem;"><div class="spinner"></div>Strategically weaving additional experience into resume…</div>
-        <div class="error-msg" id="incorporate-error"></div>
       </div>
 
       <div class="loading" id="le-loading"><div class="spinner"></div>Analyzing and rewriting for maximum ATS score…</div>
@@ -1354,9 +1388,8 @@
         <div id="recheck-gaps-output" class="stream-output" style="display:none;"></div>
         <div id="recheck-ready-output" class="stream-output" style="display:none;"></div>
         <div class="stream-output" id="recheck-output" style="display:none;"></div>
-        <div id="recheck-to-le-row" style="display:none; margin-top:1.5rem; padding-top:1.2rem; border-top:1px solid var(--border);">
-          <div id="recheck-unchecked-counter" style="font-family:'Raleway',sans-serif;font-size:0.72rem;color:var(--mid);margin-bottom:0.75rem;letter-spacing:0.03em;"></div>
-          <button class="btn" id="recheck-to-le-btn">Generate Line Edits from Unchecked Items →</button>
+        <div id="recheck-to-le-row" style="display:none; margin-top:1rem;">
+          <button class="btn" id="recheck-to-le-btn">Turn Recommendations into Line Edits →</button>
         </div>
       </div>
     </div>
@@ -1607,15 +1640,9 @@
 
     <!-- ── PANEL 9: LINKEDIN OUTREACH ── -->
     <div class="panel" id="panel-linkedin-outreach">
-      <div class="panel-title">Outreach <em>&amp; Referral</em></div>
+      <div class="panel-title">LinkedIn <em>Outreach</em></div>
       <div class="divider"></div>
       <div class="panel-desc">Craft warm, specific outreach messages — connection requests, informational interview asks, referral requests, or follow-ups after applying. These are written to feel human and earn a reply, not generic InMail.</div>
-
-      <div id="outreach-contacts-section" style="display:none;margin-bottom:2rem;">
-        <div style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;color:var(--black);margin-bottom:0.75rem;">Identified Contacts for This Role</div>
-        <div id="outreach-contacts-list" style="display:flex;flex-wrap:wrap;gap:0.75rem;"></div>
-        <div class="step-hint" style="margin-top:0.75rem;margin-bottom:0;">Click any contact to pre-fill the form below.</div>
-      </div>
 
       <div class="form-row">
         <div>
@@ -2146,6 +2173,27 @@ function showPasteArea(key) {
 }
 function hidePasteArea(key) { const a = document.getElementById('paste-area-' + key); if (a) a.style.display = 'none'; }
 
+function toggleViewArea(key) {
+  const a = document.getElementById('view-area-' + key);
+  if (!a) return;
+  const isOpen = a.style.display === 'block';
+  a.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    const ta = document.getElementById('view-text-' + key);
+    if (ta && RESUMES[key]) ta.value = RESUMES[key].text || '';
+  }
+}
+function saveViewArea(key) {
+  const ta = document.getElementById('view-text-' + key);
+  if (!ta || !ta.value.trim()) return;
+  RESUMES[key].text = ta.value.trim();
+  RESUMES[key].custom = true;
+  RESUMES[key].hidden = false;
+  localStorage.setItem(LS_PREFIX + key, ta.value.trim());
+  updateSlotUI(key);
+  toggleViewArea(key);
+}
+
 function savePastedResume(key) {
   const text = document.getElementById('paste-text-' + key).value.trim();
   if (!text || text.length < 50) { alert('Please paste at least a few lines of your resume.'); return; }
@@ -2203,7 +2251,7 @@ document.getElementById('add-resume-btn').addEventListener('click', () => {
   localStorage.setItem('cara_custom_resume_keys', JSON.stringify(customKeys));
   // Add slot to UI
   const slotsDiv = document.getElementById('resume-upload-slots');
-  const slotHtml = `<div class="resume-slot" id="slot-${key}"><div class="resume-slot-header"><input type="text" class="resume-slot-title-input" id="title-${key}" value="${escHtml(name)}" onchange="renameSlot('${key}',this.value)"><span class="resume-slot-status slot-status-custom" id="status-${key}">✓ Your version loaded</span></div><div class="resume-slot-body"><div class="slot-preview has-text" id="preview-${key}">${escHtml(text.substring(0,220))}…</div><div class="slot-actions"><button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-${key}').click()">&#11014; Upload PDF / TXT</button><input type="file" accept=".pdf,.txt" id="file-${key}" style="display:none" onchange="handleFileUpload('${key}',this.files[0])"><button class="slot-btn" onclick="showPasteArea('${key}')">&#9998; Paste Text</button><button class="slot-btn danger" id="remove-${key}" onclick="clearSlot('${key}')">&#10005; Remove</button></div></div><div class="slot-paste-area" id="paste-area-${key}"><textarea id="paste-text-${key}" placeholder="Paste your full resume text here…"></textarea><div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><button class="slot-btn upload-trigger-btn" onclick="savePastedResume('${key}')">Save This Resume</button><button class="slot-btn" onclick="hidePasteArea('${key}')">Cancel</button></div></div></div>`;
+  const slotHtml = `<div class="resume-slot" id="slot-${key}"><div class="resume-slot-header"><input type="text" class="resume-slot-title-input" id="title-${key}" value="${escHtml(name)}" onchange="renameSlot('${key}',this.value)"><span class="resume-slot-status slot-status-custom" id="status-${key}">✓ Your version loaded</span></div><div class="resume-slot-body"><div class="slot-preview has-text" id="preview-${key}">${escHtml(text.substring(0,220))}…</div><div class="slot-actions"><button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-${key}').click()">&#11014; Upload PDF / TXT</button><input type="file" accept=".pdf,.txt" id="file-${key}" style="display:none" onchange="handleFileUpload('${key}',this.files[0])"><button class="slot-btn" onclick="showPasteArea('${key}')">&#9998; Paste Text</button><button class="slot-btn" onclick="toggleViewArea('${key}')">&#128065; View / Edit</button><button class="slot-btn danger" id="remove-${key}" onclick="clearSlot('${key}')">&#10005; Remove</button></div></div><div class="slot-view-area" id="view-area-${key}"><textarea id="view-text-${key}" placeholder="No resume text loaded yet."></textarea><div style="display:flex;gap:0.5rem;"><button class="slot-btn upload-trigger-btn" onclick="saveViewArea('${key}')">Save Changes</button><button class="slot-btn" onclick="toggleViewArea('${key}')">Close</button></div></div><div class="slot-paste-area" id="paste-area-${key}"><textarea id="paste-text-${key}" placeholder="Paste your full resume text here…"></textarea><div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><button class="slot-btn upload-trigger-btn" onclick="savePastedResume('${key}')">Save This Resume</button><button class="slot-btn" onclick="hidePasteArea('${key}')">Cancel</button></div></div></div>`;
   slotsDiv.insertAdjacentHTML('beforeend', slotHtml);
   // Regenerate pills
   buildUploadSlots();
@@ -2397,7 +2445,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
   const systemPrompt = 'You are an expert ATS analyst. Be precise, data-driven, and honest. Never inflate scores or suggest fabricating experience.';
   const resumeBlock = resumeTexts.map(r => r.label + '\n---\n' + r.text).join('\n\n======\n\n');
   const userMsg = ['JOB DESCRIPTION:', jd, savedRoleName ? 'Role: ' + savedRoleName : null, 'RESUMES TO ANALYZE:', resumeBlock, 'IMPORTANT: Use these exact resume names in your SCORE and IMPROVED_SCORE lines: ' + resumeTexts.map(r => r.label).join(', '),
-    'For each resume give an ATS score 0-100% based strictly on what is actually in the resume. Output each score on its own line EXACTLY like this (use the exact resume name as listed above): SCORE: [Exact Resume Name] = [XX]%\n\nFor each resume also output the realistic improved score if honest keyword wordsmithing were applied: IMPROVED_SCORE: [Exact Resume Name] = [XX]%\n\nThen output the following five sections with EXACTLY these headers:\n\n## BEST MATCH\n[Which resume scored highest and a 2-3 sentence explanation of why it fits best]\n\n## MISSING KEYWORDS\nOutput as a markdown pipe table with these exact columns:\n| Keyword | Status | Priority | Where to Add |\nStatus = ✅ Matched or ❌ Missing. Priority = HIGH, MEDIUM, or LOW.\n\n## RED FLAGS & WINS\n[Use ✅ for strengths and ❌ for gaps — one per line]\n\n## FASTEST PATH TO 95%+\nOutput as a markdown pipe table with these exact columns:\n| Edit | Section | Impact | Action |\nImpact = HIGH, MEDIUM, or LOW. Action = specific honest wordsmithing instruction.\n\n## TRIM CANDIDATES\nBased on the highest-scoring resume only: identify content that can be safely removed WITHOUT reducing the ATS score for this specific job. Output as a markdown pipe table with these exact columns:\n| Content | Section | Reason Safe to Remove | Risk |\nRisk = LOW or MEDIUM. Only include items where removal genuinely does not hurt the score for this JD. Do not flag quantified wins, JD-matched keywords, or unique differentiators.\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume.'
+    'For each resume give an ATS score 0-100% based strictly on what is actually in the resume. Output each score on its own line EXACTLY like this (use the exact resume name as listed above): SCORE: [Exact Resume Name] = [XX]%\n\nFor each resume also output the realistic improved score if honest keyword wordsmithing were applied: IMPROVED_SCORE: [Exact Resume Name] = [XX]%\n\nThen output the following four sections with EXACTLY these headers:\n\n## BEST MATCH\n[Which resume scored highest and a 2-3 sentence explanation of why it fits best]\n\n## MISSING KEYWORDS\nOutput as a markdown pipe table with these exact columns:\n| Keyword | Status | Priority | Where to Add |\nStatus = ✅ Matched or ❌ Missing. Priority = HIGH, MEDIUM, or LOW.\n\n## RED FLAGS & WINS\n[Use ✅ for strengths and ❌ for gaps — one per line]\n\n## FASTEST PATH TO 95%+\nOutput as a markdown pipe table with these exact columns:\n| Edit | Section | Impact | Action |\nImpact = HIGH, MEDIUM, or LOW. Action = specific honest wordsmithing instruction.\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume.'
   ].filter(Boolean).join('\n\n');
   try {
     document.getElementById('ats-result').classList.add('visible');
@@ -2480,8 +2528,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     const bestTxt = atsSection(fullText, /##\s*BEST MATCH/i, /##\s*MISSING KEYWORDS/i);
     const kwTxt = atsSection(fullText, /##\s*MISSING KEYWORDS/i, /##\s*RED FLAGS/i);
     const flagsTxt = atsSection(fullText, /##\s*RED FLAGS/i, /##\s*FASTEST PATH/i);
-  const pathTxt = atsSection(fullText, /##\s*FASTEST PATH/i, /##\s*TRIM CANDIDATES/i);
-    const trimTxt = atsSection(fullText, /##\s*TRIM CANDIDATES/i, null);
+  const pathTxt = atsSection(fullText, /##\s*FASTEST PATH/i, null);
     savedAtsKeywords = kwTxt;
     savedAtsFlags = flagsTxt;
     savedAtsPath = pathTxt;
@@ -2492,51 +2539,17 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     document.getElementById('ats-keywords-output').innerHTML = formatAtsContent(kwTxt);
     document.getElementById('ats-flags-output').innerHTML = formatAtsContent(flagsTxt);
     document.getElementById('ats-path-output').innerHTML = formatAtsContent(pathTxt);
-    document.getElementById('ats-trim-output').innerHTML = formatAtsContent(trimTxt || '<p style="color:var(--mid);font-size:0.85rem;">No trim candidates identified for this resume and job combination.</p>');
     document.querySelectorAll('#ats-static-tabs .tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('#ats-static-tabs .tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        const map = { best: 'ats-best-output', keywords: 'ats-keywords-output', flags: 'ats-flags-output', path: 'ats-path-output', trim: 'ats-trim-output' };
+        const map = { best: 'ats-best-output', keywords: 'ats-keywords-output', flags: 'ats-flags-output', path: 'ats-path-output' };
         Object.values(map).forEach(id => document.getElementById(id).style.display = 'none');
         document.getElementById(map[tab.dataset.atsstatic]).style.display = 'block';
       });
     });
-    ['ats-keywords-output','ats-flags-output','ats-path-output','ats-trim-output'].forEach(id => document.getElementById(id).style.display = 'none');
+    ['ats-keywords-output','ats-flags-output','ats-path-output'].forEach(id => document.getElementById(id).style.display = 'none');
     document.getElementById('ats-best-output').style.display = 'block';
-
-    // Hiring manager lookup
-    const hmBadge = document.getElementById('ats-hm-badge');
-    if (hmBadge) {
-      hmBadge.style.display = 'none';
-      hmBadge.innerHTML = '';
-      if (savedRoleName || savedJDUrl) {
-        const companyGuess = savedRoleName ? savedRoleName.replace(/^.+?\s+at\s+/i,'').trim() : '';
-        const roleGuess   = savedRoleName ? savedRoleName.replace(/\s+at\s+.+$/i,'').trim() : '';
-        const hmSysPrompt = 'You are a professional researcher. Answer concisely and factually. If you cannot find a specific person, say "Not identified."';
-        const hmUserMsg   = `Who is the most likely hiring manager or recruiting lead for a "${roleGuess}" role at "${companyGuess || savedJDUrl}"? Provide: full name, exact title, and LinkedIn URL if known. If the specific hiring manager cannot be determined, name the most senior person leading the relevant design/strategy/product function at this company. Output EXACTLY:\nHIRING_MANAGER: [Full Name] | [Title] | [LinkedIn URL or "Not found"]`;
-        try {
-          await callClaude(hmSysPrompt, hmUserMsg, (hmText) => {
-            const hmMatch = hmText.match(/HIRING_MANAGER:\s*(.+)/);
-            if (hmMatch) {
-              const parts = hmMatch[1].split('|').map(s => s.trim());
-              const name  = parts[0] || '';
-              const title = parts[1] || '';
-              const li    = parts[2] && parts[2] !== 'Not found' ? parts[2] : '';
-              if (name && name !== 'Not identified.' && name.length > 2) {
-                hmBadge.innerHTML = `<span style="font-weight:700;margin-right:0.4rem;">Likely Hiring Manager:</span>${escHtml(name)}${title ? ' &mdash; ' + escHtml(title) : ''}${li ? ' &nbsp;<a href="' + escHtml(li) + '" target="_blank" style="color:#2a4db5;font-size:0.78rem;">LinkedIn</a>' : ''}`;
-                hmBadge.style.display = 'block';
-                // Store for Outreach panel
-                localStorage.setItem('cara_sess_hm_name', name);
-                localStorage.setItem('cara_sess_hm_title', title);
-                localStorage.setItem('cara_sess_hm_li', li);
-                refreshOutreachContacts();
-              }
-            }
-          });
-        } catch(e) { /* silent fail — HM lookup is best-effort */ }
-      }
-    }
   } catch (err) { showError('ats-error', 'Something went wrong: ' + err.message); document.getElementById('ats-result').classList.remove('visible');
   } finally { hideLoading('ats-loading'); }
 });
@@ -2575,7 +2588,7 @@ Run a comprehensive ATS check on this revised resume:
 2. **Keyword Match**: Output as a markdown table with columns: | Keyword | Status | Where to Add |. Status should be ✅ Matched or ❌ Missing.
 3. **Score Improvement**: Output as a markdown table with columns: | Metric | Before | After |. Show old score vs new score, keyword coverage change, and overall improvement summary.
 4. **Remaining Gaps**: Output as a markdown table with columns: | Gap | Priority | Suggested Fix |. Priority should be HIGH, MEDIUM, or LOW.
-5. **Ready to Submit?**: First, scan the entire resume for typos, spelling errors, grammatical mistakes, and formatting inconsistencies. Output as a markdown table with columns: | Item | Status | Action Needed |. CRITICAL ORDERING RULE: Any typo or spelling/grammar error rows MUST appear FIRST in this table before all other items. CRITICAL VERDICT RULE: If ANY typos, spelling errors, or grammatical mistakes are found, the final verdict MUST be "No" regardless of ATS score. Then give the final Yes/No verdict with one sentence explanation.
+5. **Ready to Submit?**: Output as a markdown table with columns: | Item | Status | Action Needed |. Then give a final Yes/No verdict with one sentence explanation.
 
 Be specific and direct.`;
 
@@ -2692,50 +2705,16 @@ Be specific and direct.`;
       });
     });
 
-    // Show consolidated LE button + initial counter
+    // Show Turn into Line Edits button
     document.getElementById('recheck-to-le-row').style.display = 'block';
-    updateRecheckCounter();
-
     document.getElementById('recheck-to-le-btn').onclick = async () => {
-      // Collect unchecked, non-matched rows from keywords, gaps, ready tabs
-      const tabDefs = [
-        { tabId: 'keywords', label: 'Missing Keywords', outputId: 'recheck-keywords-output' },
-        { tabId: 'gaps',     label: 'Remaining Gaps',   outputId: 'recheck-gaps-output' },
-        { tabId: 'ready',    label: 'Ready to Submit',  outputId: 'recheck-ready-output' }
-      ];
-      const skippedFps = JSON.parse(localStorage.getItem('cara_skipped_edits') || '[]');
-      let collectedItems = [];
-
-      tabDefs.forEach(({ tabId, label, outputId }) => {
-        const saved = JSON.parse(localStorage.getItem('recheck_checks_' + tabId) || '{}');
-        const outputEl = document.getElementById(outputId);
-        if (!outputEl) return;
-        const rows = outputEl.querySelectorAll('tbody tr');
-        rows.forEach((row, i) => {
-          const id = tabId + '_' + i;
-          const verdict = saved[id + '_verdict'] || (saved[id] ? 'yes' : '');
-          const isMatched = tabId === 'keywords' && row.textContent.includes('✅');
-          const isSkipped = skippedFps.some(fp => row.textContent.includes(fp.substring(0,40)));
-          if (verdict !== 'yes' && verdict !== 'no' && !isMatched && !isSkipped) {
-            const cells = Array.from(row.querySelectorAll('td')).slice(1).map(td => td.textContent.trim());
-            if (cells.length) collectedItems.push({ tab: label, content: cells.join(' | ') });
-          }
-        });
-      });
-
-      if (collectedItems.length === 0) {
-        alert('No unchecked items to translate. All items have been marked or skipped.');
-        return;
-      }
-
       // Navigate to line edits panel
       document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
       const leLink = document.querySelector('nav a[data-panel="line-edits"]');
       if (leLink) leLink.classList.add('active');
       document.getElementById('panel-line-edits').classList.add('active');
-
-      // Set round indicator
+      // Set round N indicator
       let r2 = document.getElementById('le-round2-hint');
       if (!r2) {
         r2 = document.createElement('div');
@@ -2747,55 +2726,14 @@ Be specific and direct.`;
       const roundNum = (parseInt(r2.dataset.round || '1')) + 1;
       r2.dataset.round = roundNum;
       const ordinals = ['','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th'];
-      const roundLabel = ordinals[roundNum] || (roundNum + 'th');
-      r2.innerHTML = `&#x1F504; <strong>Round ${roundLabel}:</strong> Translating ${collectedItems.length} unchecked item${collectedItems.length !== 1 ? 's' : ''} from Revised Resume Check into line edits.`;
+      const label = ordinals[roundNum] || (roundNum + 'th');
+      r2.innerHTML = `🔄 <strong>Round ${label}:</strong> Generating edits based on your Revised Resume Check recommendations.`;
       r2.style.display = 'block';
-
+      // Run the edits
       const jd2 = savedJD || document.getElementById('jd-text').value.trim();
       if (!jd2 || !updatedResume) return;
-
-      // Build structured recommendations block grouped by source tab
-      const recsByTab = {};
-      collectedItems.forEach(item => {
-        if (!recsByTab[item.tab]) recsByTab[item.tab] = [];
-        recsByTab[item.tab].push(item.content);
-      });
-      const recsBlock = Object.entries(recsByTab).map(([tab, items]) =>
-        `[FROM: ${tab}]\n` + items.map((c,i) => `${i+1}. ${c}`).join('\n')
-      ).join('\n\n');
-
-      const sp2 = `You are a senior resume editor. PERSPECTIVE: Advise from the hiring manager's lens. Produce precise, surgical edits — exact original text, exact replacement, one-line reason. Never invent experience not in the resume.`;
-      const um2 = `Translate each recommendation below into a precise line edit block.
-
-RESUME:
-${updatedResume}
-
-JOB DESCRIPTION:
-${jd2}
-
-RECOMMENDATIONS TO TRANSLATE (grouped by source):
-${recsBlock}
-
-First output:
-EDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+
-
-For each recommendation output EXACTLY:
-SECTION: [section name]
-SOURCE: [copy the exact [FROM: Tab Name] label from above]
-CONTEXT: [1-2 surrounding lines]
-BEFORE: [exact original line verbatim]
-AFTER: [rewritten version, ready to paste]
-TYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]
-SCORE_IMPACT: [whole number]
-WHY: [one sentence]
-
-RULES:
-- BEFORE must be verbatim from the resume — never invented
-- AFTER must be complete, no placeholders
-- Honest wordsmithing only — never invent titles, companies, credentials
-- Skip any recommendation where no honest edit is possible`;
-
-      const leOutput = document.getElementById('le-output');
+      const sp2 = `You are a senior resume editor. PERSPECTIVE: You are advising from the point of view of a hiring manager. What problems does this role solve at a company like this? How do I empower Cara to position herself as that solution?\n\nYou produce precise, surgical edits — exact original text, exact replacement, and one-line reason. Never invent experience not in the resume.`;
+const um2 = `You are given a resume, a job description, and a set of recommendations from an ATS analysis. Your job is to translate each recommendation into a precise, surgical edit block.\n\nFor each recommendation:\n1. Find the EXACT line in the resume it refers to\n2. Rewrite only what needs changing\n3. Output in the structured format below\n\nRESUME:\n${updatedResume}\n\nJOB DESCRIPTION:\n${jd2}\n\nRECOMMENDATIONS TO TRANSLATE:\n${fullText}\n\nFirst output this exact summary line:\nEDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+\n\nThen for each recommendation output a block in this EXACT format:\n\nSECTION: [section name — for Professional History include company name e.g. "Professional History — Kroger"]\nCONTEXT: [copy the 1-2 lines immediately surrounding the BEFORE line in the resume]\nBEFORE: [copy the exact original line from the resume verbatim — do not paraphrase]\nAFTER: [your rewritten version, ready to paste — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nSCORE_IMPACT: [estimated ATS point gain for this single edit, whole number]\nWHY: [one sentence explaining the specific improvement]\n\nRULES:\n- BEFORE must be copied verbatim from the resume — never invented\n- AFTER must be complete and ready to paste with no placeholders\n- Only make changes that are honest wordsmithing of existing experience\n- Never invent titles, companies, credentials or skills not in the resume`;      const leOutput = document.getElementById('le-output');
       leOutput.textContent = '';
       showLoading('le-loading');
       document.getElementById('le-result').classList.add('visible');
@@ -2803,8 +2741,6 @@ RULES:
       try {
         await callClaude(sp2, um2, (text) => { fullLe = text; leOutput.textContent = text; });
         renderEditBlocks(fullLe, leOutput);
-        initLeScoreTracker(fullLe);
-        saveEditsForOptimizers(fullLe, selectedLeResume);
       } catch(e) {
         leOutput.textContent = 'Error: ' + e.message;
       } finally {
@@ -3413,16 +3349,14 @@ document.getElementById('gen-research-btn').addEventListener('click', async () =
     companyNotes ? 'What Cara knows: ' + companyNotes : null,
     savedJD ? 'Job Description: ' + savedJD.substring(0, 1500) : null,
     'Cara background: ' + CARA_BIO,
-    'Structure with these headers: 1. COMPANY SNAPSHOT  2. MISSION, VALUES & CULTURE  3. STRATEGIC PRIORITIES  4. WHAT THEY ARE REALLY LOOKING FOR  5. HOW CARA MAPS TO THEIR WORLD  6. SMART QUESTIONS TO ASK  7. WATCH-OUTS  8. WHO TO KNOW\n\nFor section 8 WHO TO KNOW: Using your knowledge of this company and role, identify: (a) the most likely Hiring Manager for this role by name and title — if you cannot identify a specific person, name the most likely title/function and the current leader of that function if known; (b) up to 3 people worth reaching out to for a referral — include their name, current title, why they are worth contacting, and their LinkedIn URL if known. Format each person as: NAME | TITLE | WHY CONTACT | LINKEDIN. If a person cannot be identified with confidence, say so rather than fabricate.'
+    'Structure with these headers: 1. COMPANY SNAPSHOT  2. MISSION, VALUES & CULTURE  3. STRATEGIC PRIORITIES  4. WHAT THEY ARE REALLY LOOKING FOR  5. HOW CARA MAPS TO THEIR WORLD  6. SMART QUESTIONS TO ASK  7. WATCH-OUTS'
   ].filter(Boolean).join('\n\n');
   
   try {
     const output = document.getElementById('research-output');
     output.textContent = '';
     document.getElementById('research-result').classList.add('visible');
-    let researchFull = '';
-    await callClaude(systemPrompt, userMsg, text => { researchFull = text; output.textContent = text; });
-    parseAndStoreResearchContacts(researchFull);
+    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
   } catch (err) {
     showError('research-error', 'Error: ' + err.message);
     document.getElementById('research-result').classList.remove('visible');
@@ -3620,11 +3554,9 @@ document.getElementById('new-application-btn').addEventListener('click', () => {
   savedJD = ''; savedJDUrl = ''; savedRoleName = '';
   savedAtsKeywords = ''; savedAtsFlags = ''; savedAtsPath = '';
   atsHighestResume = null;
-  ['cara_sess_jd','cara_sess_jdurl','cara_sess_rolename','cara_sess_ats_kw','cara_sess_ats_flags','cara_sess_ats_path','cara_sess_ats_highest','cara_sess_hm_name','cara_sess_hm_title','cara_sess_hm_li','cara_sess_referral_contacts'].forEach(k => localStorage.removeItem(k));
-  const hmBadge = document.getElementById('ats-hm-badge'); if (hmBadge) { hmBadge.style.display = 'none'; hmBadge.innerHTML = ''; }
-  refreshOutreachContacts();
+  ['cara_sess_jd','cara_sess_jdurl','cara_sess_rolename','cara_sess_ats_kw','cara_sess_ats_flags','cara_sess_ats_path','cara_sess_ats_highest'].forEach(k => localStorage.removeItem(k));
   // Clear ATS outputs
-  ['ats-best-output','ats-keywords-output','ats-flags-output','ats-path-output','ats-trim-output','score-cards-container'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+  ['ats-best-output','ats-keywords-output','ats-flags-output','ats-path-output','score-cards-container'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
   // Clear recheck
   ['recheck-keywords-output','recheck-improvement-output','recheck-gaps-output','recheck-ready-output'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
   const rcResult = document.getElementById('recheck-result'); if (rcResult) rcResult.classList.remove('visible');
@@ -3673,75 +3605,12 @@ function autoSelectBestResume(resumeKey, resumeLabel) {
   if (confirm && confirmName) { confirmName.textContent = resumeLabel; confirm.style.display = 'block'; }
 }
 
-document.getElementById('incorporate-exp-btn').addEventListener('click', async () => {
-  const additionalExp = (document.getElementById('le-additional-exp').value || '').trim();
-  if (!additionalExp) { showError('incorporate-error', 'Please enter additional experience first.'); return; }
-  const jd = savedJD || document.getElementById('jd-text').value.trim();
-  if (!jd) { showError('incorporate-error', 'Please save a job description in Step 01 first.'); return; }
-  const resume = RESUMES[selectedLeResume];
-  if (!resume) { showError('incorporate-error', 'Please select a resume first.'); return; }
-
-  showLoading('incorporate-loading'); hideError('incorporate-error');
-  document.getElementById('le-result').classList.add('visible');
-
-  const sp = `You are a senior resume editor and strategist. You read additional experience a candidate provides and make strategic decisions about how best to incorporate it into an existing resume — either by strengthening an existing bullet with this context, or inserting a new bullet where none exists that covers it. You never parrot the raw notes. You translate them into tight, metric-driven, first-person-implied resume language.`;
-
-  const skippedFps = JSON.parse(localStorage.getItem('cara_skipped_edits') || '[]');
-  const skippedBlock = skippedFps.length ? `\nSKIPPED EDITS (do NOT suggest these again):\n${skippedFps.map((f,i)=>(i+1)+'. '+f).join('\n')}\n` : '';
-
-  const um = `You are given a resume, a job description, and additional experience notes from the candidate. Your job is to strategically decide how to incorporate each piece of experience into the resume.
-
-DECISION RULES:
-1. If the additional experience STRENGTHENS or ADDS SPECIFICITY to an existing bullet — rewrite that bullet to incorporate it. Mark TYPE as "Modified | Additional Experience".
-2. If no existing bullet covers this experience — create a new INSERT block. Mark TYPE as "Insert | Additional Experience".
-3. Never just repeat the candidate's notes. Translate them into tight resume language: action verb, metric where possible, no subject pronoun, no storytelling.
-4. If a piece of additional experience cannot be honestly incorporated without fabricating a claim, skip it and explain why in a NOTE block.
-
-RESUME (${resume.label}):
-${resume.text}
-
-JOB DESCRIPTION:
-${jd}
-
-ADDITIONAL EXPERIENCE TO INCORPORATE:
-${additionalExp}
-${skippedBlock}
-First output:
-EDIT_SUMMARY: [N] edits needed | Projected score: [current]% → [improved]%
-
-For each piece of additional experience output EXACTLY:
-
-SECTION: [section name]
-SOURCE: [Additional Experience]
-CONTEXT: [1-2 surrounding lines, or "New bullet" if INSERT]
-BEFORE: [exact original line verbatim if modifying existing | INSERT if new]
-AFTER: [complete, ready-to-paste resume bullet — action verb, no pronoun, tight language]
-TYPE: [Modified | Additional Experience  OR  Insert | Additional Experience]
-SCORE_IMPACT: [whole number]
-WHY: [one sentence on why this strengthens the resume for this JD]`;
-
-  const leOutput = document.getElementById('le-output');
-  leOutput.textContent = '';
-  let fullText = '';
-  try {
-    await callClaude(sp, um, (text) => { fullText = text; leOutput.textContent = text; });
-    renderEditBlocks(fullText, leOutput);
-    initLeScoreTracker(fullText);
-    saveEditsForOptimizers(fullText, selectedLeResume);
-  } catch(e) {
-    showError('incorporate-error', 'Error: ' + e.message);
-  } finally {
-    hideLoading('incorporate-loading');
-  }
-});
-
 document.getElementById('gen-edits-btn').addEventListener('click', async () => {
   const jd = savedJD || document.getElementById('jd-text').value.trim();
   if (!jd) { showError('le-error', 'Please save a job description in Step 01 first.'); return; }
 
   const resume = RESUMES[selectedLeResume];
-  const skippedFps = JSON.parse(localStorage.getItem('cara_skipped_edits') || '[]');
-  const skippedBlock = skippedFps.length ? `\nSKIPPED EDITS (the user has permanently dismissed these — do NOT suggest them again):\n${skippedFps.map((f,i) => (i+1)+'. '+f).join('\n')}\n` : '';
+  const additionalExp = (document.getElementById('le-additional-exp').value || '').trim();
   const focusMap = {
     full: 'every section of the resume — synopsis, core competencies, and all experience bullets',
     summary: 'only the Synopsis / professional summary section at the top',
@@ -3784,7 +3653,6 @@ INTEGRITY RULES (non-negotiable):
 - NEVER invent client names, company names, or domains (e.g. fintech, healthcare, federal) not in the resume
 - If a JD keyword requires experience Cara does not have, flag it as a gap — do not fabricate a match
 - The goal is the highest score achievable through honest wordsmithing only
-${skippedBlock}
 
 EDITING RULES:
 - Only output edits for lines that ACTUALLY need changing — do not include lines that are already strong
@@ -3796,16 +3664,7 @@ EDITING RULES:
 - If a bullet needs a keyword added, work it in naturally at the start or end
 - For competencies, add missing keyword clusters as new pipe-separated entries only if they reflect actual skills
 
-Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.
-
-SYNOPSIS LENGTH CHECK: After all edits, if the Synopsis / professional summary section of this resume exceeds 3000 characters, output one final block:
-SECTION: Synopsis
-CONTEXT: [first line of synopsis]
-BEFORE: [full current synopsis text]
-AFTER: [condensed version under 3000 characters that preserves all key ATS keywords]
-TYPE: Paragraph
-SCORE_IMPACT: 0
-WHY: Synopsis exceeds 3000 characters — condensed to improve ATS parser compatibility.`;
+Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.${additionalExp ? `\n\nADDITIONAL EXPERIENCE TO INCORPORATE:\nThe candidate has provided additional experience not currently in the resume. For each item below, generate an INSERT block showing exactly where and how to add it. Use this format:\n\nSECTION: [best section to insert into]\nCONTEXT: [the line it should appear near]\nBEFORE: INSERT\nAFTER: [the new line or bullet, complete and ready to paste]\nTYPE: [Insert]\nWHY: [one sentence on why this addition improves ATS match]\n\nAdditional experience:\n${additionalExp}` : ''}`;
 
   try {
     const output = document.getElementById('le-output');
@@ -3870,100 +3729,25 @@ function addCheckboxRow(html, tabId) {
   });
 }
 
-function getRecheckRowText(tr) {
-  // Extract all cell text from a table row for use as fingerprint/content
-  return Array.from(tr.querySelectorAll ? tr.querySelectorAll('td') : [])
-    .slice(1).map(td => (td.textContent || '').trim()).join(' | ');
-}
-
-function updateRecheckCounter() {
-  const counterEl = document.getElementById('recheck-unchecked-counter');
-  if (!counterEl) return;
-  const tabs = ['keywords','gaps','ready'];
-  let totalUnchecked = 0;
-  const breakdown = [];
-  tabs.forEach(tabId => {
-    const saved = JSON.parse(localStorage.getItem('recheck_checks_' + tabId) || '{}');
-    const skipped = JSON.parse(localStorage.getItem('cara_skipped_edits') || '[]');
-    const outputEl = document.getElementById('recheck-' + tabId + '-output');
-    if (!outputEl) return;
-    const rows = outputEl.querySelectorAll('tbody tr');
-    let tabUnchecked = 0;
-    rows.forEach((row, i) => {
-      const id = tabId + '_' + i;
-      const isChecked = !!saved[id];
-      const isSkipped = skipped.some(fp => row.textContent.includes(fp.substring(0,40)));
-      // Auto-skip matched keyword rows
-      const isMatched = tabId === 'keywords' && row.textContent.includes('✅');
-      if (!isChecked && !isSkipped && !isMatched) tabUnchecked++;
-    });
-    if (tabUnchecked > 0) breakdown.push(`${tabUnchecked} in ${tabId === 'keywords' ? 'Missing Keywords' : tabId === 'gaps' ? 'Remaining Gaps' : 'Ready to Submit'}`);
-    totalUnchecked += tabUnchecked;
-  });
-  if (totalUnchecked === 0) {
-    counterEl.innerHTML = '<span style="color:var(--green);font-weight:600;">✓ All items addressed — nothing to translate.</span>';
-  } else {
-    counterEl.innerHTML = `<strong>${totalUnchecked} unchecked item${totalUnchecked !== 1 ? 's' : ''}</strong> will be translated into line edits${breakdown.length ? ' <span style="color:var(--mid);">(' + breakdown.join(', ') + ')</span>' : ''}`;
-  }
-}
-
 function renderRecheckTab(raw, tabId) {
   if (!raw) return '';
   const formatted = (typeof formatRecheckContent === 'function') ? formatRecheckContent(raw) : raw;
+  // Inject checkboxes into table rows
   let result = formatted;
   const saved = JSON.parse(localStorage.getItem('recheck_checks_' + tabId) || '{}');
-  const skippedFps = JSON.parse(localStorage.getItem('cara_skipped_edits') || '[]');
   let ri = 0;
   result = result.replace(/<tbody>([\s\S]*?)<\/tbody>/g, (match, tbody) => {
     let newTbody = tbody.replace(/<tr>/g, () => {
       const id = tabId + '_' + ri++;
-      const isChecked = !!saved[id];
-      const verdict = saved[id + '_verdict'] || (isChecked ? 'yes' : '');
-      const bg = verdict === 'yes' ? 'background:#f0faf4;opacity:0.6;' : verdict === 'no' ? 'background:#fdf0f0;opacity:0.5;' : '';
-      const yesSty = verdict === 'yes' ? 'background:#1e6b35;color:#fff;border-color:#1e6b35;' : 'background:#eaf7ee;color:#1e6b35;border:1px solid #b2dfc0;';
-      const noSty  = verdict === 'no'  ? 'background:#8b2020;color:#fff;border-color:#8b2020;' : 'background:#fdf0f0;color:#8b2020;border:1px solid #f0c0c0;';
-      return `<tr style="${bg}" data-rcid="${id}" data-tab="${tabId}"><td style="padding:0.3rem 0.4rem;border:1px solid #dedede;width:70px;text-align:center;white-space:nowrap;"><button onclick="rcMarkRow('${id}','${tabId}','yes',this)" style="padding:0.15rem 0.4rem;border-radius:3px;font-size:0.7rem;font-weight:700;cursor:pointer;${yesSty}margin-right:2px;">✓</button><button onclick="rcMarkRow('${id}','${tabId}','no',this)" style="padding:0.15rem 0.4rem;border-radius:3px;font-size:0.7rem;font-weight:700;cursor:pointer;${noSty}">✕</button></td>`;
+      const checked = saved[id] ? 'checked' : '';
+      const bg = saved[id] ? 'background:#f0faf4;opacity:0.6;' : '';
+      return `<tr style="${bg}"><td style="padding:0.4rem 0.5rem;border:1px solid #dedede;width:32px;text-align:center;"><input type="checkbox" ${checked} style="width:15px;height:15px;cursor:pointer;accent-color:#1e6b35;" onchange="(function(el){var id='${id}',tab='${tabId}',saved=JSON.parse(localStorage.getItem('recheck_checks_'+tab)||'{}');saved[id]=el.checked;localStorage.setItem('recheck_checks_'+tab,JSON.stringify(saved));el.closest('tr').style.background=el.checked?'#f0faf4':'';el.closest('tr').style.opacity=el.checked?'0.6':'1';})(this)"></td>`;
     });
     return '<tbody>' + newTbody + '</tbody>';
   });
-  result = result.replace(/<thead><tr>/, '<thead><tr><th style="padding:0.4rem 0.5rem;background:#f7f6f4;border:1px solid #dedede;width:70px;font-family:\'Raleway\',sans-serif;font-size:0.55rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--mid);">Done?</th>');
+  // Add checkbox column to thead
+  result = result.replace(/<thead><tr>/, '<thead><tr><th style="padding:0.4rem 0.5rem;background:#f7f6f4;border:1px solid #dedede;width:32px;"></th>');
   return result;
-}
-
-function rcMarkRow(id, tabId, verdict, btn) {
-  const saved = JSON.parse(localStorage.getItem('recheck_checks_' + tabId) || '{}');
-  const current = saved[id + '_verdict'] || '';
-  const newVerdict = current === verdict ? '' : verdict;
-  saved[id + '_verdict'] = newVerdict;
-  saved[id] = newVerdict === 'yes'; // legacy compat
-  localStorage.setItem('recheck_checks_' + tabId, JSON.stringify(saved));
-
-  // Update row style
-  const row = btn.closest('tr');
-  if (row) {
-    row.style.background = newVerdict === 'yes' ? '#f0faf4' : newVerdict === 'no' ? '#fdf0f0' : '';
-    row.style.opacity    = newVerdict ? '0.6' : '1';
-    const btns = row.querySelectorAll('button');
-    if (btns[0]) { btns[0].style.cssText = newVerdict === 'yes' ? 'padding:0.15rem 0.4rem;border-radius:3px;font-size:0.7rem;font-weight:700;cursor:pointer;background:#1e6b35;color:#fff;border:1px solid #1e6b35;margin-right:2px;' : 'padding:0.15rem 0.4rem;border-radius:3px;font-size:0.7rem;font-weight:700;cursor:pointer;background:#eaf7ee;color:#1e6b35;border:1px solid #b2dfc0;margin-right:2px;'; }
-    if (btns[1]) { btns[1].style.cssText = newVerdict === 'no'  ? 'padding:0.15rem 0.4rem;border-radius:3px;font-size:0.7rem;font-weight:700;cursor:pointer;background:#8b2020;color:#fff;border:1px solid #8b2020;' : 'padding:0.15rem 0.4rem;border-radius:3px;font-size:0.7rem;font-weight:700;cursor:pointer;background:#fdf0f0;color:#8b2020;border:1px solid #f0c0c0;'; }
-  }
-
-  // If ✕, write fingerprint to skipped edits
-  if (newVerdict === 'no') {
-    const outputEl = document.getElementById('recheck-' + tabId + '-output');
-    if (outputEl) {
-      const rows = outputEl.querySelectorAll('tbody tr');
-      const rowIndex = parseInt(id.split('_').pop());
-      if (!isNaN(rowIndex) && rows[rowIndex]) {
-        const cellText = Array.from(rows[rowIndex].querySelectorAll('td')).slice(1).map(td => td.textContent.trim()).join(' | ').substring(0, 80);
-        if (cellText) {
-          const skipped = JSON.parse(localStorage.getItem('cara_skipped_edits') || '[]');
-          if (!skipped.includes(cellText)) { skipped.push(cellText); localStorage.setItem('cara_skipped_edits', JSON.stringify(skipped)); }
-        }
-      }
-    }
-  }
-  updateRecheckCounter();
 }
 
 function renderEditBlocks(rawText, container) {
@@ -4026,28 +3810,26 @@ function renderEditBlocks(rawText, container) {
       return text.substring(start + marker.length, end).trim().replace(/^`+|`+$/g, '').trim();
     }
 
-    const section     = extractField(block, 'SECTION',      ['SOURCE','CONTEXT','BEFORE','AFTER','TYPE','SCORE_IMPACT','WHY']);
-    const source      = extractField(block, 'SOURCE',       ['CONTEXT','BEFORE','AFTER','TYPE','SCORE_IMPACT','WHY','SECTION']);
-    const context     = extractField(block, 'CONTEXT',      ['BEFORE','AFTER','TYPE','SCORE_IMPACT','WHY','SECTION','SOURCE']);
-    const before      = extractField(block, 'BEFORE',       ['AFTER','TYPE','SCORE_IMPACT','WHY','SECTION','CONTEXT','SOURCE']);
-    const after       = extractField(block, 'AFTER',        ['TYPE','SCORE_IMPACT','WHY','SECTION','BEFORE','CONTEXT','SOURCE']);
-    const type        = extractField(block, 'TYPE',         ['SCORE_IMPACT','WHY','SECTION','BEFORE','AFTER','CONTEXT','SOURCE']);
-    const scoreImpact = extractField(block, 'SCORE_IMPACT', ['WHY','SECTION','BEFORE','AFTER','TYPE','CONTEXT','SOURCE']);
-    const why         = extractField(block, 'WHY',          ['SECTION','BEFORE','AFTER','TYPE','SCORE_IMPACT','CONTEXT','SOURCE']);
+    const section     = extractField(block, 'SECTION',      ['CONTEXT','BEFORE','AFTER','TYPE','SCORE_IMPACT','WHY']);
+    const context     = extractField(block, 'CONTEXT',      ['BEFORE','AFTER','TYPE','SCORE_IMPACT','WHY','SECTION']);
+    const before      = extractField(block, 'BEFORE',       ['AFTER','TYPE','SCORE_IMPACT','WHY','SECTION','CONTEXT']);
+    const after       = extractField(block, 'AFTER',        ['TYPE','SCORE_IMPACT','WHY','SECTION','BEFORE','CONTEXT']);
+    const type        = extractField(block, 'TYPE',         ['SCORE_IMPACT','WHY','SECTION','BEFORE','AFTER','CONTEXT']);
+    const scoreImpact = extractField(block, 'SCORE_IMPACT', ['WHY','SECTION','BEFORE','AFTER','TYPE','CONTEXT']);
+    const why         = extractField(block, 'WHY',          ['SECTION','BEFORE','AFTER','TYPE','SCORE_IMPACT','CONTEXT']);
 
     if (!before && !after) return;
 
     const impact = parseInt(scoreImpact) || 0;
     const editId = 'edit-block-' + i;
     const isInsert = before === 'INSERT' || (type || '').toLowerCase() === 'insert';
-    const fp = (before || '').trim().substring(0, 80).replace(/`/g, '');
-    html += `<div class="edit-block" id="${editId}" data-impact="${impact}" data-fp="${escHtml(fp)}">
+    html += `<div class="edit-block" id="${editId}" data-impact="${impact}" data-checked="false">
    <div class="edit-block-header">
         <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-          <strong style="font-size:0.84rem;">Edit ${i + 1}</strong>
-          <button onclick="leMarkEdit('${editId}','yes',${i})" id="${editId}-yes" style="padding:0.18rem 0.65rem;border-radius:3px;font-size:0.75rem;font-weight:700;cursor:pointer;border:1px solid #b2dfc0;background:#eaf7ee;color:#1e6b35;transition:all 0.12s;">✓ Applied</button>
-          <button onclick="leMarkEdit('${editId}','no',${i})" id="${editId}-no" style="padding:0.18rem 0.65rem;border-radius:3px;font-size:0.75rem;font-weight:700;cursor:pointer;border:1px solid #f0c0c0;background:#fdf0f0;color:#8b2020;transition:all 0.12s;">✕ Skip</button>
-          ${source ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#f5e6ff;border:1px solid #ddb8f5;border-radius:3px;font-size:0.65rem;font-weight:600;color:#6b21a8;letter-spacing:0.02em;">${escHtml(source.replace(/^\[FROM:\s*/,'').replace(/\]$/,''))}</span>` : ''}
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;margin:0;">
+            <input type="checkbox" style="width:15px;height:15px;cursor:pointer;accent-color:#1e6b35;" onchange="updateLeScoreTracker(this,${i})">
+            <strong>Edit ${i + 1}</strong>
+          </label>
           ${section ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#1a1a1a;border-radius:3px;font-size:0.68rem;font-weight:600;color:#fff;letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}
           ${type ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:${isInsert ? '#fff3e0' : '#e8f0fe'};border:1px solid ${isInsert ? '#f0c080' : '#c5d4f5'};border-radius:3px;font-size:0.68rem;font-weight:600;color:${isInsert ? '#a05000' : '#2a4db5'};letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}
           ${impact > 0 ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#eaf7ee;border:1px solid #b2dfc0;border-radius:3px;font-size:0.68rem;font-weight:700;color:#1e6b35;">+${impact} pts</span>` : ''}
@@ -4056,7 +3838,7 @@ function renderEditBlocks(rawText, container) {
       ${isInsert ? `<div class="edit-row-before" style="background:#fff8ee;border-color:#f0c080;"><span class="edit-label" style="color:#a05000;">Insert new</span>${escHtml(after)}</div>` : `<div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>`}
       ${context ? `<div style="font-size:0.75rem;color:#888;font-style:italic;padding:0.35rem 0.75rem;background:#f9f9f9;border-left:3px solid #ddd;margin:0 0 0.25rem;line-height:1.5;"><span style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:#aaa;display:block;margin-bottom:0.2rem;">Surrounding context</span>${escHtml(context)}</div>` : ''}
       ${!isInsert ? `<div class="edit-row-after" id="after-${i}"><span class="edit-label">Replace with</span><span class="after-text">${escHtml(after)}</span><button class="copy-btn" style="float:right;margin-left:0.5rem;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="var t=this.previousElementSibling.textContent;navigator.clipboard.writeText(t).then(function(){},function(){});this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy'},2000)">Copy</button></div>` : ''}
-      ${why ? `<div class="edit-row-why">&#128161; ${escHtml(why)}</div>` : ''}
+      ${why ? `<div class="edit-row-why">💡 ${escHtml(why)}</div>` : ''}
     </div>`;
   });
 
@@ -4087,56 +3869,23 @@ function initLeScoreTracker(rawText) {
   document.getElementById('le-checked-count').textContent = '0';
   document.getElementById('le-projected-score').textContent = leBaseScore ? leBaseScore + '%' : '—';
 }
-
-function leMarkEdit(blockId, verdict, idx) {
-  const block = document.getElementById(blockId);
-  if (!block) return;
-  const yesBtn = document.getElementById(blockId + '-yes');
-  const noBtn  = document.getElementById(blockId + '-no');
-  const current = block.dataset.verdict;
-
-  if (current === verdict) {
-    // toggle off
-    block.dataset.verdict = '';
-    block.style.opacity = '1';
-    block.style.background = '';
-    if (yesBtn) { yesBtn.style.fontWeight = '700'; yesBtn.style.opacity = '1'; }
-    if (noBtn)  { noBtn.style.fontWeight = '700'; noBtn.style.opacity = '1'; }
-  } else {
-    block.dataset.verdict = verdict;
-    if (verdict === 'yes') {
-      block.style.background = '#f0faf4';
-      block.style.opacity = '0.6';
-      if (yesBtn) { yesBtn.style.background = '#1e6b35'; yesBtn.style.color = '#fff'; yesBtn.style.borderColor = '#1e6b35'; }
-      if (noBtn)  { noBtn.style.background = '#fdf0f0'; noBtn.style.color = '#8b2020'; noBtn.style.borderColor = '#f0c0c0'; }
-    } else {
-      block.style.background = '#fdf0f0';
-      block.style.opacity = '0.5';
-      if (noBtn)  { noBtn.style.background = '#8b2020'; noBtn.style.color = '#fff'; noBtn.style.borderColor = '#8b2020'; }
-      if (yesBtn) { yesBtn.style.background = '#eaf7ee'; yesBtn.style.color = '#1e6b35'; yesBtn.style.borderColor = '#b2dfc0'; }
-      // Persist skip fingerprint so it won't appear in future runs
-      const fp = block.dataset.fp || '';
-      if (fp) {
-        const skipped = JSON.parse(localStorage.getItem('cara_skipped_edits') || '[]');
-        if (!skipped.includes(fp)) { skipped.push(fp); localStorage.setItem('cara_skipped_edits', JSON.stringify(skipped)); }
-      }
-    }
+function updateLeScoreTracker(checkbox, idx) {
+  const block = document.getElementById('edit-block-' + idx);
+  if (block) {
+    block.style.opacity = checkbox.checked ? '0.55' : '1';
+    block.style.background = checkbox.checked ? '#f0faf4' : '';
   }
-
-  // Update score tracker
   const blocks = document.querySelectorAll('#le-output .edit-block');
-  let appliedCount = 0, totalImpact = 0;
+  let checked = 0, totalImpact = 0;
   blocks.forEach(b => {
-    if (b.dataset.verdict === 'yes') { appliedCount++; totalImpact += (parseInt(b.dataset.impact) || 0); }
+    const cb = b.querySelector('input[type="checkbox"]');
+    const impact = parseInt(b.dataset.impact) || 0;
+    if (cb && cb.checked) { checked++; totalImpact += impact; }
   });
-  const checkedEl = document.getElementById('le-checked-count');
-  const projEl = document.getElementById('le-projected-score');
-  if (checkedEl) checkedEl.textContent = appliedCount;
-  if (projEl) projEl.textContent = leBaseScore ? Math.min(leBaseScore + totalImpact, 100) + '%' : (totalImpact ? '+' + totalImpact + ' pts' : '—');
+  document.getElementById('le-checked-count').textContent = checked;
+  const projected = leBaseScore ? Math.min(leBaseScore + totalImpact, 100) + '%' : (totalImpact ? '+' + totalImpact + ' pts' : '—');
+  document.getElementById('le-projected-score').textContent = projected;
 }
-
-// legacy — kept so recheck "Turn into Line Edits" path still works
-function updateLeScoreTracker(checkbox, idx) { leMarkEdit('edit-block-' + idx, checkbox && checkbox.checked ? 'yes' : '', idx); }
 
 // ─── RECHECK OUTPUT TABS ──────────────────────────────────────────────────────
 document.getElementById('recheck-tabs').addEventListener('click', e => {
@@ -4561,75 +4310,10 @@ function renderStarStories() {
 
 renderStarStories();
 
-// ─── OUTREACH CONTACTS ───────────────────────────────────────────────────────
-function refreshOutreachContacts() {
-  const section = document.getElementById('outreach-contacts-section');
-  const list    = document.getElementById('outreach-contacts-list');
-  if (!section || !list) return;
-
-  const contacts = [];
-
-  // Hiring manager from ATS lookup
-  const hmName  = localStorage.getItem('cara_sess_hm_name') || '';
-  const hmTitle = localStorage.getItem('cara_sess_hm_title') || '';
-  const hmLi    = localStorage.getItem('cara_sess_hm_li') || '';
-  if (hmName) contacts.push({ name: hmName, title: hmTitle, li: hmLi, tag: 'Hiring Manager', tagColor: '#2a4db5', tagBg: '#e8f0fe' });
-
-  // Referral contacts from company research
-  const researchContacts = JSON.parse(localStorage.getItem('cara_sess_referral_contacts') || '[]');
-  researchContacts.forEach(c => contacts.push({ ...c, tag: 'Referral Contact', tagColor: '#1e6b35', tagBg: '#e8f5ec' }));
-
-  if (contacts.length === 0) { section.style.display = 'none'; return; }
-
-  section.style.display = 'block';
-  list.innerHTML = contacts.map(c => {
-    const liHtml = c.li && c.li !== 'Not found' ? `<a href="${escHtml(c.li)}" target="_blank" style="font-size:0.7rem;color:#2a4db5;text-decoration:none;margin-top:0.25rem;display:block;">LinkedIn ↗</a>` : '';
-    return `<div onclick="prefillOutreachContact(${JSON.stringify(escHtml(c.name))},${JSON.stringify(escHtml(c.title))})" style="cursor:pointer;border:1px solid var(--border);border-radius:6px;padding:0.75rem 1rem;min-width:180px;max-width:240px;background:#fff;transition:border-color 0.15s;" onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='var(--border)'">
-      <span style="font-size:0.6rem;font-weight:700;font-family:'Raleway',sans-serif;letter-spacing:0.06em;text-transform:uppercase;padding:0.1rem 0.45rem;border-radius:3px;background:${c.tagBg};color:${c.tagColor};display:inline-block;margin-bottom:0.4rem;">${c.tag}</span>
-      <div style="font-weight:700;font-size:0.88rem;color:var(--black);">${escHtml(c.name)}</div>
-      <div style="font-size:0.78rem;color:var(--mid);line-height:1.4;">${escHtml(c.title || '')}</div>
-      ${liHtml}
-    </div>`;
-  }).join('');
-}
-
-function prefillOutreachContact(name, titleAndCompany) {
-  const nameEl  = document.getElementById('li-name');
-  const titleEl = document.getElementById('li-title');
-  if (nameEl)  nameEl.value  = name;
-  if (titleEl) titleEl.value = titleAndCompany;
-  // Scroll to form
-  const formRow = document.querySelector('#panel-linkedin-outreach .form-row');
-  if (formRow) formRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// Parse WHO TO KNOW section from company research output and store referral contacts
-function parseAndStoreResearchContacts(rawText) {
-  const section = rawText.match(/8\.\s*WHO TO KNOW[\s\S]*?(?=\n\d+\.|$)/i);
-  if (!section) return;
-  const lines = section[0].split('\n');
-  const contacts = [];
-  for (const line of lines) {
-    const t = line.trim();
-    // Match lines like: Name | Title | Why | LinkedIn
-    if (t.includes('|')) {
-      const parts = t.split('|').map(s => s.trim());
-      if (parts.length >= 2 && parts[0] && !/^(name|hiring|referral|who)/i.test(parts[0])) {
-        contacts.push({ name: parts[0], title: parts[1] || '', why: parts[2] || '', li: parts[3] || '' });
-      }
-    }
-  }
-  if (contacts.length) {
-    localStorage.setItem('cara_sess_referral_contacts', JSON.stringify(contacts.slice(0, 3)));
-    refreshOutreachContacts();
-  }
-}
-
 // ─── PAGE INIT ───────────────────────────────────────────────────────────────
 loadSavedResumes();
 buildUploadSlots();
 renderAllOptimizers();
-refreshOutreachContacts();
 
 // Restore session state
 if (savedJD) {
