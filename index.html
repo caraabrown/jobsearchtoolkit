@@ -3257,7 +3257,7 @@ loadResumeLinks();
 
 // ─── JOB TRACKER ──────────────────────────────────────────────────────────────
 let jobs = JSON.parse(localStorage.getItem('cara_jobs') || '[]');
-function saveJobs() { localStorage.setItem('cara_jobs', JSON.stringify(jobs)); populateInterviewJobPicker(); }
+function saveJobs() { localStorage.setItem('cara_jobs', JSON.stringify(jobs)); if (document.getElementById('interview-job-picker')) populateInterviewJobPicker(); }
 function getWeekStart() { const now = new Date(); const day = now.getDay(); const diff = now.getDate() - day + (day === 0 ? -6 : 1); const mon = new Date(now.setDate(diff)); mon.setHours(0,0,0,0); return mon; }
 
 function updateTrackerStats() {
