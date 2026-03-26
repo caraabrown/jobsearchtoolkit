@@ -2125,6 +2125,12 @@ function buildUploadSlots() {
     if (titleInput) titleInput.value = RESUMES[key].label;
   });
   
+  // Snapshot current selections before wiping pills
+  const prevATS = new Set(selectedResumesForATS);
+  const prevLE = selectedLeResume;
+  const prevCL = selectedResumeForCL;
+  const prevInterview = selectedInterviewResume;
+
   // Regenerate pills from RESUMES object
   ['ats-resume-pills', 'le-resume-pills', 'cl-resume-pills', 'interview-resume-pills'].forEach(containerId => {
     const container = document.getElementById(containerId);
@@ -2137,11 +2143,15 @@ function buildUploadSlots() {
     const leContainer = document.getElementById('le-resume-pills');
     const clContainer = document.getElementById('cl-resume-pills');
     const intContainer = document.getElementById('interview-resume-pills');
-    if (atsContainer) atsContainer.insertAdjacentHTML('beforeend', `<div class="pill" data-resume="${key}">${escHtml(name)}</div>`);
-    if (leContainer) leContainer.insertAdjacentHTML('beforeend', `<div class="pill" data-resume="${key}">${escHtml(name)}</div>`);
-    if (clContainer) clContainer.insertAdjacentHTML('beforeend', `<div class="pill" data-resume="${key}">${escHtml(name)}</div>`);
-    if (intContainer) intContainer.insertAdjacentHTML('beforeend', `<div class="pill" data-resume="${key}">${escHtml(name)}</div>`);
+    if (atsContainer) atsContainer.insertAdjacentHTML('beforeend', `<div class="pill${prevATS.has(key) ? ' selected' : ''}" data-resume="${key}">${escHtml(name)}</div>`);
+    if (leContainer) leContainer.insertAdjacentHTML('beforeend', `<div class="pill${prevLE === key ? ' selected' : ''}" data-resume="${key}">${escHtml(name)}</div>`);
+    if (clContainer) clContainer.insertAdjacentHTML('beforeend', `<div class="pill${prevCL === key ? ' selected' : ''}" data-resume="${key}">${escHtml(name)}</div>`);
+    if (intContainer) intContainer.insertAdjacentHTML('beforeend', `<div class="pill${prevInterview === key ? ' selected' : ''}" data-resume="${key}">${escHtml(name)}</div>`);
   }
+
+  // Rebuild selectedResumesForATS from only keys that still exist and aren't hidden
+  selectedResumesForATS = new Set([...prevATS].filter(k => RESUMES[k] && !RESUMES[k].hidden));
+
   attachPillListeners();
 }
 
@@ -3682,7 +3692,7 @@ Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.$
     // Initialize score tracker
     initLeScoreTracker(fullText);
     // Save impactful edits to resume optimizer store
-    saveEditsForOptimizers(fullText, selectedLeResume);
+    saveEditsForOptimizers(fullText, selectedLeResume, savedJD);
 
   } catch (err) {
     showError('le-error', 'Something went wrong: ' + err.message);
@@ -4095,7 +4105,8 @@ function saveOptimizerStore(key, data) {
   localStorage.setItem('cara_optimizers_' + key, JSON.stringify(data));
 }
 
-function saveEditsForOptimizers(rawText, resumeKey) {
+function saveEditsForOptimizers(rawText, resumeKey, jdText) {
+  const jdFingerprint = (jdText || '').trim().substring(0, 120);
   const lines = rawText.split('\n');
   let blocks = [], currentBlock = [];
   for (const line of lines) {
@@ -4129,11 +4140,16 @@ function saveEditsForOptimizers(rawText, resumeKey) {
     const fingerprint = before.trim().substring(0, 80);
     const existing = store.find(e => e.fingerprint === fingerprint);
     if (existing) {
-      existing.count = (existing.count || 1) + 1;
+      // Only count this JD once per edit
+      const seenJDs = existing.seenJDs || [];
+      if (jdFingerprint && seenJDs.includes(jdFingerprint)) continue;
+      seenJDs.push(jdFingerprint);
+      existing.seenJDs = seenJDs;
+      existing.count = seenJDs.filter(j => j).length;
       existing.impact = Math.max(existing.impact || 0, impact);
       changed = true;
     } else {
-      store.push({ fingerprint, section, before, after, why, impact, count: 1, ts: Date.now() });
+      store.push({ fingerprint, section, before, after, why, impact, count: 1, seenJDs: jdFingerprint ? [jdFingerprint] : [], ts: Date.now() });
       changed = true;
     }
   }
@@ -4180,7 +4196,7 @@ function renderOptimizersForSlot(key) {
         <span style="font-size:0.65rem;font-weight:700;background:#2a4db5;color:#fff;padding:0.12rem 0.5rem;border-radius:3px;">${escHtml(label)}</span>
         ${e.section ? `<span style="font-size:0.65rem;font-weight:600;background:#1a1a1a;color:#fff;padding:0.12rem 0.45rem;border-radius:3px;">${escHtml(e.section)}</span>` : ''}
         <span style="font-size:0.65rem;background:#eaf7ee;color:#1e6b35;border:1px solid #b2dfc0;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700;">+${e.impact} pts</span>
-        <span style="font-size:0.65rem;background:#e8f0fe;color:#2a4db5;border:1px solid #c5d4f5;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700;">Suggested ${e.count}×</span>
+        <span style="font-size:0.65rem;background:#e8f0fe;color:#2a4db5;border:1px solid #c5d4f5;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700;">Seen in ${e.count} JD${e.count === 1 ? '' : 's'}</span>
         <span style="font-size:0.75rem;color:var(--mid);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml((e.before||'').substring(0,55))}…</span>
         <button onclick="dismissOptimizer('${key}','${fp}','applied')" title="Applied — hide this" style="background:#1e6b35;color:#fff;border:none;border-radius:3px;padding:0.2rem 0.55rem;font-size:0.8rem;cursor:pointer;flex-shrink:0;line-height:1;">✓</button>
         <button onclick="dismissOptimizer('${key}','${fp}','skipped')" title="Won't apply — hide this" style="background:#cc4444;color:#fff;border:none;border-radius:3px;padding:0.2rem 0.55rem;font-size:0.8rem;cursor:pointer;flex-shrink:0;line-height:1;">✕</button>
@@ -4312,7 +4328,29 @@ renderStarStories();
 
 // ─── PAGE INIT ───────────────────────────────────────────────────────────────
 loadSavedResumes();
+
+// Fix 1: inject slot cards for custom resumes that survived page reload but have no DOM slot
+(function restoreCustomSlots() {
+  const slotsDiv = document.getElementById('resume-upload-slots');
+  if (!slotsDiv) return;
+  RESUME_KEYS.forEach(({ key }) => {
+    if (!key.startsWith('custom_')) return;
+    if (document.getElementById('slot-' + key)) return; // already exists
+    const r = RESUMES[key];
+    if (!r) return;
+    const name = escHtml(r.label);
+    const preview = escHtml((r.text || '').substring(0, 220));
+    const slotHtml = `<div class="resume-slot" id="slot-${key}"><div class="resume-slot-header"><input type="text" class="resume-slot-title-input" id="title-${key}" value="${name}" onchange="renameSlot('${key}',this.value)"><span class="resume-slot-status slot-status-custom" id="status-${key}">✓ Your version loaded</span></div><div class="resume-slot-body"><div class="slot-preview has-text" id="preview-${key}">${preview}…</div><div class="slot-actions"><button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-${key}').click()">&#11014; Upload PDF / TXT</button><input type="file" accept=".pdf,.txt" id="file-${key}" style="display:none" onchange="handleFileUpload('${key}',this.files[0])"><button class="slot-btn" onclick="showPasteArea('${key}')">&#9998; Paste Text</button><button class="slot-btn" onclick="toggleViewArea('${key}')">&#128065; View / Edit</button><button class="slot-btn danger" id="remove-${key}" onclick="clearSlot('${key}')">&#10005; Remove</button></div></div><div class="slot-view-area" id="view-area-${key}"><textarea id="view-text-${key}" placeholder="No resume text loaded yet."></textarea><div style="display:flex;gap:0.5rem;"><button class="slot-btn upload-trigger-btn" onclick="saveViewArea('${key}')">Save Changes</button><button class="slot-btn" onclick="toggleViewArea('${key}')">Close</button></div></div><div class="slot-paste-area" id="paste-area-${key}"><textarea id="paste-text-${key}" placeholder="Paste your full resume text here…"></textarea><div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><button class="slot-btn upload-trigger-btn" onclick="savePastedResume('${key}')">Save This Resume</button><button class="slot-btn" onclick="hidePasteArea('${key}')">Cancel</button></div></div></div>`;
+    slotsDiv.insertAdjacentHTML('beforeend', slotHtml);
+  });
+})();
+
 buildUploadSlots();
+
+// Fix 2: sync selectedLeResume to atsHighestResume if one was stored from a previous ATS run
+if (atsHighestResume && RESUMES[atsHighestResume]) {
+  selectedLeResume = atsHighestResume;
+}
 renderAllOptimizers();
 
 // Restore session state
