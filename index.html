@@ -1571,6 +1571,7 @@
 
       <div class="btn-row">
         <button class="btn" id="gen-research-btn">Generate Research Brief</button>
+        <button class="btn" style="background:transparent;color:var(--mid);border:1px solid var(--border);" onclick="document.getElementById('company-name').value='';document.getElementById('company-url').value='';document.getElementById('company-notes').value='';document.getElementById('research-result').classList.remove('visible');">Clear</button>
       </div>
 
       <div class="loading" id="research-loading"><div class="spinner"></div>Building your intelligence brief…</div>
@@ -1589,6 +1590,15 @@
       <div class="panel-desc">Generates the 10 most likely interview questions for this specific role, then crafts a tailored STAR-method answer for each one — pulled directly from your real accomplishments. Read these before your interview, not generic tips.</div>
 
       <div class="step-hint">Save a job description first. The more specific the JD, the sharper the questions and answers.</div>
+
+      <label>Load JD from Job Tracker <span style="font-weight:400;color:var(--mid);font-size:0.78rem;">(optional — or use the currently saved JD)</span></label>
+      <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:1rem;">
+        <select id="interview-job-picker" style="flex:1;font-family:'Raleway',sans-serif;font-size:0.78rem;padding:0.45rem 0.6rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--black);">
+          <option value="">— Use current saved JD —</option>
+        </select>
+        <button class="slot-btn" style="white-space:nowrap;" onclick="loadInterviewJobJD()">Load JD</button>
+      </div>
+      <div id="interview-jd-loaded-msg" style="display:none;font-family:'Raleway',sans-serif;font-size:0.68rem;letter-spacing:0.06em;color:var(--green);margin-bottom:0.75rem;"></div>
 
       <label>Interview stage</label>
       <div class="tab-row" id="interview-stage-tabs">
@@ -1717,6 +1727,7 @@
 
         <div class="btn-row">
           <button class="btn" id="gen-salary-btn">Research Salary &amp; Build Strategy</button>
+          <button class="btn" style="background:transparent;color:var(--mid);border:1px solid var(--border);" onclick="['sal-role','sal-location','sal-company-type','sal-offered','sal-situation'].forEach(id=>{var el=document.getElementById(id);if(el)el.value='';});document.getElementById('salary-result').classList.remove('visible');">Clear</button>
         </div>
 
         <div class="loading" id="salary-loading"><div class="spinner"></div>Researching salary data and building your strategy…</div>
@@ -2323,6 +2334,7 @@ function attachPillListeners() {
 let savedJD        = localStorage.getItem('cara_sess_jd') || '';
 let savedJDUrl     = localStorage.getItem('cara_sess_jdurl') || '';
 let savedRoleName  = localStorage.getItem('cara_sess_rolename') || '';
+let currentJobId   = localStorage.getItem('cara_sess_current_job') || null;
 let savedAtsKeywords = localStorage.getItem('cara_sess_ats_kw') || '';
 let savedAtsFlags  = localStorage.getItem('cara_sess_ats_flags') || '';
 let savedAtsPath   = localStorage.getItem('cara_sess_ats_path') || '';
@@ -2339,6 +2351,36 @@ document.querySelectorAll('nav a[data-panel]').forEach(link => {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     link.classList.add('active');
     document.getElementById('panel-' + panelId).classList.add('active');
+
+    if (panelId === 'interview-prep') populateInterviewJobPicker();
+
+    // Auto-populate Company Research from saved JD session
+    if (panelId === 'company-research') {
+      const nameEl = document.getElementById('company-name');
+      const urlEl  = document.getElementById('company-url');
+      if (nameEl && !nameEl.value && savedRoleName) {
+        const atIdx = savedRoleName.lastIndexOf(' at ');
+        if (atIdx > -1) nameEl.value = savedRoleName.substring(atIdx + 4).trim();
+      }
+      if (urlEl && !urlEl.value && savedJDUrl) urlEl.value = savedJDUrl;
+    }
+
+    // Auto-populate Salary & Recruiter Intel from saved JD session
+    if (panelId === 'salary-intel') {
+      const roleEl = document.getElementById('sal-role');
+      const urlEl  = document.getElementById('rec-role');
+      if (roleEl && !roleEl.value && savedRoleName) {
+        const atIdx = savedRoleName.lastIndexOf(' at ');
+        roleEl.value = atIdx > -1 ? savedRoleName.substring(0, atIdx).trim() : savedRoleName;
+      }
+      if (urlEl && !urlEl.value && savedRoleName) urlEl.value = savedRoleName;
+      // Salary offered from JD
+      const salEl = document.getElementById('sal-offered');
+      if (salEl && !salEl.value && savedJD) {
+        const m = savedJD.match(/\$[\d,]+(?:K|k)?(?:\s*[-–—to]+\s*\$[\d,]+(?:K|k)?)?/i);
+        if (m) salEl.value = m[0];
+      }
+    }
   });
 });
 
@@ -2389,6 +2431,7 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
       company: autoCompany || '(see URL)',
       role: autoRole || savedRoleName,
       url: savedJDUrl,
+      hub_jd: savedJD,
       source: '',
       notes: '',
       dateAdded: new Date().toISOString(),
@@ -2400,6 +2443,8 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
     jobs.unshift(newJob);
     saveJobs();
     renderJobs();
+    currentJobId = newJob.id;
+    localStorage.setItem('cara_sess_current_job', currentJobId);
   }
 
   setTimeout(() => {
@@ -3125,7 +3170,7 @@ loadResumeLinks();
 
 // ─── JOB TRACKER ──────────────────────────────────────────────────────────────
 let jobs = JSON.parse(localStorage.getItem('cara_jobs') || '[]');
-function saveJobs() { localStorage.setItem('cara_jobs', JSON.stringify(jobs)); }
+function saveJobs() { localStorage.setItem('cara_jobs', JSON.stringify(jobs)); populateInterviewJobPicker(); }
 function getWeekStart() { const now = new Date(); const day = now.getDay(); const diff = now.getDate() - day + (day === 0 ? -6 : 1); const mon = new Date(now.setDate(diff)); mon.setHours(0,0,0,0); return mon; }
 
 function updateTrackerStats() {
@@ -3213,6 +3258,15 @@ function prepJob(id, destination) {
   const job = jobs.find(j => j.id === id);
   if (!job) return;
   document.querySelectorAll('.prep-menu').forEach(m => m.style.display = 'none');
+  currentJobId = id;
+  localStorage.setItem('cara_sess_current_job', id);
+  // Load the job's saved JD into session
+  if (job.hub_jd) {
+    savedJD = job.hub_jd;
+    localStorage.setItem('cara_sess_jd', savedJD);
+    document.getElementById('jd-text').value = savedJD;
+    document.getElementById('jd-saved-msg').style.display = 'block';
+  }
   if (job.role || job.company) {
     savedRoleName = (job.role || '') + (job.company && job.company !== '(see URL)' ? ' at ' + job.company : '');
     document.getElementById('job-role-name').value = savedRoleName;
@@ -3334,6 +3388,36 @@ document.querySelectorAll('#research-depth-tabs .tab').forEach(tab => {
   });
 });
 
+function formatMarkdown(raw) {
+  if (!raw) return '';
+  function boldify(t) { return t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*\*/g,''); }
+  const lines = raw.split('\n');
+  let out = '<div class="ats-result-section">';
+  let inTable = false, tableHtml = '';
+  for (const line of lines) {
+    const t = line.trim();
+    if (!t) { if (inTable) { out += tableHtml + '</tbody></table></div>'; inTable = false; tableHtml = ''; } continue; }
+    if (t.startsWith('|') && t.endsWith('|')) {
+      if (/^[\|\s\-:]+$/.test(t)) continue;
+      const cells = t.split('|').slice(1,-1).map(c => c.trim());
+      if (!inTable) { inTable = true; tableHtml = '<div style="overflow-x:auto;margin:0.75rem 0;"><table style="width:100%;border-collapse:collapse;font-size:0.82rem;"><thead><tr>' + cells.map(c => `<th style="text-align:left;padding:0.5rem 0.75rem;background:#f7f6f4;border:1px solid #dedede;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:#555;">${boldify(c)}</th>`).join('') + '</tr></thead><tbody>'; }
+      else { tableHtml += '<tr>' + cells.map(c => `<td style="padding:0.5rem 0.75rem;border:1px solid #dedede;vertical-align:top;line-height:1.5;">${boldify(c)}</td>`).join('') + '</tr>'; }
+      continue;
+    }
+    if (inTable) { out += tableHtml + '</tbody></table></div>'; inTable = false; tableHtml = ''; }
+    if (/^#{1,3}\s/.test(t)) { out += '<div class="ats-heading">' + boldify(t.replace(/^#+\s*/,'')) + '</div>'; continue; }
+    if (t.startsWith('**') && t.endsWith('**')) { out += '<div class="ats-subhead">' + boldify(t) + '</div>'; continue; }
+    if (/^\d+\.\s*\*\*/.test(t)) { out += '<div class="ats-subhead">' + boldify(t.replace(/^\d+\.\s*/,'')) + '</div>'; continue; }
+    if (/^[\u2713\u2714\u2705✅]/.test(t)) { out += `<div class="ats-line ats-win"><span class="ats-line-icon">✓</span><span>${boldify(t.replace(/^[\u2713\u2714\u2705✅]\s*/,''))}</span></div>`; continue; }
+    if (/^[\u2717\u2718\u274C❌⚠️🚩]/.test(t)) { out += `<div class="ats-line ats-warn"><span class="ats-line-icon">✕</span><span>${boldify(t.replace(/^[\u2717\u2718\u274C❌⚠️🚩]\s*/,''))}</span></div>`; continue; }
+    if (/^[-•*]\s/.test(t)) { out += '<div class="ats-bullet"><span>' + boldify(t.replace(/^[-•*]\s*/,'')) + '</span></div>'; continue; }
+    if (/^>\s/.test(t)) { out += `<div style="border-left:3px solid #dedede;padding:0.5rem 1rem;margin:0.4rem 0;font-style:italic;color:#555;font-size:0.85rem;">${boldify(t.replace(/^>\s*/,''))}</div>`; continue; }
+    out += '<div class="ats-paragraph">' + boldify(t) + '</div>';
+  }
+  if (inTable) out += tableHtml + '</tbody></table></div>';
+  return out + '</div>';
+}
+
 document.getElementById('gen-research-btn').addEventListener('click', async () => {
   const companyName = document.getElementById('company-name').value.trim();
   if (!companyName) { showError('research-error', 'Please enter a company name.'); return; }
@@ -3366,7 +3450,9 @@ document.getElementById('gen-research-btn').addEventListener('click', async () =
     const output = document.getElementById('research-output');
     output.textContent = '';
     document.getElementById('research-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+    let fullResearch = '';
+    await callClaude(systemPrompt, userMsg, text => { fullResearch = text; output.textContent = text; });
+    output.innerHTML = formatMarkdown(fullResearch);
   } catch (err) {
     showError('research-error', 'Error: ' + err.message);
     document.getElementById('research-result').classList.remove('visible');
@@ -3378,6 +3464,42 @@ document.getElementById('gen-research-btn').addEventListener('click', async () =
 // ─── INTERVIEW PREP ───────────────────────────────────────────────────────────
 let selectedInterviewStage = 'phone';
 let selectedInterviewResume = 'principal_ds';
+
+function populateInterviewJobPicker() {
+  const sel = document.getElementById('interview-job-picker');
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">— Use current saved JD —</option>';
+  jobs.forEach(j => {
+    if (!j.hub_jd) return;
+    const label = [j.role, j.company !== '(see URL)' ? j.company : ''].filter(Boolean).join(' at ');
+    const opt = document.createElement('option');
+    opt.value = j.id;
+    opt.textContent = label || '(Untitled job)';
+    sel.appendChild(opt);
+  });
+  if (prev) sel.value = prev;
+}
+
+function loadInterviewJobJD() {
+  const sel = document.getElementById('interview-job-picker');
+  if (!sel || !sel.value) return;
+  const job = jobs.find(j => j.id === sel.value);
+  if (!job || !job.hub_jd) { alert('No JD saved for this job yet.'); return; }
+  savedJD = job.hub_jd;
+  localStorage.setItem('cara_sess_jd', savedJD);
+  document.getElementById('jd-text').value = savedJD;
+  document.getElementById('jd-saved-msg').style.display = 'block';
+  if (job.role || job.company) {
+    savedRoleName = (job.role || '') + (job.company && job.company !== '(see URL)' ? ' at ' + job.company : '');
+    localStorage.setItem('cara_sess_rolename', savedRoleName);
+    document.getElementById('job-role-name').value = savedRoleName;
+  }
+  const msg = document.getElementById('interview-jd-loaded-msg');
+  if (msg) { msg.textContent = '✓ JD loaded for ' + (sel.options[sel.selectedIndex].text); msg.style.display = 'block'; }
+}
+
+
 
 document.querySelectorAll('#interview-stage-tabs .tab').forEach(tab => {
   tab.addEventListener('click', () => {
