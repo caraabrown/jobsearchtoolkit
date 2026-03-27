@@ -1631,6 +1631,10 @@
       <div class="result-box" id="research-result">
         <button class="copy-btn" onclick="copyResult('research-output')">Copy</button>
         <div class="stream-output" id="research-output"></div>
+        <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--border);">
+          <button class="btn" id="research-to-edits-btn" style="font-size:0.75rem;padding:0.5rem 1.2rem;">Turn Recommendations into Line-by-Line Edits →</button>
+          <div style="font-size:0.72rem;color:var(--mid);margin-top:0.4rem;">Takes insights from this brief and generates targeted resume edits and cover letter additions.</div>
+        </div>
       </div>
     </div>
 
@@ -2645,6 +2649,27 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
   }
   document.getElementById('jd-saved-msg').style.display = 'block';
 
+  // Auto-populate relevant fields across all panels
+  const atIdx2 = savedRoleName.lastIndexOf(' at ');
+  const autoRolePart = atIdx2 > 0 ? savedRoleName.substring(0, atIdx2).trim() : savedRoleName;
+  const autoCompanyPart = atIdx2 > 0 ? savedRoleName.substring(atIdx2 + 4).trim() : '';
+
+  // Company Research
+  const cnEl = document.getElementById('company-name'); if (cnEl && !cnEl.value && autoCompanyPart) cnEl.value = autoCompanyPart;
+  const cuEl = document.getElementById('company-url'); if (cuEl && !cuEl.value && savedJDUrl) cuEl.value = savedJDUrl;
+  // HM Finder
+  const hmcEl = document.getElementById('hm-company'); if (hmcEl && !hmcEl.value && autoCompanyPart) hmcEl.value = autoCompanyPart;
+  const hmrEl = document.getElementById('hm-role'); if (hmrEl && !hmrEl.value && autoRolePart) hmrEl.value = autoRolePart;
+  // Referral Engine
+  const refcEl = document.getElementById('ref-company'); if (refcEl && !refcEl.value && autoCompanyPart) refcEl.value = autoCompanyPart;
+  const refrEl = document.getElementById('ref-role'); if (refrEl && !refrEl.value && autoRolePart) refrEl.value = autoRolePart;
+  // Follow-Up Builder
+  const fuContactEl = document.getElementById('fu-contact');
+  if (fuContactEl && !fuContactEl.value && autoCompanyPart) fuContactEl.placeholder = 'e.g., Recruiter or hiring manager for ' + savedRoleName;
+  // Interview focus hint
+  const ifEl = document.getElementById('interview-focus');
+  if (ifEl && !ifEl.value && savedRoleName) ifEl.placeholder = 'e.g., I want to make sure I highlight the Kroger NPS story. I\'m interviewing for ' + savedRoleName + '…';
+
   // Auto-add to job tracker
   if (savedRoleName || savedJDUrl) {
     // Parse "Role at Company" from savedRoleName
@@ -3128,7 +3153,7 @@ REQUIREMENTS:
     const output = document.getElementById('cl-output');
     output.innerHTML = '';
     document.getElementById('cl-result').classList.add('visible');
-    const LOGO_DATA = 'data:image/png;base64,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';
+    const LOGO_DATA = 'data:image/png;base64,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';
     function formatCoverLetter(raw) {
       if (!raw) return '';
       const lines = raw.split('\n');
@@ -3864,6 +3889,60 @@ document.getElementById('gen-research-btn').addEventListener('click', async () =
 });
 
 // ─── INTERVIEW PREP ───────────────────────────────────────────────────────────
+document.getElementById('research-to-edits-btn')?.addEventListener('click', async () => {
+  const researchText = document.getElementById('research-output')?.innerText || '';
+  if (!researchText.trim()) return;
+  const resume = RESUMES[selectedLeResume] || RESUMES[atsHighestResume] || RESUMES['principal_ds'];
+  if (!resume) { alert('Please select a resume on the Line-by-Line Edits page first.'); return; }
+  // Navigate to line edits panel
+  document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const leLink = document.querySelector('nav a[data-panel="line-edits"]');
+  if (leLink) leLink.classList.add('active');
+  document.getElementById('panel-line-edits').classList.add('active');
+  // Run edits using research brief as context
+  showLoading('le-loading');
+  hideError('le-error');
+  document.getElementById('le-result').classList.remove('visible');
+  const sys = `You are a senior resume editor and ATS optimization specialist. You produce precise, surgical edits — showing the exact original text, the exact replacement text, and a clear one-line reason for each change. CRITICAL RULE: You never invent experience, industries, credentials, or titles the candidate has not demonstrated in their resume.`;
+  const msg = `A company research brief has been generated for a role Cara is pursuing. Use the insights in that brief to produce targeted, line-by-line resume edits and cover letter additions that position her specifically for this company and role.
+
+COMPANY RESEARCH BRIEF:
+${researchText}
+
+RESUME (${resume.label}):
+${resume.text}
+
+${savedJD ? 'JOB DESCRIPTION:\n' + savedJD.substring(0, 1000) : ''}
+
+First output:
+EDIT_SUMMARY: [N] edits needed | Projected score improvement: [XX]%
+
+Then for each edit output a block in EXACT format:
+SECTION: [section name]
+CONTEXT: [1-2 surrounding lines]
+BEFORE: [exact original text verbatim]
+AFTER: [rewritten version ready to paste]
+TYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Insert | Cover Letter Addition]
+SCORE_IMPACT: [whole number]
+WHY: [one sentence — reference the specific company insight driving this edit]
+
+For Cover Letter Additions use TYPE: Cover Letter Addition and BEFORE: INSERT. These should reflect specific company values, priorities, or language from the research brief.
+
+INTEGRITY RULES: Never add industries, titles, credentials or skills not evidenced in the resume.`;
+  try {
+    const output = document.getElementById('le-output');
+    output.textContent = '';
+    document.getElementById('le-result').classList.add('visible');
+    let fullText = '';
+    await callClaude(sys, msg, text => { fullText = text; output.textContent = text; });
+    renderEditBlocks(fullText, output);
+    initLeScoreTracker(fullText);
+  } catch(err) { showError('le-error', err.message); document.getElementById('le-result').classList.remove('visible'); }
+  finally { hideLoading('le-loading'); }
+});
+
+
 let selectedInterviewStage = 'phone';
 let selectedInterviewResume = 'principal_ds';
 
@@ -4549,7 +4628,7 @@ renderJobs();
 
 // ─── NEW APPLICATION ──────────────────────────────────────────────────────────
 document.getElementById('new-application-btn').addEventListener('click', () => {
-  if (!confirm('Start a new application? This clears the current JD and ATS results. Your saved resumes and job tracker are not affected.')) return;
+  if (!confirm('Start a new application? This clears the current JD and all analysis. Your saved resumes and job tracker are not affected.')) return;
   // Clear JD fields
   ['jd-text','jd-url','job-role-name'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   document.getElementById('jd-saved-msg').style.display = 'none';
@@ -4560,21 +4639,68 @@ document.getElementById('new-application-btn').addEventListener('click', () => {
   ['cara_sess_jd','cara_sess_jdurl','cara_sess_rolename','cara_sess_ats_kw','cara_sess_ats_flags','cara_sess_ats_path','cara_sess_ats_highest'].forEach(k => localStorage.removeItem(k));
   // Clear ATS outputs
   ['ats-best-output','ats-keywords-output','ats-flags-output','ats-path-output','score-cards-container'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+  document.getElementById('ats-result')?.classList.remove('visible');
   // Clear recheck
   ['recheck-keywords-output','recheck-improvement-output','recheck-gaps-output','recheck-ready-output'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
-  const rcResult = document.getElementById('recheck-result'); if (rcResult) rcResult.classList.remove('visible');
+  document.getElementById('recheck-result')?.classList.remove('visible');
   const rcScore = document.getElementById('recheck-score-card'); if (rcScore) { rcScore.style.display = 'none'; rcScore.innerHTML = ''; }
-  const updatedTA = document.getElementById('updated-resume-text'); if (updatedTA) updatedTA.value = '';
+  document.getElementById('updated-resume-text') && (document.getElementById('updated-resume-text').value = '');
   // Clear line edits
-  const leOut = document.getElementById('le-output'); if (leOut) leOut.innerHTML = '';
-  const leResult = document.getElementById('le-result'); if (leResult) leResult.classList.remove('visible');
-  const tracker = document.getElementById('le-score-tracker'); if (tracker) tracker.style.display = 'none';
+  document.getElementById('le-output') && (document.getElementById('le-output').innerHTML = '');
+  document.getElementById('le-result')?.classList.remove('visible');
+  document.getElementById('le-score-tracker') && (document.getElementById('le-score-tracker').style.display = 'none');
+  document.getElementById('le-additional-exp') && (document.getElementById('le-additional-exp').value = '');
   // Clear cover letter
-  const clOut = document.getElementById('cl-output'); if (clOut) clOut.innerHTML = '';
-  const clResult = document.getElementById('cl-result'); if (clResult) clResult.classList.remove('visible');
-  // Reset resume pill selections
+  document.getElementById('cl-output') && (document.getElementById('cl-output').innerHTML = '');
+  document.getElementById('cl-result')?.classList.remove('visible');
+  document.getElementById('cl-anecdote') && (document.getElementById('cl-anecdote').value = '');
+  // Clear Why This Job
+  document.getElementById('why-output') && (document.getElementById('why-output').innerHTML = '');
+  document.getElementById('why-result')?.classList.remove('visible');
+  document.getElementById('why-context') && (document.getElementById('why-context').value = '');
+  // Clear Custom Q&A
+  document.getElementById('qa-output') && (document.getElementById('qa-output').innerHTML = '');
+  document.getElementById('qa-result')?.classList.remove('visible');
+  document.getElementById('custom-question') && (document.getElementById('custom-question').value = '');
+  // Clear Company Research
+  ['company-name','company-url'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('company-notes') && (document.getElementById('company-notes').value = '');
+  document.getElementById('research-output') && (document.getElementById('research-output').innerHTML = '');
+  document.getElementById('research-result')?.classList.remove('visible');
+  // Clear Interview Prep
+  document.getElementById('interview-focus') && (document.getElementById('interview-focus').value = '');
+  document.getElementById('interview-output') && (document.getElementById('interview-output').innerHTML = '');
+  document.getElementById('interview-result')?.classList.remove('visible');
+  document.getElementById('ii-name') && (document.getElementById('ii-name').value = '');
+  document.getElementById('ii-context') && (document.getElementById('ii-context').value = '');
+  document.getElementById('ii-output') && (document.getElementById('ii-output').innerHTML = '');
+  document.getElementById('ii-result')?.classList.remove('visible');
+  // Clear LinkedIn Outreach
+  ['li-name','li-title','li-goal','hm-company','hm-role','sl-target','sl-hook'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['li-context','hm-context'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('li-output') && (document.getElementById('li-output').innerHTML = '');
+  document.getElementById('li-result')?.classList.remove('visible');
+  document.getElementById('sl-output') && (document.getElementById('sl-output').innerHTML = '');
+  document.getElementById('sl-result')?.classList.remove('visible');
+  // Clear Referral Engine
+  ['ref-company','ref-role','ref-target-name','ref-ask-person'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['ref-known','ref-target-context','ref-ask-context'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('ref-output') && (document.getElementById('ref-output').innerHTML = '');
+  document.getElementById('ref-result')?.classList.remove('visible');
+  // Clear Follow-Up Builder
+  document.getElementById('fu-contact') && (document.getElementById('fu-contact').value = '');
+  document.getElementById('fu-context') && (document.getElementById('fu-context').value = '');
+  document.getElementById('fu-output') && (document.getElementById('fu-output').innerHTML = '');
+  document.getElementById('fu-result')?.classList.remove('visible');
+  // Clear Salary Intel
+  ['sal-role','sal-location','sal-offered'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('sal-situation') && (document.getElementById('sal-situation').value = '');
+  ['salary-result','recruiter-result'].forEach(id => document.getElementById(id)?.classList.remove('visible'));
+  ['rec-role','rec-jd','rec-info'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  // Reset pill selections
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
-  const leHint = document.getElementById('le-auto-hint'); if (leHint) leHint.style.display = 'none';
+  document.getElementById('le-auto-hint') && (document.getElementById('le-auto-hint').style.display = 'none');
+  document.getElementById('le-resume-confirm') && (document.getElementById('le-resume-confirm').style.display = 'none');
   // Navigate to JD panel
   document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
