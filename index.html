@@ -3507,7 +3507,7 @@ document.querySelectorAll('#li-mode-tabs .tab').forEach(tab => {
   });
 });
 
-document.getElementById('gen-hm-btn').addEventListener('click', async () => {
+document.getElementById('gen-hm-btn')?.addEventListener('click', async () => {
   const company = document.getElementById('hm-company').value.trim();
   if (!company) { showError('li-error', 'Please enter a company name.'); return; }
   const role = document.getElementById('hm-role').value.trim();
@@ -3902,7 +3902,8 @@ document.querySelectorAll('#ref-connection-tabs .tab').forEach(tab => {
 });
 
 // Auto-populate from session when panel opens
-document.querySelector('nav a[data-panel="referral-engine"]').addEventListener('click', () => {
+const refNavLink = document.querySelector('nav a[data-panel="referral-engine"]');
+if (refNavLink) refNavLink.addEventListener('click', () => {
   const compEl = document.getElementById('ref-company');
   const roleEl = document.getElementById('ref-role');
   if (compEl && !compEl.value && savedRoleName) {
@@ -3915,7 +3916,7 @@ document.querySelector('nav a[data-panel="referral-engine"]').addEventListener('
   }
 });
 
-document.getElementById('gen-ref-finder-btn').addEventListener('click', async () => {
+document.getElementById('gen-ref-finder-btn')?.addEventListener('click', async () => {
   const company = document.getElementById('ref-company').value.trim();
   if (!company) { showError('ref-error', 'Please enter a company name.'); return; }
   const role = document.getElementById('ref-role').value.trim();
@@ -3941,7 +3942,7 @@ document.getElementById('gen-ref-finder-btn').addEventListener('click', async ()
   finally { hideLoading('ref-loading'); }
 });
 
-document.getElementById('gen-ref-outreach-btn').addEventListener('click', async () => {
+document.getElementById('gen-ref-outreach-btn')?.addEventListener('click', async () => {
   const target = document.getElementById('ref-target-name').value.trim();
   if (!target) { showError('ref-error', 'Please enter the person you are reaching out to.'); return; }
   const context = document.getElementById('ref-target-context').value.trim();
@@ -3971,7 +3972,7 @@ document.getElementById('gen-ref-outreach-btn').addEventListener('click', async 
   finally { hideLoading('ref-loading'); }
 });
 
-document.getElementById('gen-ref-ask-btn').addEventListener('click', async () => {
+document.getElementById('gen-ref-ask-btn')?.addEventListener('click', async () => {
   const person = document.getElementById('ref-ask-person').value.trim();
   if (!person) { showError('ref-error', 'Please describe who you are asking.'); return; }
   const rel = document.getElementById('ref-ask-context').value.trim();
@@ -4044,13 +4045,14 @@ function loadFollowUpJob() {
   else if (job.screening) { selectedFuStage = 'screening'; document.querySelectorAll('#fu-stage-tabs .tab').forEach(t => { t.classList.toggle('active', t.dataset.fustage === 'screening'); }); }
 }
 
-document.querySelector('nav a[data-panel="followup-builder"]').addEventListener('click', () => {
+const fuNavLink = document.querySelector('nav a[data-panel="followup-builder"]');
+if (fuNavLink) fuNavLink.addEventListener('click', () => {
   populateFollowUpPicker();
   const contactEl = document.getElementById('fu-contact');
   if (contactEl && !contactEl.value && savedRoleName) contactEl.placeholder = 'e.g., Recruiter or hiring manager for ' + savedRoleName;
 });
 
-document.getElementById('gen-fu-btn').addEventListener('click', async () => {
+document.getElementById('gen-fu-btn')?.addEventListener('click', async () => {
   const jd = savedJD;
   const contact = document.getElementById('fu-contact').value.trim();
   const context = document.getElementById('fu-context').value.trim();
