@@ -1019,8 +1019,9 @@
   <nav>
     <div class="nav-section">Setup</div>
     <ul>
+      <li><a href="#" data-panel="dashboard" class="active"><span class="num">◈</span> Dashboard</a></li>
       <li><a href="#" data-panel="my-resumes"><span class="num">00</span> My Resumes</a></li>
-      <li><a href="#" class="active" data-panel="job-input"><span class="num">01</span> Job Description</a></li>
+      <li><a href="#" data-panel="job-input"><span class="num">01</span> Job Description</a></li>
     </ul>
     <div class="nav-section">Analysis</div>
     <ul>
@@ -1053,6 +1054,45 @@
   <main>
 
     <!-- ── PANEL 1: JOB DESCRIPTION ── -->
+
+    <!-- ── DASHBOARD ── -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="panel-title">Job Search <em>Dashboard</em></div>
+      <div class="divider"></div>
+
+      <div id="dash-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.75rem;margin-bottom:1.5rem;"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+        <div style="border:1px solid var(--border);border-radius:6px;padding:1rem;">
+          <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.75rem;">Pipeline</div>
+          <div id="dash-pipeline" style="font-size:0.82rem;color:var(--black);line-height:2;"></div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:6px;padding:1rem;">
+          <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.75rem;">Recent Activity</div>
+          <div id="dash-recent" style="font-size:0.82rem;color:var(--black);line-height:1.8;"></div>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--border);border-radius:6px;padding:1rem;margin-bottom:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+          <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);">Weekly Focus Recommendation</div>
+          <button class="slot-btn upload-trigger-btn" id="dash-focus-btn" onclick="generateDashFocus()">Generate</button>
+        </div>
+        <div class="loading" id="dash-focus-loading" style="display:none;"><div class="spinner"></div>Analyzing your search…</div>
+        <div id="dash-focus-output" style="font-size:0.85rem;color:var(--black);line-height:1.6;"></div>
+      </div>
+
+      <div style="border:1px solid var(--border);border-radius:6px;padding:1rem;">
+        <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.75rem;">Quick Actions</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+          <button class="slot-btn upload-trigger-btn" onclick="document.querySelector('nav a[data-panel=job-input]').click()">+ New JD</button>
+          <button class="slot-btn upload-trigger-btn" onclick="document.querySelector('nav a[data-panel=ats-check]').click()">Run ATS Check</button>
+          <button class="slot-btn upload-trigger-btn" onclick="document.querySelector('nav a[data-panel=referral-engine]').click()">Find Referral</button>
+          <button class="slot-btn upload-trigger-btn" onclick="document.querySelector('nav a[data-panel=followup-builder]').click()">Write Follow-Up</button>
+          <button class="slot-btn upload-trigger-btn" onclick="document.querySelector('nav a[data-panel=job-tracker]').click()">View Tracker</button>
+        </div>
+      </div>
+    </div>
 
     <!-- ── PANEL 0: MY RESUMES ── -->
     <div class="panel" id="panel-my-resumes">
@@ -1255,7 +1295,7 @@
       </div>
     </div>
 
-    <div class="panel active" id="panel-job-input">
+    <div class="panel" id="panel-job-input">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
         <div>
           <div class="panel-title">Job <em>Description</em></div>
@@ -1312,6 +1352,15 @@
         <div id="ats-flags-output" class="stream-output" style="display:none;"></div>
         <div id="ats-path-output" class="stream-output" style="display:none;"></div>
         <div id="ats-detail-output" class="stream-output" style="display:none;"></div>
+      </div>
+
+      <div style="margin-top:2rem;border-top:2px solid var(--border);padding-top:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+          <div style="font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;color:var(--black);">ATS Score History</div>
+          <button onclick="localStorage.removeItem('cara_ats_history');renderAtsHistory();" style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;background:transparent;border:1px solid var(--border);border-radius:3px;padding:0.2rem 0.6rem;color:var(--mid);cursor:pointer;">Clear</button>
+        </div>
+        <div id="ats-history-empty" style="font-size:0.82rem;color:var(--mid);">Run your first ATS analysis to start tracking score progress.</div>
+        <div id="ats-history-chart" style="display:none;overflow-x:auto;"></div>
       </div>
     </div>
 
@@ -1627,6 +1676,25 @@
         <div class="stream-output" id="interview-output"></div>
       </div>
 
+      <!-- INTERVIEW INTELLIGENCE BRIEF -->
+      <div style="margin-top:2rem;border-top:2px solid var(--border);padding-top:1.5rem;">
+        <div style="font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;color:var(--black);margin-bottom:0.3rem;">Interview Intelligence Brief</div>
+        <div style="font-size:0.8rem;color:var(--mid);margin-bottom:1rem;">Research your interviewer before you walk in — what they care about, how to connect, and what to say to be memorable.</div>
+        <label>Interviewer name & title *</label>
+        <input type="text" id="ii-name" placeholder="e.g., Jordan Reeves, VP of Design Strategy at Accenture">
+        <label>Their LinkedIn URL or anything you know about them (optional)</label>
+        <textarea id="ii-context" placeholder="e.g., linkedin.com/in/jordanreeves — previously at USDS, posts about service design in gov, went to Georgetown, mentioned on a podcast about healthcare UX…" rows="3"></textarea>
+        <div class="btn-row">
+          <button class="btn" id="gen-ii-btn">Generate Interviewer Brief</button>
+        </div>
+        <div class="loading" id="ii-loading"><div class="spinner"></div>Building your interviewer brief…</div>
+        <div class="error-msg" id="ii-error"></div>
+        <div class="result-box" id="ii-result">
+          <button class="copy-btn" onclick="copyResult('ii-output')">Copy</button>
+          <div class="stream-output" id="ii-output"></div>
+        </div>
+      </div>
+
       <!-- STAR Story Bank -->
       <div style="margin-top:2rem;border-top:2px solid var(--border);padding-top:1.5rem;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
@@ -1717,6 +1785,35 @@
       <div class="result-box" id="li-result">
         <button class="copy-btn" onclick="copyResult('li-output')">Copy</button>
         <div class="stream-output" id="li-output"></div>
+      </div>
+
+      <div style="margin-top:2rem;border-top:2px solid var(--border);padding-top:1.5rem;">
+        <div style="font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;color:var(--black);margin-bottom:0.3rem;">Subject Line Generator</div>
+        <div style="font-size:0.8rem;color:var(--mid);margin-bottom:1rem;">5 subject line options for email or InMail — specific, human, and built to get opened.</div>
+        <div class="form-row">
+          <div>
+            <label>Who are you emailing? *</label>
+            <input type="text" id="sl-target" placeholder="e.g., Jordan Reeves, VP of Design at Accenture">
+          </div>
+          <div>
+            <label>Channel</label>
+            <div class="tab-row" id="sl-channel-tabs" style="margin-top:0.3rem;">
+              <div class="tab active" data-slchannel="email">Email</div>
+              <div class="tab" data-slchannel="inmail">LinkedIn InMail</div>
+            </div>
+          </div>
+        </div>
+        <label>Your hook / angle (optional)</label>
+        <input type="text" id="sl-hook" placeholder="e.g., mutual connection, their recent post, specific project they led, Howard alumni">
+        <div class="btn-row">
+          <button class="btn" id="gen-sl-btn">Generate Subject Lines</button>
+        </div>
+        <div class="loading" id="sl-loading"><div class="spinner"></div>Writing subject lines…</div>
+        <div class="error-msg" id="sl-error"></div>
+        <div class="result-box" id="sl-result">
+          <button class="copy-btn" onclick="copyResult('sl-output')">Copy</button>
+          <div class="stream-output" id="sl-output"></div>
+        </div>
       </div>
     </div>
 
@@ -2483,6 +2580,7 @@ document.querySelectorAll('nav a[data-panel]').forEach(link => {
     document.getElementById('panel-' + panelId).classList.add('active');
 
     if (panelId === 'interview-prep') populateInterviewJobPicker();
+    if (panelId === 'dashboard') renderDashboard();
 
     // Auto-populate Company Research from saved JD session
     if (panelId === 'company-research') {
@@ -2667,6 +2765,19 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
           }
         });
         if (highestKey) autoSelectBestResume(highestKey, highestLabel);
+        // Save to ATS score history
+        const historyEntry = { ts: Date.now(), jd: savedRoleName || 'Run ' + new Date().toLocaleDateString(), scores: {} };
+        scoreMatches.forEach(match => {
+          const name = match[1].trim();
+          const pct = parseInt(match[2]);
+          const key = resumeKeyMap[name] || Object.keys(resumeKeyMap).find(k => name.includes(k) || k.includes(name));
+          if (key) historyEntry.scores[key] = { label: name, pct };
+        });
+        const history = JSON.parse(localStorage.getItem('cara_ats_history') || '[]');
+        history.push(historyEntry);
+        if (history.length > 30) history.shift(); // keep last 30
+        localStorage.setItem('cara_ats_history', JSON.stringify(history));
+        renderAtsHistory();
       }
       fullText = text;
       document.getElementById('ats-best-output').textContent = text;
@@ -3358,7 +3469,36 @@ function renderJobs() {
         const val = escHtml(j[f.key] || '');
         return `<div><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.3rem;">${f.label}</div><textarea rows="4" style="width:100%;box-sizing:border-box;font-size:0.8rem;line-height:1.5;padding:0.5rem 0.6rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--black);resize:vertical;" placeholder="Paste or type ${f.label.toLowerCase()} here…" onchange="event.stopPropagation();saveJobHubField('${j.id}','${f.key}',this.value)">${val}</textarea></div>`;
       }).join('') + '</div>';
-    const detailRow = '<tr class="job-detail-row ' + isHired + '" data-detail-id="' + j.id + '" style="display:none;"><td colspan="10" style="padding:1rem 1.2rem;background:var(--bgoff);">' + chipsHtml + hubHtml + '</td></tr>';
+
+    // People / Networking tab
+    const people = j.hub_people ? JSON.parse(j.hub_people) : [];
+    const peopleRows = people.map((p, pi) => `<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:0.4rem;margin-bottom:0.4rem;align-items:center;">
+      <input type="text" value="${escHtml(p.name||'')}" placeholder="Name" style="font-size:0.78rem;padding:0.3rem 0.5rem;border:1px solid var(--border);border-radius:3px;background:var(--bg);color:var(--black);" onchange="event.stopPropagation();updatePersonField('${j.id}',${pi},'name',this.value)">
+      <input type="text" value="${escHtml(p.title||'')}" placeholder="Title" style="font-size:0.78rem;padding:0.3rem 0.5rem;border:1px solid var(--border);border-radius:3px;background:var(--bg);color:var(--black);" onchange="event.stopPropagation();updatePersonField('${j.id}',${pi},'title',this.value)">
+      <input type="text" value="${escHtml(p.linkedin||'')}" placeholder="LinkedIn URL" style="font-size:0.78rem;padding:0.3rem 0.5rem;border:1px solid var(--border);border-radius:3px;background:var(--bg);color:var(--black);" onchange="event.stopPropagation();updatePersonField('${j.id}',${pi},'linkedin',this.value)">
+      <select style="font-size:0.72rem;padding:0.3rem 0.4rem;border:1px solid var(--border);border-radius:3px;background:var(--bg);color:var(--black);" onchange="event.stopPropagation();updatePersonField('${j.id}',${pi},'status',this.value)">
+        ${['Stranger','Connected','Replied','Call Booked','Met IRL','Referred Me'].map(s=>`<option value="${s}"${p.status===s?' selected':''}>${s}</option>`).join('')}
+      </select>
+      <button onclick="event.stopPropagation();removePerson('${j.id}',${pi})" style="background:transparent;border:1px solid var(--border);border-radius:3px;padding:0.2rem 0.45rem;font-size:0.7rem;color:var(--mid);cursor:pointer;">✕</button>
+    </div>`).join('');
+
+    const peopleHtml = `<div style="margin-top:0.5rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:0.4rem;margin-bottom:0.4rem;">
+        ${['Name','Title','LinkedIn','Status',''].map(h=>`<div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);">${h}</div>`).join('')}
+      </div>
+      <div id="people-rows-${j.id}">${peopleRows}</div>
+      <button onclick="event.stopPropagation();addPerson('${j.id}')" style="margin-top:0.5rem;font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.3rem 0.8rem;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--mid);cursor:pointer;">+ Add Person</button>
+    </div>`;
+
+    const hubTabsHtml = `<div style="margin-top:0.75rem;">
+      <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:0.75rem;">
+        <button onclick="event.stopPropagation();switchHubTab('${j.id}','content')" id="hubtab-content-${j.id}" style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.4rem 0.8rem;border:none;border-bottom:2px solid var(--black);background:transparent;color:var(--black);cursor:pointer;font-weight:700;">Content</button>
+        <button onclick="event.stopPropagation();switchHubTab('${j.id}','people')" id="hubtab-people-${j.id}" style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.4rem 0.8rem;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--mid);cursor:pointer;">People</button>
+      </div>
+      <div id="hubpanel-content-${j.id}">${hubHtml}</div>
+      <div id="hubpanel-people-${j.id}" style="display:none;">${peopleHtml}</div>
+    </div>`;
+    const detailRow = '<tr class="job-detail-row ' + isHired + '" data-detail-id="' + j.id + '" style="display:none;"><td colspan="10" style="padding:1rem 1.2rem;background:var(--bgoff);">' + chipsHtml + hubTabsHtml + '</td></tr>';
     return '<tr class="' + isHired + ' job-main-row" data-id="' + j.id + '" ' + isRejected + ' onclick="toggleDetailRow(\'' + j.id + '\')">' +
       '<td><strong>' + escHtml(j.company) + '</strong> ' + urlCell + '</td>' +
       '<td>' + escHtml(j.role) + '</td>' +
@@ -3366,9 +3506,9 @@ function renderJobs() {
       '<td style="font-size:0.75rem;color:var(--mid);">' + howApplied + '</td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.screening?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'screening\',this.checked)"><span>Screen</span></div></td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.interview?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'interview\',this.checked)"><span>Interview</span></div></td>' +
-      '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.rejected?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'rejected\',this.checked)"><span>Rejected</span></div></td>' +
+      '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.rejected?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'rejected\',this.checked);if(this.checked)showRejectionDebrief(\'' + j.id + '\');"><span>Rejected</span></div></td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.hired?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'hired\',this.checked)"><span>Hired!</span></div></td>' +
-'<td style="position:relative;"><div class="prep-dropdown-wrap"><button class="prep-btn" onclick="event.stopPropagation();togglePrepMenu(\'' + j.id + '\')">Prep ▾</button><div class="prep-menu" id="prep-menu-' + j.id + '" style="display:none;"><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'interview-prep\')">Interview Prep</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'company-research\')">Company Research</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'salary-intel\')">Salary Intel</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'followup-builder\')">Follow-Up Builder</div><div onclick="event.stopPropagation();showNextMove(\'' + j.id + '\')">&#x1F4A1; What\'s My Next Move?</div></div></div></td>' +
+'<td style="position:relative;"><div class="prep-dropdown-wrap"><button class="prep-btn" onclick="event.stopPropagation();togglePrepMenu(\'' + j.id + '\')">Prep ▾</button><div class="prep-menu" id="prep-menu-' + j.id + '" style="display:none;"><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'interview-prep\')">Interview Prep</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'company-research\')">Company Research</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'salary-intel\')">Salary Intel</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'followup-builder\')">Follow-Up Builder</div><div onclick="event.stopPropagation();showNextMove(\'' + j.id + '\')">&#x1F4A1; What\'s My Next Move?</div><div onclick="event.stopPropagation();showRejectionDebrief(\'' + j.id + '\')">&#x1F4CB; Rejection Debrief</div></div></div></td>' +
 '<td><button class="delete-job-btn" onclick="event.stopPropagation();deleteJob(\'' + j.id + '\')" title="Remove">✕</button></td></tr>' + detailRow;
   }).join('');
 }
@@ -3465,6 +3605,60 @@ function prepJob(id, destination) {
 function escHtml(str) { return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function toggleStage(id, field, val) { const job = jobs.find(j => j.id === id); if (!job) return; job[field] = val; saveJobs(); renderJobs(); }
 function deleteJob(id) { if (!confirm('Remove this application?')) return; jobs = jobs.filter(j => j.id !== id); saveJobs(); renderJobs(); }
+function switchHubTab(id, tab) {
+  ['content','people'].forEach(t => {
+    const panel = document.getElementById('hubpanel-' + t + '-' + id);
+    const btn = document.getElementById('hubtab-' + t + '-' + id);
+    if (!panel || !btn) return;
+    const active = t === tab;
+    panel.style.display = active ? 'block' : 'none';
+    btn.style.borderBottomColor = active ? 'var(--black)' : 'transparent';
+    btn.style.color = active ? 'var(--black)' : 'var(--mid)';
+    btn.style.fontWeight = active ? '700' : '400';
+  });
+}
+
+function getPeople(id) {
+  const job = jobs.find(j => j.id === id);
+  if (!job) return [];
+  try { return job.hub_people ? JSON.parse(job.hub_people) : []; } catch(e) { return []; }
+}
+
+function savePeople(id, people) {
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  job.hub_people = JSON.stringify(people);
+  saveJobs();
+}
+
+function addPerson(id) {
+  const people = getPeople(id);
+  people.push({ name: '', title: '', linkedin: '', status: 'Stranger' });
+  savePeople(id, people);
+  renderJobs();
+  // Re-open row and switch to people tab
+  const row = document.querySelector('[data-detail-id="' + id + '"]');
+  if (row) row.style.display = 'table-row';
+  switchHubTab(id, 'people');
+}
+
+function removePerson(id, idx) {
+  const people = getPeople(id);
+  people.splice(idx, 1);
+  savePeople(id, people);
+  renderJobs();
+  const row = document.querySelector('[data-detail-id="' + id + '"]');
+  if (row) row.style.display = 'table-row';
+  switchHubTab(id, 'people');
+}
+
+function updatePersonField(id, idx, field, value) {
+  const people = getPeople(id);
+  if (!people[idx]) return;
+  people[idx][field] = value;
+  savePeople(id, people);
+}
+
 function toggleDetailRow(id) { const r = document.querySelector('[data-detail-id="' + id + '"]'); if (r) r.style.display = r.style.display === 'none' ? 'table-row' : 'none'; }
 function saveJobHubField(id, field, value) { const job = jobs.find(j => j.id === id); if (!job) return; job[field] = value; saveJobs(); }
 document.getElementById('manual-add-btn').addEventListener('click', () => {
@@ -3876,6 +4070,270 @@ document.getElementById('gen-recruiter-btn').addEventListener('click', async () 
   } finally {
     hideLoading('recruiter-loading');
   }
+});
+
+// ─── DASHBOARD ───────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const now = Date.now();
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+  const weekJobs = jobs.filter(j => (now - new Date(j.dateAdded || j.dateApplied || now).getTime()) < weekMs);
+  const active = jobs.filter(j => (j.screening || j.interview) && !j.hired && !j.rejected);
+  const interviews = jobs.filter(j => j.interview && !j.rejected);
+  const rejected = jobs.filter(j => j.rejected);
+  const hired = jobs.filter(j => j.hired);
+  const history = JSON.parse(localStorage.getItem('cara_ats_history') || '[]');
+  const avgAts = history.length ? Math.round(history.reduce((sum, h) => {
+    const scores = Object.values(h.scores).map(s => s.pct);
+    return sum + (scores.length ? scores.reduce((a,b) => a+b,0)/scores.length : 0);
+  }, 0) / history.length) : null;
+
+  // Stat cards
+  const stats = [
+    { num: weekJobs.length, label: 'Applied This Week' },
+    { num: active.length, label: 'Active Pipeline' },
+    { num: interviews.length, label: 'Total Interviews' },
+    { num: rejected.length, label: 'Rejections' },
+    { num: hired.length, label: 'Offers', green: true },
+    { num: avgAts !== null ? avgAts + '%' : '—', label: 'Avg ATS Score' },
+  ];
+  const statsEl = document.getElementById('dash-stats');
+  if (statsEl) statsEl.innerHTML = stats.map(s =>
+    `<div style="border:1px solid var(--border);border-radius:6px;padding:0.85rem 1rem;text-align:center;">
+      <div style="font-size:1.6rem;font-weight:800;color:${s.green ? 'var(--green)' : 'var(--black)'};">${s.num}</div>
+      <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-top:0.2rem;">${s.label}</div>
+    </div>`
+  ).join('');
+
+  // Pipeline
+  const pipelineEl = document.getElementById('dash-pipeline');
+  if (pipelineEl) {
+    const stages = [
+      { label: 'Applied', count: jobs.filter(j => !j.screening && !j.interview && !j.rejected && !j.hired).length },
+      { label: 'Screening', count: jobs.filter(j => j.screening && !j.interview && !j.rejected).length },
+      { label: 'Interview', count: interviews.length },
+      { label: 'Rejected', count: rejected.length },
+      { label: 'Hired', count: hired.length },
+    ];
+    pipelineEl.innerHTML = stages.map(s =>
+      `<div style="display:flex;align-items:center;gap:0.75rem;">
+        <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);width:70px;flex-shrink:0;">${s.label}</div>
+        <div style="flex:1;height:8px;background:var(--bgoff);border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:${jobs.length ? Math.round((s.count/jobs.length)*100) : 0}%;background:var(--black);border-radius:4px;"></div>
+        </div>
+        <div style="font-size:0.78rem;font-weight:700;width:20px;text-align:right;">${s.count}</div>
+      </div>`
+    ).join('');
+  }
+
+  // Recent activity
+  const recentEl = document.getElementById('dash-recent');
+  if (recentEl) {
+    const recent = [...jobs].sort((a,b) => new Date(b.dateAdded||b.dateApplied||0) - new Date(a.dateAdded||a.dateApplied||0)).slice(0, 5);
+    recentEl.innerHTML = recent.length ? recent.map(j => {
+      const stage = j.hired ? '🎉 Hired' : j.rejected ? '✕ Rejected' : j.interview ? '◎ Interview' : j.screening ? '◉ Screening' : '○ Applied';
+      return `<div style="display:flex;justify-content:space-between;gap:0.5rem;border-bottom:1px solid var(--border);padding:0.2rem 0;">
+        <span>${escHtml(j.role||'')} <span style="color:var(--mid);font-size:0.75rem;">@ ${escHtml(j.company||'')}</span></span>
+        <span style="font-size:0.72rem;color:var(--mid);white-space:nowrap;">${stage}</span>
+      </div>`;
+    }).join('') : '<span style="color:var(--mid);font-size:0.8rem;">No applications yet.</span>';
+  }
+}
+
+async function generateDashFocus() {
+  const out = document.getElementById('dash-focus-output');
+  const loading = document.getElementById('dash-focus-loading');
+  out.innerHTML = ''; loading.style.display = 'flex';
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+  const weekJobs = jobs.filter(j => (Date.now() - new Date(j.dateAdded||j.dateApplied||Date.now()).getTime()) < weekMs);
+  const active = jobs.filter(j => (j.screening||j.interview) && !j.hired && !j.rejected);
+  const history = JSON.parse(localStorage.getItem('cara_ats_history') || '[]');
+  const sys = 'You are a direct, no-fluff job search strategist. You give one clear weekly focus recommendation — specific, honest, and actionable.';
+  const msg = [
+    'Give Cara Brown a weekly focus recommendation for her job search.',
+    'Applications this week: ' + weekJobs.length,
+    'Active pipeline: ' + active.length + ' roles',
+    'Total applications: ' + jobs.length,
+    'ATS runs this session: ' + history.length,
+    active.length ? 'Active roles: ' + active.map(j => (j.role||'') + ' at ' + (j.company||'')).join(', ') : null,
+    'CARA BIO: ' + CARA_BIO,
+    'Give: 1. THIS WEEK\'S FOCUS — one specific strategic priority. 2. TOP 3 ACTIONS — concrete things to do this week in order of priority. 3. WATCH OUT FOR — one thing she should stop or avoid. Keep it under 200 words total. Be direct.'
+  ].filter(Boolean).join('\n\n');
+  try {
+    let full = '';
+    await callClaude(sys, msg, t => { full = t; out.innerHTML = formatMarkdown(full); });
+    out.innerHTML = formatMarkdown(full);
+  } catch(e) { out.textContent = 'Error: ' + e.message; }
+  finally { loading.style.display = 'none'; }
+}
+
+// ─── REJECTION DEBRIEF ───────────────────────────────────────────────────────
+let selectedRejStage = 'application';
+let currentRejJobId = null;
+
+document.querySelectorAll('#rejection-stage-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#rejection-stage-tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedRejStage = tab.dataset.rejstage;
+  });
+});
+
+function showRejectionDebrief(id) {
+  document.querySelectorAll('.prep-menu').forEach(m => m.style.display = 'none');
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  currentRejJobId = id;
+  const label = (job.role || '') + (job.company && job.company !== '(see URL)' ? ' at ' + job.company : '');
+  document.getElementById('rejection-job-title').textContent = label || 'Application';
+  document.getElementById('rejection-output').textContent = '';
+  document.getElementById('rejection-notes').value = '';
+  document.getElementById('rejection-loading').style.display = 'none';
+  document.getElementById('rejection-modal').style.display = 'flex';
+}
+
+document.getElementById('gen-rejection-btn')?.addEventListener('click', async () => {
+  const job = jobs.find(j => j.id === currentRejJobId);
+  const notes = document.getElementById('rejection-notes').value.trim();
+  const out = document.getElementById('rejection-output');
+  const loading = document.getElementById('rejection-loading');
+  out.textContent = '';
+  loading.style.display = 'flex';
+  const label = job ? (job.role || '') + (job.company && job.company !== '(see URL)' ? ' at ' + job.company : '') : 'this role';
+  const sys = 'You are a candid career strategist. You help people extract honest, actionable lessons from rejections — without toxic positivity or vague platitudes.';
+  const msg = [
+    'Run a rejection debrief for Cara Brown. She was rejected for: ' + label,
+    'Stage the rejection happened: ' + selectedRejStage,
+    notes ? 'Her own assessment: ' + notes : null,
+    job && job.hub_jd ? 'Job description: ' + job.hub_jd.substring(0, 600) : (savedJD ? 'JD context: ' + savedJD.substring(0, 600) : null),
+    'CARA BIO: ' + CARA_BIO,
+    'Provide: 1. HONEST READ — what likely happened at this stage based on the facts. Be direct, not harsh. 2. ROOT CAUSE — the most probable real reason, even if uncomfortable. 3. WHAT TO CHANGE — 2-3 specific, concrete things to do differently on the next application. 4. WHAT TO KEEP — what she should not change, because it is working. 5. NEXT MOVE — one specific action to take in the next 48 hours related to this rejection (follow-up, request feedback, etc.).'
+  ].filter(Boolean).join('\n\n');
+  try {
+    let full = '';
+    await callClaude(sys, msg, t => { full = t; out.textContent = t; });
+    out.innerHTML = formatMarkdown(full);
+  } catch(e) { out.textContent = 'Error: ' + e.message; }
+  finally { loading.style.display = 'none'; }
+});
+
+
+function renderAtsHistory() {
+  const history = JSON.parse(localStorage.getItem('cara_ats_history') || '[]');
+  const empty = document.getElementById('ats-history-empty');
+  const chart = document.getElementById('ats-history-chart');
+  if (!empty || !chart) return;
+  if (history.length === 0) { empty.style.display = 'block'; chart.style.display = 'none'; return; }
+  empty.style.display = 'none'; chart.style.display = 'block';
+  const allKeys = new Set();
+  history.forEach(h => Object.keys(h.scores).forEach(k => allKeys.add(k)));
+  const keys = [...allKeys];
+  const colors = ['#2a4db5','#1e6b35','#a05000','#8b2020','#5a3a8a','#0d7a7a'];
+  const W = Math.max(400, history.length * 60 + 80);
+  const H = 200, padL = 36, padR = 16, padT = 24, padB = 40;
+  const chartW = W - padL - padR, chartH = H - padT - padB;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="min-width:${W}px;font-family:sans-serif;">`;
+  [0,25,50,75,100].forEach(v => {
+    const y = padT + chartH - (v / 100) * chartH;
+    svg += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#e8e8e8" stroke-width="1"/>`;
+    svg += `<text x="${padL-4}" y="${y+4}" text-anchor="end" font-size="9" fill="#aaa">${v}</text>`;
+  });
+  keys.forEach((key, ki) => {
+    const color = colors[ki % colors.length];
+    const points = history.map((h, hi) => {
+      const x = padL + (history.length > 1 ? (hi / (history.length - 1)) * chartW : chartW / 2);
+      const pct = h.scores[key] ? h.scores[key].pct : null;
+      const y = pct !== null ? padT + chartH - (pct / 100) * chartH : null;
+      return { x, y, pct };
+    });
+    let pathD = '';
+    points.forEach((p, i) => {
+      if (p.y === null) return;
+      const prev = points.slice(0, i).find(pp => pp.y !== null);
+      pathD += (pathD === '' || !prev) ? `M ${p.x} ${p.y}` : ` L ${p.x} ${p.y}`;
+    });
+    if (pathD) svg += `<path d="${pathD}" stroke="${color}" stroke-width="2" fill="none"/>`;
+    points.forEach(p => {
+      if (p.y === null) return;
+      const lbl = RESUMES[key] ? RESUMES[key].label : key;
+      svg += `<circle cx="${p.x}" cy="${p.y}" r="4" fill="${color}" stroke="#fff" stroke-width="1.5"><title>${lbl}: ${p.pct}%</title></circle>`;
+    });
+  });
+  history.forEach((h, hi) => {
+    const x = padL + (history.length > 1 ? (hi / (history.length - 1)) * chartW : chartW / 2);
+    svg += `<text x="${x}" y="${H-6}" text-anchor="middle" font-size="8" fill="#888">${(h.jd||'').substring(0,12)}</text>`;
+  });
+  keys.forEach((key, ki) => {
+    const lx = padL + ki * 130;
+    if (lx + 120 > W) return;
+    const lbl = RESUMES[key] ? RESUMES[key].label : key;
+    svg += `<rect x="${lx}" y="6" width="10" height="10" rx="2" fill="${colors[ki%colors.length]}"/>`;
+    svg += `<text x="${lx+14}" y="15" font-size="8.5" fill="#555">${lbl.substring(0,18)}</text>`;
+  });
+  svg += '</svg>';
+  chart.innerHTML = svg;
+}
+
+// ─── INTERVIEW INTELLIGENCE BRIEF ────────────────────────────────────────────
+document.getElementById('gen-ii-btn')?.addEventListener('click', async () => {
+  const name = document.getElementById('ii-name').value.trim();
+  if (!name) { showError('ii-error', 'Please enter the interviewer name and title.'); return; }
+  const context = document.getElementById('ii-context').value.trim();
+  showLoading('ii-loading'); hideError('ii-error');
+  document.getElementById('ii-result').classList.remove('visible');
+  const sys = 'You are an expert interview coach who helps senior professionals research their interviewers and walk into conversations with genuine, specific knowledge that makes them memorable.';
+  const msg = [
+    'Build an interviewer intelligence brief for Cara Brown. She is interviewing with: ' + name,
+    context ? 'What Cara knows / their LinkedIn: ' + context : null,
+    savedRoleName ? 'Role Cara is interviewing for: ' + savedRoleName : null,
+    savedJD ? 'Job description context: ' + savedJD.substring(0, 600) : null,
+    'CARA BIO: ' + CARA_BIO,
+    'Provide: 1. WHO THEY ARE — likely background, career trajectory, and what got them to this role. 2. WHAT THEY CARE ABOUT — based on their title, org, and any signals available; what problems they are solving. 3. HOW CARA MAPS TO THEIR WORLD — 2-3 specific points of genuine connection between her work and theirs. 4. CONVERSATION HOOKS — 3 specific, non-generic things to reference or ask that will signal she did real research. 5. WHAT TO AVOID — anything that might land wrong given their background. Be specific. No filler.'
+  ].filter(Boolean).join('\n\n');
+  try {
+    const out = document.getElementById('ii-output');
+    out.textContent = '';
+    document.getElementById('ii-result').classList.add('visible');
+    let full = '';
+    await callClaude(sys, msg, t => { full = t; out.textContent = t; });
+    out.innerHTML = formatMarkdown(full);
+  } catch(e) { showError('ii-error', e.message); document.getElementById('ii-result').classList.remove('visible'); }
+  finally { hideLoading('ii-loading'); }
+});
+
+// ─── SUBJECT LINE GENERATOR ──────────────────────────────────────────────────
+let selectedSLChannel = 'email';
+
+document.querySelectorAll('#sl-channel-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#sl-channel-tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedSLChannel = tab.dataset.slchannel;
+  });
+});
+
+document.getElementById('gen-sl-btn')?.addEventListener('click', async () => {
+  const target = document.getElementById('sl-target').value.trim();
+  if (!target) { showError('sl-error', 'Please enter who you are emailing.'); return; }
+  const hook = document.getElementById('sl-hook').value.trim();
+  showLoading('sl-loading'); hideError('sl-error');
+  document.getElementById('sl-result').classList.remove('visible');
+  const sys = 'You are an expert at writing email and LinkedIn InMail subject lines that get opened by busy senior professionals. You write lines that are specific, human, and never generic.';
+  const msg = [
+    'Write 5 subject line options for a ' + selectedSLChannel + ' from Cara Brown to ' + target + '.',
+    hook ? 'Hook / angle: ' + hook : null,
+    savedRoleName ? 'Context: Cara is reaching out about a ' + savedRoleName + ' opportunity.' : null,
+    'CARA BIO: ' + CARA_BIO,
+    'Rules: Each subject line must be under 60 characters. No clickbait. No generic lines like "Quick question" or "Following up." Each should feel like it was written specifically for this person. For each line, add one sentence explaining why it works. Number them 1-5.'
+  ].filter(Boolean).join('\n\n');
+  try {
+    const out = document.getElementById('sl-output');
+    out.textContent = '';
+    document.getElementById('sl-result').classList.add('visible');
+    let full = '';
+    await callClaude(sys, msg, t => { full = t; out.textContent = t; });
+    out.innerHTML = formatMarkdown(full);
+  } catch(e) { showError('sl-error', e.message); document.getElementById('sl-result').classList.remove('visible'); }
+  finally { hideLoading('sl-loading'); }
 });
 
 // ─── REFERRAL ENGINE ──────────────────────────────────────────────────────────
@@ -4378,6 +4836,7 @@ function renderEditBlocks(rawText, container) {
           ${section ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#1a1a1a;border-radius:3px;font-size:0.68rem;font-weight:600;color:#fff;letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}
           ${type ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:${isInsert ? '#fff3e0' : '#e8f0fe'};border:1px solid ${isInsert ? '#f0c080' : '#c5d4f5'};border-radius:3px;font-size:0.68rem;font-weight:600;color:${isInsert ? '#a05000' : '#2a4db5'};letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}
           ${impact > 0 ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#eaf7ee;border:1px solid #b2dfc0;border-radius:3px;font-size:0.68rem;font-weight:700;color:#1e6b35;">+${impact} pts</span>` : ''}
+          <button onclick="var el=document.getElementById('${editId}');el.style.opacity='0.4';el.style.pointerEvents='none';el.dataset.checked='rejected';" title="Skip this edit" style="margin-left:auto;background:transparent;border:1px solid #ddd;border-radius:3px;padding:0.15rem 0.5rem;font-size:0.75rem;color:#aaa;cursor:pointer;line-height:1;">✕</button>
         </div>
       </div>
       ${isInsert ? `<div class="edit-row-before" style="background:#fff8ee;border-color:#f0c080;"><span class="edit-label" style="color:#a05000;">Insert new</span>${escHtml(after)}</div>` : `<div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>`}
@@ -4891,6 +5350,8 @@ if (atsHighestResume && RESUMES[atsHighestResume]) {
   selectedLeResume = atsHighestResume;
 }
 renderAllOptimizers();
+renderAtsHistory();
+renderDashboard();
 
 // Restore session state
 if (savedJD) {
@@ -4905,6 +5366,32 @@ if (savedGoal) { const goalEl = document.getElementById('daily-goal-input'); if 
 document.addEventListener('change', function(e) { if (e.target && e.target.id === 'daily-goal-input') { localStorage.setItem('cara_daily_goal', e.target.value); updateTrackerStats(); } });
 
 </script>
+<!-- Rejection Debrief Modal -->
+<div id="rejection-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:var(--bg);border-radius:8px;max-width:620px;width:90%;max-height:85vh;overflow-y:auto;padding:2rem;position:relative;">
+    <button onclick="document.getElementById('rejection-modal').style.display='none';" style="position:absolute;top:1rem;right:1rem;background:transparent;border:none;font-size:1.2rem;cursor:pointer;color:var(--mid);">✕</button>
+    <div style="font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;color:var(--mid);margin-bottom:0.5rem;">Rejection Debrief</div>
+    <div id="rejection-job-title" style="font-size:1rem;font-weight:700;margin-bottom:1.2rem;color:var(--black);"></div>
+    <label style="font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);">What stage did it end at?</label>
+    <div class="tab-row" id="rejection-stage-tabs" style="margin-bottom:1rem;">
+      <div class="tab active" data-rejstage="application">Application</div>
+      <div class="tab" data-rejstage="phone">Phone Screen</div>
+      <div class="tab" data-rejstage="interview">Interview</div>
+      <div class="tab" data-rejstage="final">Final Round</div>
+    </div>
+    <label style="font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);">What do you think went wrong? (optional)</label>
+    <textarea id="rejection-notes" placeholder="e.g., I think I was too vague about the healthcare experience requirement. Or — no idea, I thought it went well." rows="3" style="width:100%;box-sizing:border-box;font-size:0.82rem;margin-bottom:1rem;"></textarea>
+    <div class="btn-row" style="margin-bottom:1rem;">
+      <button class="btn" id="gen-rejection-btn">Run Debrief</button>
+    </div>
+    <div class="loading" id="rejection-loading" style="display:none;"><div class="spinner"></div>Analyzing what happened…</div>
+    <div id="rejection-output" class="stream-output" style="font-size:0.85rem;"></div>
+    <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+      <button class="slot-btn upload-trigger-btn" onclick="navigator.clipboard.writeText(document.getElementById('rejection-output').innerText);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000);">Copy</button>
+      <button class="slot-btn" onclick="document.getElementById('rejection-modal').style.display='none';">Close</button>
+    </div>
+  </div>
+</div>
 <!-- Next Move Modal -->
 <div id="next-move-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
   <div style="background:var(--bg);border-radius:8px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;padding:2rem;position:relative;">
