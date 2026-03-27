@@ -3520,7 +3520,7 @@ document.getElementById('gen-hm-btn')?.addEventListener('click', async () => {
     context ? 'Context: ' + context : null,
     savedJD ? 'Job description: ' + savedJD.substring(0, 1000) : null,
     'CARA BIO: ' + CARA_BIO,
-    'Provide: 1. SEARCH STRINGS — 3 exact LinkedIn search queries to find this person (use Boolean search, title variations, department logic). 2. WHO TO LOOK FOR — likely title, seniority, department based on company size and role. 3. PROFILE SIGNALS — 5 things to check on their profile before reaching out. 4. FIRST MESSAGE — a targeted connection request (under 300 chars) once you find them. 5. FOLLOW-UP — a Day 3 message if they connect but don't respond.'
+    'Provide: 1. SEARCH STRINGS — 3 exact LinkedIn search queries to find this person (use Boolean search, title variations, department logic). 2. WHO TO LOOK FOR — likely title, seniority, department based on company size and role. 3. PROFILE SIGNALS — 5 things to check on their profile before reaching out. 4. FIRST MESSAGE — a targeted connection request (under 300 chars) once you find them. 5. FOLLOW-UP — a Day 3 message if they connect but do not respond.'
   ].filter(Boolean).join('\n\n');
   try {
     const out = document.getElementById('li-output');
