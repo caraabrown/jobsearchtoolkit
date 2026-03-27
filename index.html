@@ -3368,9 +3368,43 @@ function renderJobs() {
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.interview?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'interview\',this.checked)"><span>Interview</span></div></td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.rejected?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'rejected\',this.checked)"><span>Rejected</span></div></td>' +
       '<td style="text-align:center;"><div class="stage-check-item"><input type="checkbox" ' + (j.hired?'checked':'') + ' onchange="event.stopPropagation();toggleStage(\'' + j.id + '\',\'hired\',this.checked)"><span>Hired!</span></div></td>' +
-'<td style="position:relative;"><div class="prep-dropdown-wrap"><button class="prep-btn" onclick="event.stopPropagation();togglePrepMenu(\'' + j.id + '\')">Prep ▾</button><div class="prep-menu" id="prep-menu-' + j.id + '" style="display:none;"><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'interview-prep\')">Interview Prep</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'company-research\')">Company Research</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'salary-intel\')">Salary Intel</div></div></div></td>' +
+'<td style="position:relative;"><div class="prep-dropdown-wrap"><button class="prep-btn" onclick="event.stopPropagation();togglePrepMenu(\'' + j.id + '\')">Prep ▾</button><div class="prep-menu" id="prep-menu-' + j.id + '" style="display:none;"><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'interview-prep\')">Interview Prep</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'company-research\')">Company Research</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'salary-intel\')">Salary Intel</div><div onclick="event.stopPropagation();prepJob(\'' + j.id + '\',\'followup-builder\')">Follow-Up Builder</div><div onclick="event.stopPropagation();showNextMove(\'' + j.id + '\')">&#x1F4A1; What\'s My Next Move?</div></div></div></td>' +
 '<td><button class="delete-job-btn" onclick="event.stopPropagation();deleteJob(\'' + j.id + '\')" title="Remove">✕</button></td></tr>' + detailRow;
   }).join('');
+}
+
+async function showNextMove(id) {
+  document.querySelectorAll('.prep-menu').forEach(m => m.style.display = 'none');
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  const modal = document.getElementById('next-move-modal');
+  const titleEl = document.getElementById('next-move-job-title');
+  const out = document.getElementById('next-move-output');
+  const loading = document.getElementById('next-move-loading');
+  const label = (job.role || '') + (job.company && job.company !== '(see URL)' ? ' at ' + job.company : '');
+  titleEl.textContent = label || 'Application';
+  out.textContent = '';
+  modal.style.display = 'flex';
+  loading.style.display = 'flex';
+  const stage = job.hired ? 'offer/hired' : job.interview ? 'post-interview' : job.screening ? 'post-phone-screen' : job.rejected ? 'rejected' : 'applied-waiting';
+  const dateApplied = job.dateAdded || job.dateApplied;
+  const daysElapsed = dateApplied ? Math.floor((Date.now() - new Date(dateApplied)) / 86400000) : null;
+  const sys = 'You are a candid, no-fluff career strategist. You give specific, actionable next steps — not generic advice.';
+  const msg = [
+    'Cara Brown needs her next move for this application:',
+    'Role: ' + label,
+    'Stage: ' + stage,
+    daysElapsed !== null ? 'Days since applying: ' + daysElapsed : null,
+    job.hub_jd ? 'JD context: ' + job.hub_jd.substring(0, 600) : null,
+    'CARA BIO: ' + CARA_BIO,
+    'Give: 1. SITUATION READ — honest assessment of where this stands. 2. NEXT ACTION — one specific thing to do in the next 24 hours (include exact message if outreach is needed). 3. THIS WEEK — 2-3 supporting actions. 4. RED FLAGS — anything she should watch for. Be direct. No fluff.'
+  ].filter(Boolean).join('\n\n');
+  try {
+    let full = '';
+    await callClaude(sys, msg, t => { full = t; out.textContent = t; });
+    out.innerHTML = formatMarkdown(full);
+  } catch(e) { out.textContent = 'Error: ' + e.message; }
+  finally { loading.style.display = 'none'; }
 }
 
 function togglePrepMenu(id) {
@@ -4869,5 +4903,19 @@ if (savedGoal) { const goalEl = document.getElementById('daily-goal-input'); if 
 document.addEventListener('change', function(e) { if (e.target && e.target.id === 'daily-goal-input') { localStorage.setItem('cara_daily_goal', e.target.value); updateTrackerStats(); } });
 
 </script>
+<!-- Next Move Modal -->
+<div id="next-move-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:var(--bg);border-radius:8px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;padding:2rem;position:relative;">
+    <button onclick="document.getElementById('next-move-modal').style.display='none';" style="position:absolute;top:1rem;right:1rem;background:transparent;border:none;font-size:1.2rem;cursor:pointer;color:var(--mid);">✕</button>
+    <div style="font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;color:var(--mid);margin-bottom:0.5rem;">Application Intelligence</div>
+    <div id="next-move-job-title" style="font-size:1rem;font-weight:700;margin-bottom:1.2rem;color:var(--black);"></div>
+    <div class="loading" id="next-move-loading" style="display:none;"><div class="spinner"></div>Analyzing your next move…</div>
+    <div id="next-move-output" class="stream-output" style="font-size:0.85rem;"></div>
+    <div style="margin-top:1.2rem;display:flex;gap:0.5rem;">
+      <button class="slot-btn upload-trigger-btn" onclick="navigator.clipboard.writeText(document.getElementById('next-move-output').innerText);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000);">Copy</button>
+      <button class="slot-btn" onclick="document.getElementById('next-move-modal').style.display='none';">Close</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
