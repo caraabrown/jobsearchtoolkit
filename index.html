@@ -1044,7 +1044,8 @@
       <li><a href="#" data-panel="interview-prep"><span class="num">09</span> Interview Prep</a></li>
       <li><a href="#" data-panel="linkedin-outreach"><span class="num">10</span> LinkedIn Outreach</a></li>
       <li><a href="#" data-panel="referral-engine"><span class="num">11</span> Referral Engine</a></li>
-      <li><a href="#" data-panel="salary-intel"><span class="num">12</span> Salary &amp; Recruiter Intel</a></li>
+      <li><a href="#" data-panel="followup-builder"><span class="num">12</span> Follow-Up Builder</a></li>
+      <li><a href="#" data-panel="salary-intel"><span class="num">13</span> Salary &amp; Recruiter Intel</a></li>
     </ul>
   </nav>
 
@@ -1776,6 +1777,48 @@
       <div class="result-box" id="ref-result">
         <button class="copy-btn" onclick="copyResult('ref-output')">Copy</button>
         <div class="stream-output" id="ref-output"></div>
+      </div>
+    </div>
+
+    <!-- ── PANEL 12: FOLLOW-UP BUILDER ── -->
+    <div class="panel" id="panel-followup-builder">
+      <div class="panel-title">Follow-Up <em>Builder</em></div>
+      <div class="divider"></div>
+      <div class="panel-desc">Most candidates go silent after applying. A strategic follow-up sequence keeps you visible without being annoying. This tool builds a timed, multi-touch sequence tailored to where you are in the process.</div>
+
+      <div class="step-hint">Works best after saving a job description. Select a tracked job or use the current session.</div>
+
+      <label>Load from Job Tracker <span style="font-weight:400;color:var(--mid);font-size:0.78rem;">(optional)</span></label>
+      <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:1rem;">
+        <select id="fu-job-picker" style="flex:1;font-family:'Raleway',sans-serif;font-size:0.78rem;padding:0.45rem 0.6rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--black);">
+          <option value="">— Use current saved JD —</option>
+        </select>
+        <button class="slot-btn" style="white-space:nowrap;" onclick="loadFollowUpJob()">Load</button>
+      </div>
+
+      <label>Stage you are at *</label>
+      <div class="tab-row" id="fu-stage-tabs">
+        <div class="tab active" data-fustage="applied">Just Applied</div>
+        <div class="tab" data-fustage="screening">After Phone Screen</div>
+        <div class="tab" data-fustage="interview">After Interview</div>
+        <div class="tab" data-fustage="offer">Offer Stage</div>
+      </div>
+
+      <label>Who are you following up with? (optional)</label>
+      <input type="text" id="fu-contact" placeholder="e.g., Recruiter Sarah at Accenture, or the hiring manager Jordan Reeves">
+
+      <label>Anything notable from your last interaction? (optional)</label>
+      <textarea id="fu-context" placeholder="e.g., The phone screen went well, they mentioned the team is growing fast, she said decisions would be made within 2 weeks…" rows="3"></textarea>
+
+      <div class="btn-row">
+        <button class="btn" id="gen-fu-btn">Build Follow-Up Sequence</button>
+      </div>
+
+      <div class="loading" id="fu-loading"><div class="spinner"></div>Building your follow-up sequence…</div>
+      <div class="error-msg" id="fu-error"></div>
+      <div class="result-box" id="fu-result">
+        <button class="copy-btn" onclick="copyResult('fu-output')">Copy</button>
+        <div class="stream-output" id="fu-output"></div>
       </div>
     </div>
 
@@ -3257,7 +3300,7 @@ loadResumeLinks();
 
 // ─── JOB TRACKER ──────────────────────────────────────────────────────────────
 let jobs = JSON.parse(localStorage.getItem('cara_jobs') || '[]');
-function saveJobs() { localStorage.setItem('cara_jobs', JSON.stringify(jobs)); if (document.getElementById('interview-job-picker')) populateInterviewJobPicker(); }
+function saveJobs() { localStorage.setItem('cara_jobs', JSON.stringify(jobs)); if (document.getElementById('interview-job-picker')) populateInterviewJobPicker(); if (document.getElementById('fu-job-picker')) populateFollowUpPicker(); }
 function getWeekStart() { const now = new Date(); const day = now.getDay(); const diff = now.getDate() - day + (day === 0 ? -6 : 1); const mon = new Date(now.setDate(diff)); mon.setHours(0,0,0,0); return mon; }
 
 function updateTrackerStats() {
@@ -3920,6 +3963,90 @@ document.getElementById('gen-ref-ask-btn').addEventListener('click', async () =>
     out.innerHTML = formatMarkdown(full);
   } catch(e) { showError('ref-error', e.message); document.getElementById('ref-result').classList.remove('visible'); }
   finally { hideLoading('ref-loading'); }
+});
+
+// ─── FOLLOW-UP BUILDER ───────────────────────────────────────────────────────
+let selectedFuStage = 'applied';
+
+document.querySelectorAll('#fu-stage-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#fu-stage-tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedFuStage = tab.dataset.fustage;
+  });
+});
+
+function populateFollowUpPicker() {
+  const sel = document.getElementById('fu-job-picker');
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">— Use current saved JD —</option>';
+  jobs.forEach(j => {
+    const label = [j.role, j.company !== '(see URL)' ? j.company : ''].filter(Boolean).join(' at ');
+    const opt = document.createElement('option');
+    opt.value = j.id;
+    opt.textContent = label || '(Untitled job)';
+    sel.appendChild(opt);
+  });
+  if (prev) sel.value = prev;
+}
+
+function loadFollowUpJob() {
+  const sel = document.getElementById('fu-job-picker');
+  if (!sel || !sel.value) return;
+  const job = jobs.find(j => j.id === sel.value);
+  if (!job) return;
+  if (job.hub_jd) {
+    savedJD = job.hub_jd;
+    localStorage.setItem('cara_sess_jd', savedJD);
+    document.getElementById('jd-text').value = savedJD;
+  }
+  if (job.role || job.company) {
+    savedRoleName = (job.role || '') + (job.company && job.company !== '(see URL)' ? ' at ' + job.company : '');
+    localStorage.setItem('cara_sess_rolename', savedRoleName);
+  }
+  // Auto-set stage based on job status
+  if (job.interview) { selectedFuStage = 'interview'; document.querySelectorAll('#fu-stage-tabs .tab').forEach(t => { t.classList.toggle('active', t.dataset.fustage === 'interview'); }); }
+  else if (job.screening) { selectedFuStage = 'screening'; document.querySelectorAll('#fu-stage-tabs .tab').forEach(t => { t.classList.toggle('active', t.dataset.fustage === 'screening'); }); }
+}
+
+document.querySelector('nav a[data-panel="followup-builder"]').addEventListener('click', () => {
+  populateFollowUpPicker();
+  const contactEl = document.getElementById('fu-contact');
+  if (contactEl && !contactEl.value && savedRoleName) contactEl.placeholder = 'e.g., Recruiter or hiring manager for ' + savedRoleName;
+});
+
+document.getElementById('gen-fu-btn').addEventListener('click', async () => {
+  const jd = savedJD;
+  const contact = document.getElementById('fu-contact').value.trim();
+  const context = document.getElementById('fu-context').value.trim();
+  const stageMap = {
+    applied: 'just submitted an application online and has not heard back yet',
+    screening: 'completed a phone screen and is waiting to hear about next steps',
+    interview: 'completed an interview (could be first round or panel) and is waiting on a decision',
+    offer: 'received an offer or is in active offer negotiation'
+  };
+  showLoading('fu-loading'); hideError('fu-error');
+  document.getElementById('fu-result').classList.remove('visible');
+  const sys = 'You are a career strategist who writes follow-up sequences that keep candidates top of mind without being pushy. Every message should feel human, add value, and move the process forward.';
+  const msg = [
+    'Build a follow-up sequence for Cara Brown. She has ' + stageMap[selectedFuStage] + '.',
+    savedRoleName ? 'Role: ' + savedRoleName : null,
+    contact ? 'Following up with: ' + contact : null,
+    context ? 'Context from last interaction: ' + context : null,
+    jd ? 'Job description: ' + jd.substring(0, 800) : null,
+    'CARA BIO: ' + CARA_BIO,
+    'Write a 3-touch sequence. For each touch include: TIMING (when to send relative to last contact), CHANNEL (email, LinkedIn, or both), SUBJECT LINE (if email), MESSAGE (ready to copy/paste, under 150 words), and WHY THIS WORKS. Messages should feel personal to her background, not generic. The third touch should be a graceful close that leaves the door open.'
+  ].filter(Boolean).join('\n\n');
+  try {
+    const out = document.getElementById('fu-output');
+    out.textContent = '';
+    document.getElementById('fu-result').classList.add('visible');
+    let full = '';
+    await callClaude(sys, msg, t => { full = t; out.textContent = t; });
+    out.innerHTML = formatMarkdown(full);
+  } catch(e) { showError('fu-error', e.message); document.getElementById('fu-result').classList.remove('visible'); }
+  finally { hideLoading('fu-loading'); }
 });
 
 // Init tracker on load
@@ -4707,13 +4834,17 @@ loadSavedResumes();
   if (!slotsDiv) return;
   RESUME_KEYS.forEach(({ key }) => {
     if (!key.startsWith('custom_')) return;
-    if (document.getElementById('slot-' + key)) return; // already exists
+    if (document.getElementById('slot-' + key)) return;
     const r = RESUMES[key];
     if (!r) return;
     const name = escHtml(r.label);
-    const preview = escHtml((r.text || '').substring(0, 220));
-    const slotHtml = `<div class="resume-slot" id="slot-${key}"><div class="resume-slot-header"><input type="text" class="resume-slot-title-input" id="title-${key}" value="${name}" onchange="renameSlot('${key}',this.value)"><span class="resume-slot-status slot-status-custom" id="status-${key}">✓ Your version loaded</span></div><div class="resume-slot-body"><div class="slot-preview has-text" id="preview-${key}">${preview}…</div><div class="slot-actions"><button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-${key}').click()">&#11014; Upload PDF / TXT</button><input type="file" accept=".pdf,.txt" id="file-${key}" style="display:none" onchange="handleFileUpload('${key}',this.files[0])"><button class="slot-btn" onclick="showPasteArea('${key}')">&#9998; Paste Text</button><button class="slot-btn" onclick="toggleViewArea('${key}')">&#128065; View / Edit</button><button class="slot-btn danger" id="remove-${key}" onclick="clearSlot('${key}')">&#10005; Remove</button></div></div><div class="slot-view-area" id="view-area-${key}"><textarea id="view-text-${key}" placeholder="No resume text loaded yet."></textarea><div style="display:flex;gap:0.5rem;"><button class="slot-btn upload-trigger-btn" onclick="saveViewArea('${key}')">Save Changes</button><button class="slot-btn" onclick="toggleViewArea('${key}')">Close</button></div></div><div class="slot-paste-area" id="paste-area-${key}"><textarea id="paste-text-${key}" placeholder="Paste your full resume text here…"></textarea><div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><button class="slot-btn upload-trigger-btn" onclick="savePastedResume('${key}')">Save This Resume</button><button class="slot-btn" onclick="hidePasteArea('${key}')">Cancel</button></div></div></div>`;
-    slotsDiv.insertAdjacentHTML('beforeend', slotHtml);
+    const preview = escHtml((r.text || '').substring(0, 220)).replace(/`/g, '&#96;');
+    const k = key;
+    const slot = document.createElement('div');
+    slot.className = 'resume-slot';
+    slot.id = 'slot-' + k;
+    slot.innerHTML = '<div class="resume-slot-header"><input type="text" class="resume-slot-title-input" id="title-' + k + '" value="' + name + '" onchange="renameSlot(\'' + k + '\',this.value)"><span class="resume-slot-status slot-status-custom" id="status-' + k + '">✓ Your version loaded</span></div><div class="resume-slot-body"><div class="slot-preview has-text" id="preview-' + k + '">' + preview + '…</div><div class="slot-actions"><button class="slot-btn upload-trigger-btn" onclick="document.getElementById(\'file-' + k + '\').click()">&#11014; Upload PDF / TXT</button><input type="file" accept=".pdf,.txt" id="file-' + k + '" style="display:none" onchange="handleFileUpload(\'' + k + '\',this.files[0])"><button class="slot-btn" onclick="showPasteArea(\'' + k + '\')">&#9998; Paste Text</button><button class="slot-btn" onclick="toggleViewArea(\'' + k + '\')">&#128065; View / Edit</button><button class="slot-btn danger" id="remove-' + k + '" onclick="clearSlot(\'' + k + '\')">&#10005; Remove</button></div></div><div class="slot-view-area" id="view-area-' + k + '"><textarea id="view-text-' + k + '" placeholder="No resume text loaded yet."></textarea><div style="display:flex;gap:0.5rem;"><button class="slot-btn upload-trigger-btn" onclick="saveViewArea(\'' + k + '\')">Save Changes</button><button class="slot-btn" onclick="toggleViewArea(\'' + k + '\')">Close</button></div></div><div class="slot-paste-area" id="paste-area-' + k + '"><textarea id="paste-text-' + k + '" placeholder="Paste your full resume text here…"></textarea><div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><button class="slot-btn upload-trigger-btn" onclick="savePastedResume(\'' + k + '\')">Save This Resume</button><button class="slot-btn" onclick="hidePasteArea(\'' + k + '\')">Cancel</button></div></div>';
+    slotsDiv.appendChild(slot);
   });
 })();
 
