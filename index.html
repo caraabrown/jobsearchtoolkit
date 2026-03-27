@@ -4666,6 +4666,7 @@ EDITING RULES:
 - Prioritize: (1) missing hard keywords, (2) missing soft skills the JD emphasizes, (3) verb choice, (4) structure
 - If a bullet needs a keyword added, work it in naturally at the start or end
 - For competencies, add missing keyword clusters as new pipe-separated entries only if they reflect actual skills
+- REMOVE edits: If any content actively hurts the ATS score — irrelevant keywords, off-topic bullets, or content that signals the wrong domain — flag it as a REMOVE block. Use TYPE: Remove. AFTER field should be empty. WHY should explain what it signals to ATS and why cutting it improves match. Only flag genuine ATS liabilities, not general quality issues.
 
 Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.${additionalExp ? `\n\nADDITIONAL EXPERIENCE TO INCORPORATE:\nThe candidate has provided additional experience not currently in the resume. For each item below, generate an INSERT block showing exactly where and how to add it. Use this format:\n\nSECTION: [best section to insert into]\nCONTEXT: [the line it should appear near]\nBEFORE: INSERT\nAFTER: [the new line or bullet, complete and ready to paste]\nTYPE: [Insert]\nWHY: [one sentence on why this addition improves ATS match]\n\nAdditional experience:\n${additionalExp}` : ''}`;
 
@@ -4826,6 +4827,7 @@ function renderEditBlocks(rawText, container) {
     const impact = parseInt(scoreImpact) || 0;
     const editId = 'edit-block-' + i;
     const isInsert = before === 'INSERT' || (type || '').toLowerCase() === 'insert';
+    const isRemove = (type || '').toLowerCase() === 'remove';
     html += `<div class="edit-block" id="${editId}" data-impact="${impact}" data-checked="false">
    <div class="edit-block-header">
         <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
@@ -4834,14 +4836,14 @@ function renderEditBlocks(rawText, container) {
             <strong>Edit ${i + 1}</strong>
           </label>
           ${section ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#1a1a1a;border-radius:3px;font-size:0.68rem;font-weight:600;color:#fff;letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}
-          ${type ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:${isInsert ? '#fff3e0' : '#e8f0fe'};border:1px solid ${isInsert ? '#f0c080' : '#c5d4f5'};border-radius:3px;font-size:0.68rem;font-weight:600;color:${isInsert ? '#a05000' : '#2a4db5'};letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}
+          ${isRemove ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#fdf0f0;border:1px solid #f0c0c0;border-radius:3px;font-size:0.68rem;font-weight:700;color:#8b2020;letter-spacing:0.02em;">Safe to Remove</span>` : (type ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:${isInsert ? '#fff3e0' : '#e8f0fe'};border:1px solid ${isInsert ? '#f0c080' : '#c5d4f5'};border-radius:3px;font-size:0.68rem;font-weight:600;color:${isInsert ? '#a05000' : '#2a4db5'};letter-spacing:0.02em;">${escHtml(type)}</span>` : '')}
           ${impact > 0 ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#eaf7ee;border:1px solid #b2dfc0;border-radius:3px;font-size:0.68rem;font-weight:700;color:#1e6b35;">+${impact} pts</span>` : ''}
           <button onclick="var el=document.getElementById('${editId}');el.style.opacity='0.4';el.style.pointerEvents='none';el.dataset.checked='rejected';" title="Skip this edit" style="margin-left:auto;background:transparent;border:1px solid #ddd;border-radius:3px;padding:0.15rem 0.5rem;font-size:0.75rem;color:#aaa;cursor:pointer;line-height:1;">✕</button>
         </div>
       </div>
-      ${isInsert ? `<div class="edit-row-before" style="background:#fff8ee;border-color:#f0c080;"><span class="edit-label" style="color:#a05000;">Insert new</span>${escHtml(after)}</div>` : `<div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>`}
+      ${isRemove ? `<div class="edit-row-before" style="background:#fdf0f0;border-color:#f0c0c0;"><span class="edit-label" style="color:#8b2020;">Remove</span>${escHtml(before)}</div>` : isInsert ? `<div class="edit-row-before" style="background:#fff8ee;border-color:#f0c080;"><span class="edit-label" style="color:#a05000;">Insert new</span>${escHtml(after)}</div>` : `<div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>`}
       ${context ? `<div style="font-size:0.75rem;color:#888;font-style:italic;padding:0.35rem 0.75rem;background:#f9f9f9;border-left:3px solid #ddd;margin:0 0 0.25rem;line-height:1.5;"><span style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:#aaa;display:block;margin-bottom:0.2rem;">Surrounding context</span>${escHtml(context)}</div>` : ''}
-      ${!isInsert ? `<div class="edit-row-after" id="after-${i}"><span class="edit-label">Replace with</span><span class="after-text">${escHtml(after)}</span><button class="copy-btn" style="float:right;margin-left:0.5rem;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="var t=this.previousElementSibling.textContent;navigator.clipboard.writeText(t).then(function(){},function(){});this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy'},2000)">Copy</button></div>` : ''}
+      ${!isInsert && !isRemove ? `<div class="edit-row-after" id="after-${i}"><span class="edit-label">Replace with</span><span class="after-text">${escHtml(after)}</span><button class="copy-btn" style="float:right;margin-left:0.5rem;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="var t=this.previousElementSibling.textContent;navigator.clipboard.writeText(t).then(function(){},function(){});this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy'},2000)">Copy</button></div>` : ''}
       ${why ? `<div class="edit-row-why">💡 ${escHtml(why)}</div>` : ''}
     </div>`;
   });
@@ -5348,6 +5350,17 @@ buildUploadSlots();
 // Fix 2: sync selectedLeResume to atsHighestResume if one was stored from a previous ATS run
 if (atsHighestResume && RESUMES[atsHighestResume]) {
   selectedLeResume = atsHighestResume;
+  // Visually select the pill and show confirm banner
+  document.querySelectorAll('#le-resume-pills .pill').forEach(p => {
+    p.classList.toggle('selected', p.dataset.resume === atsHighestResume);
+  });
+  const autoName = document.getElementById('le-auto-resume-name');
+  if (autoName) autoName.textContent = RESUMES[atsHighestResume].label;
+  const hint = document.getElementById('le-auto-hint');
+  if (hint) hint.style.display = 'block';
+  const confirm = document.getElementById('le-resume-confirm');
+  const confirmName = document.getElementById('le-resume-confirm-name');
+  if (confirm && confirmName) { confirmName.textContent = RESUMES[atsHighestResume].label; confirm.style.display = 'block'; }
 }
 renderAllOptimizers();
 renderAtsHistory();
