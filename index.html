@@ -1989,15 +1989,15 @@
         <div class="result-box" id="salary-result">
           <button class="copy-btn" onclick="copyResult('salary-active-output')">Copy</button>
           <div class="tab-row" id="salary-result-tabs" style="margin-bottom:1rem;">
-            <div class="tab active" data-saltab="positioning">Final Positioning</div>
-            <div class="tab" data-saltab="market">Market Rate</div>
+            <div class="tab active" data-saltab="market">Market Rate</div>
             <div class="tab" data-saltab="numbers">Your Numbers</div>
+            <div class="tab" data-saltab="positioning">Final Positioning</div>
             <div class="tab" data-saltab="scripts">Negotiation Scripts</div>
             <div class="tab" data-saltab="traps">Traps to Avoid</div>
           </div>
-          <div id="salary-tab-positioning" class="stream-output salary-tab-content"></div>
-          <div id="salary-tab-market" class="stream-output salary-tab-content" style="display:none;"></div>
+          <div id="salary-tab-market" class="stream-output salary-tab-content"></div>
           <div id="salary-tab-numbers" class="stream-output salary-tab-content" style="display:none;"></div>
+          <div id="salary-tab-positioning" class="stream-output salary-tab-content" style="display:none;"></div>
           <div id="salary-tab-scripts" class="stream-output salary-tab-content" style="display:none;"></div>
           <div id="salary-tab-traps" class="stream-output salary-tab-content" style="display:none;"></div>
           <div id="salary-output" class="stream-output" style="display:none;"></div>
@@ -4178,12 +4178,12 @@ document.getElementById('salary-result-tabs').addEventListener('click', e => {
   const tab = e.target.closest('.tab'); if (!tab) return;
   document.querySelectorAll('#salary-result-tabs .tab').forEach(t => t.classList.remove('active'));
   tab.classList.add('active');
-  ['positioning','market','numbers','scripts','traps'].forEach(key => {
+  ['market','numbers','positioning','scripts','traps'].forEach(key => {
     const el = document.getElementById('salary-tab-' + key); if (el) el.style.display = tab.dataset.saltab === key ? 'block' : 'none';
   });
   const activeEl = document.getElementById('salary-tab-' + tab.dataset.saltab);
   const activeOut = document.getElementById('salary-active-output');
-  if (activeEl && activeOut) activeOut.textContent = activeEl.textContent;
+  if (activeEl && activeOut) activeOut.innerHTML = activeEl.innerHTML;
 });
 
 document.getElementById('gen-salary-btn').addEventListener('click', async () => {
@@ -4195,39 +4195,104 @@ document.getElementById('gen-salary-btn').addEventListener('click', async () => 
   const situation = document.getElementById('sal-situation').value.trim();
   showLoading('salary-loading'); hideError('salary-error');
   document.getElementById('salary-result').classList.remove('visible');
+
   const systemPrompt = 'You are an expert salary negotiation coach with deep knowledge of design, strategy, and consulting markets. Give specific numbers and exact language.';
-  const userMsg = ['Build a salary research brief and negotiation strategy for Cara Brown.', 'Role: ' + role, location ? 'Location: ' + location : null, companyType ? 'Company type: ' + companyType : null, offered ? 'Offered or mentioned: ' + offered : null, situation ? 'Situation: ' + situation : null, 'Cara: 15+ years, MBA, Principal-level, $270M enterprise impact, C-suite partnerships.',
-    'Output EXACTLY these five sections with these headers:\n\n## FINAL POSITIONING\n[2-3 sentence confident summary]\n\n## MARKET RATE\n[Realistic salary ranges by level and sector]\n\n## CARAS NUMBERS\n[Target, floor, and stretch — specific dollar amounts]\n\n## NEGOTIATION SCRIPTS\n[Exact language for: salary expectations question, countering a lowball, asking for time, negotiating total comp]\n\n## TRAPS TO AVOID\n[3-4 specific mistakes and how to handle them]'
+  const userMsg = [
+    'Build a salary research brief and negotiation strategy for Cara Brown.',
+    'Role: ' + role,
+    location ? 'Location: ' + location : null,
+    companyType ? 'Company type: ' + companyType : null,
+    offered ? 'Offered or mentioned: ' + offered : null,
+    situation ? 'Situation: ' + situation : null,
+    'Cara: 15+ years, MBA, Principal-level, $270M enterprise impact, C-suite partnerships.',
+    `Output EXACTLY these five sections with these exact headers (no variation):
+
+## MARKET RATE
+Realistic base salary ranges for this role by company type and sector. Use a markdown table with columns: | Company Type | Level | Base Salary Range | Notes |. Then 2-3 sentences of context on market conditions.
+
+## YOUR NUMBERS
+A markdown table with columns: | Number | Amount | Rationale |. Rows: Target Base, Floor (walk-away), Stretch, Total Comp Target. Then one sentence on Cara's positioning leverage for this specific role.
+
+## FINAL POSITIONING
+2-3 sentence confident narrative summary of how Cara should position herself and her number.
+
+## NEGOTIATION SCRIPTS
+Exact word-for-word language for: (1) When asked salary expectations, (2) Countering a lowball, (3) Asking for time to consider, (4) Negotiating total comp beyond base. Use bold labels for each script.
+
+## TRAPS TO AVOID
+A markdown table with columns: | Trap | Why It Hurts | What to Do Instead |. 3-4 rows.`
   ].filter(Boolean).join('\n\n');
-  ['positioning','market','numbers','scripts','traps'].forEach(tab => { const el = document.getElementById('salary-tab-' + tab); if (el) { el.innerHTML = ''; el.style.display = 'none'; } });
-  document.getElementById('salary-tab-positioning').style.display = 'block';
-  document.querySelectorAll('#salary-result-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===0));
-  let formatSalaryContent = function(raw) {
+
+  function formatSalaryContent(raw) {
     if (!raw) return '';
-    return '<div class="ats-result-section">' + raw.split('\n').map(line => {
-      const t = line.trim(); if (!t) return '';
-      if (/^#{1,3}\s/.test(t)) return '<div class="ats-heading">' + t.replace(/^#+\s*/,'').replace(/\*\*/g,'') + '</div>';
-      if (t.startsWith('**') && t.endsWith('**')) return '<div class="ats-subhead">' + t.replace(/\*\*/g,'') + '</div>';
-      if (/^[\u2713\u2714\u2705✅]/.test(t)) return '<div class="ats-line ats-win">' + t + '</div>';
-      if (/^[\u2717\u2718\u274C❌⚠️🚩]/.test(t)) return '<div class="ats-line ats-warn">' + t + '</div>';
-      if (/^[-•*]\s/.test(t)) return '<div class="ats-bullet">' + t.replace(/^[-•*]\s*/,'') + '</div>';
-      if (/^\d+\.\s*\*\*/.test(t)) return '<div class="ats-subhead">' + t.replace(/^\d+\.\s*/,'').replace(/\*\*/g,'') + '</div>';
-      let html = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      return '<div class="ats-paragraph">' + html + '</div>';
-    }).join('') + '</div>';
-  };
+    function boldify(t) { return t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*\*/g,''); }
+    const lines = raw.split('\n');
+    let out = '<div class="ats-result-section">';
+    let inTable = false, tableHtml = '';
+    for (const line of lines) {
+      const t = line.trim();
+      if (!t) {
+        if (inTable) { out += tableHtml + '</tbody></table></div>'; inTable = false; tableHtml = ''; }
+        continue;
+      }
+      if (t.startsWith('|') && t.endsWith('|')) {
+        if (/^[\|\s\-:]+$/.test(t)) continue;
+        const cells = t.split('|').slice(1,-1).map(c => c.trim());
+        if (!inTable) {
+          inTable = true;
+          tableHtml = '<div style="overflow-x:auto;margin:0.75rem 0;"><table style="width:100%;border-collapse:collapse;font-size:0.82rem;"><thead><tr>' +
+            cells.map(c => `<th style="text-align:left;padding:0.5rem 0.75rem;background:#f7f6f4;border:1px solid #dedede;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:#555;">${boldify(c)}</th>`).join('') +
+            '</tr></thead><tbody>';
+        } else {
+          tableHtml += '<tr>' + cells.map(c => `<td style="padding:0.5rem 0.75rem;border:1px solid #dedede;vertical-align:top;line-height:1.5;">${boldify(c)}</td>`).join('') + '</tr>';
+        }
+        continue;
+      }
+      if (inTable) { out += tableHtml + '</tbody></table></div>'; inTable = false; tableHtml = ''; }
+      if (/^#{1,3}\s/.test(t)) { out += '<div class="ats-heading">' + boldify(t.replace(/^#+\s*/,'')) + '</div>'; continue; }
+      if (t.startsWith('**') && t.endsWith('**')) { out += '<div class="ats-subhead">' + boldify(t) + '</div>'; continue; }
+      if (/^\d+\.\s*\*\*/.test(t)) { out += '<div class="ats-subhead">' + boldify(t.replace(/^\d+\.\s*/,'')) + '</div>'; continue; }
+      if (/^[-•*]\s/.test(t)) { out += '<div class="ats-bullet"><span>' + boldify(t.replace(/^[-•*]\s*/,'')) + '</span></div>'; continue; }
+      out += '<div class="ats-paragraph">' + boldify(t) + '</div>';
+    }
+    if (inTable) out += tableHtml + '</tbody></table></div>';
+    return out + '</div>';
+  }
+
+  function salSection(txt, startRe, endRe) {
+    const sm = txt.search(startRe);
+    if (sm < 0) return '';
+    const em = endRe ? txt.search(endRe) : -1;
+    const raw = (em > sm ? txt.substring(sm, em) : txt.substring(sm)).trim();
+    // Strip the section header line itself
+    return raw.replace(/^##\s+[A-Z ]+\n?/,'').trim();
+  }
+
+  ['market','numbers','positioning','scripts','traps'].forEach(tab => {
+    const el = document.getElementById('salary-tab-' + tab);
+    if (el) { el.innerHTML = ''; el.style.display = 'none'; }
+  });
+  document.getElementById('salary-tab-market').style.display = 'block';
+  document.querySelectorAll('#salary-result-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===0));
+
   try {
     document.getElementById('salary-result').classList.add('visible');
     let fullSalText = '';
-    await callClaude(systemPrompt, userMsg, text => { fullSalText = text; document.getElementById('salary-tab-positioning').innerHTML = formatSalaryContent(text); });
-    function salSection(txt, startRe, endRe) { const sm = txt.search(startRe); if (sm < 0) return txt; const em = endRe ? txt.search(endRe) : -1; return (em > sm ? txt.substring(sm, em) : txt.substring(sm)).replace(/^##\s*/gm,'').replace(/\*\*/g,'').trim(); }
-    document.getElementById('salary-tab-positioning').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*FINAL POSITIONING/i, /##\s*MARKET RATE/i));
-    document.getElementById('salary-tab-market').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*MARKET RATE/i, /##\s*CARAS NUMBERS/i));
-    document.getElementById('salary-tab-numbers').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*CARAS NUMBERS/i, /##\s*NEGOTIATION SCRIPTS/i));
-    document.getElementById('salary-tab-scripts').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*NEGOTIATION SCRIPTS/i, /##\s*TRAPS TO AVOID/i));
-    document.getElementById('salary-tab-traps').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*TRAPS TO AVOID/i, null));
-    document.getElementById('salary-active-output').innerHTML = document.getElementById('salary-tab-positioning').innerHTML;
-  } catch (err) { showError('salary-error', 'Error: ' + err.message); document.getElementById('salary-result').classList.remove('visible');
+    // Stream into market tab while loading
+    await callClaude(systemPrompt, userMsg, text => {
+      fullSalText = text;
+      document.getElementById('salary-tab-market').innerHTML = formatSalaryContent(text);
+    });
+    // On complete, split into sections
+    document.getElementById('salary-tab-market').innerHTML      = formatSalaryContent(salSection(fullSalText, /##\s*MARKET RATE/i,        /##\s*YOUR NUMBERS/i));
+    document.getElementById('salary-tab-numbers').innerHTML     = formatSalaryContent(salSection(fullSalText, /##\s*YOUR NUMBERS/i,        /##\s*FINAL POSITIONING/i));
+    document.getElementById('salary-tab-positioning').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*FINAL POSITIONING/i,   /##\s*NEGOTIATION SCRIPTS/i));
+    document.getElementById('salary-tab-scripts').innerHTML     = formatSalaryContent(salSection(fullSalText, /##\s*NEGOTIATION SCRIPTS/i, /##\s*TRAPS TO AVOID/i));
+    document.getElementById('salary-tab-traps').innerHTML       = formatSalaryContent(salSection(fullSalText, /##\s*TRAPS TO AVOID/i,      null));
+    document.getElementById('salary-active-output').innerHTML   = document.getElementById('salary-tab-market').innerHTML;
+  } catch (err) {
+    showError('salary-error', 'Error: ' + err.message);
+    document.getElementById('salary-result').classList.remove('visible');
   } finally { hideLoading('salary-loading'); }
 });
 
@@ -4249,22 +4314,45 @@ document.getElementById('gen-recruiter-btn').addEventListener('click', async () 
     'Role: ' + recRole,
     'Recruiter details: ' + recInfo,
     recJD ? 'JD or details shared: ' + recJD : null,
-    'Provide: 1. SITUATION ASSESSMENT — what is likely happening  2. RECRUITER LEGITIMACY — for each recruiter: tier (primary/secondary/body shop), red flags, green flags  3. DUPLICATE SUBMISSION RISK — what happens if two agencies submit her, how to protect herself  4. WHO TO RESPOND TO — specific recommendation and in what order  5. QUESTIONS TO ASK BEFORE CONSENTING — exact questions to ask each recruiter  6. PROTOCOL GOING FORWARD — standard process to avoid this again'
+    'Provide:\n1. **SITUATION ASSESSMENT** — what is likely happening\n2. **RECRUITER LEGITIMACY** — a markdown table with columns: | Recruiter | Tier | Red Flags | Green Flags | Recommendation |\n3. **DUPLICATE SUBMISSION RISK** — what happens if two agencies submit her, how to protect herself\n4. **WHO TO RESPOND TO** — specific recommendation and in what order\n5. **QUESTIONS TO ASK BEFORE CONSENTING** — exact questions to ask each recruiter\n6. **PROTOCOL GOING FORWARD** — standard process to avoid this again'
   ].filter(Boolean).join('\n\n');
   
   let formatRecruiterContent = function(raw) {
     if (!raw) return '';
-    return '<div class="ats-result-section">' + raw.split('\n').map(line => {
-      const t = line.trim(); if (!t) return '';
-      if (/^#{1,3}\s/.test(t)) return '<div class="ats-heading">' + t.replace(/^#+\s*/,'').replace(/\*\*/g,'') + '</div>';
-      if (t.startsWith('**') && t.endsWith('**')) return '<div class="ats-subhead">' + t.replace(/\*\*/g,'') + '</div>';
-      if (/^[\u2713\u2714\u2705✅]/.test(t)) return '<div class="ats-line ats-win">' + t + '</div>';
-      if (/^[\u2717\u2718\u274C❌⚠️🚩]/.test(t)) return '<div class="ats-line ats-warn">' + t + '</div>';
-      if (/^[-•*]\s/.test(t)) return '<div class="ats-bullet">' + t.replace(/^[-•*]\s*/,'') + '</div>';
-      if (/^\d+\.\s*\*\*/.test(t)) return '<div class="ats-subhead">' + t.replace(/^\d+\.\s*/,'').replace(/\*\*/g,'') + '</div>';
-      let html = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      return '<div class="ats-paragraph">' + html + '</div>';
-    }).join('') + '</div>';
+    function boldify(t) { return t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*\*/g,''); }
+    const lines = raw.split('\n');
+    let out = '<div class="ats-result-section">';
+    let inTable = false, tableHtml = '';
+    for (const line of lines) {
+      const t = line.trim();
+      if (!t) {
+        if (inTable) { out += tableHtml + '</tbody></table></div>'; inTable = false; tableHtml = ''; }
+        continue;
+      }
+      if (t.startsWith('|') && t.endsWith('|')) {
+        if (/^[\|\s\-:]+$/.test(t)) continue;
+        const cells = t.split('|').slice(1,-1).map(c => c.trim());
+        if (!inTable) {
+          inTable = true;
+          tableHtml = '<div style="overflow-x:auto;margin:0.75rem 0;"><table style="width:100%;border-collapse:collapse;font-size:0.82rem;"><thead><tr>' +
+            cells.map(c => `<th style="text-align:left;padding:0.5rem 0.75rem;background:#f7f6f4;border:1px solid #dedede;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:#555;">${boldify(c)}</th>`).join('') +
+            '</tr></thead><tbody>';
+        } else {
+          tableHtml += '<tr>' + cells.map(c => `<td style="padding:0.5rem 0.75rem;border:1px solid #dedede;vertical-align:top;line-height:1.5;">${boldify(c)}</td>`).join('') + '</tr>';
+        }
+        continue;
+      }
+      if (inTable) { out += tableHtml + '</tbody></table></div>'; inTable = false; tableHtml = ''; }
+      if (/^#{1,3}\s/.test(t)) { out += '<div class="ats-heading">' + boldify(t.replace(/^#+\s*/,'')) + '</div>'; continue; }
+      if (t.startsWith('**') && t.endsWith('**')) { out += '<div class="ats-subhead">' + boldify(t) + '</div>'; continue; }
+      if (/^\d+\.\s*\*\*/.test(t)) { out += '<div class="ats-subhead">' + boldify(t.replace(/^\d+\.\s*/,'')) + '</div>'; continue; }
+      if (/^[\u2713\u2714\u2705✅]/.test(t)) { out += `<div class="ats-line ats-win"><span class="ats-line-icon">✓</span><span>${boldify(t.replace(/^[\u2713\u2714\u2705✅]\s*/,''))}</span></div>`; continue; }
+      if (/^[\u2717\u2718\u274C❌⚠️🚩]/.test(t)) { out += `<div class="ats-line ats-warn"><span class="ats-line-icon">✕</span><span>${boldify(t.replace(/^[\u2717\u2718\u274C❌⚠️🚩]\s*/,''))}</span></div>`; continue; }
+      if (/^[-•*]\s/.test(t)) { out += '<div class="ats-bullet"><span>' + boldify(t.replace(/^[-•*]\s*/,'')) + '</span></div>'; continue; }
+      out += '<div class="ats-paragraph">' + boldify(t) + '</div>';
+    }
+    if (inTable) out += tableHtml + '</tbody></table></div>';
+    return out + '</div>';
   };
   
   try {
