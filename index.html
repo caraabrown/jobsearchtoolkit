@@ -1494,6 +1494,9 @@
       <label>Additional context (optional)</label>
       <textarea id="why-context" placeholder="Add any personal notes, things that specifically excited you about this role, the company, or the team…" rows="5"></textarea>
 
+      <label>Word limit (optional)</label>
+      <input type="text" id="why-word-limit" placeholder="e.g., 250 words or ~3 paragraphs">
+
       <div class="btn-row">
         <button class="btn" id="gen-why-btn">Generate Answer</button>
       </div>
@@ -1504,6 +1507,7 @@
       <div class="result-box" id="why-result">
         <button class="copy-btn" onclick="copyResult('why-output')">Copy</button>
         <div class="stream-output" id="why-output"></div>
+        <div id="why-counter" style="margin-top:0.6rem;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.08em;color:var(--mid);text-align:right;display:none;">0 words · 0 characters</div>
       </div>
 
       <div class="loading" id="why-qc-loading"><div class="spinner"></div>Running quality check…</div>
@@ -1522,6 +1526,9 @@
       <label>Application Question *</label>
       <textarea id="custom-question" placeholder="e.g., Describe a time you had to influence without authority to drive enterprise-wide change…" rows="5"></textarea>
 
+      <label>Additional Experience to Incorporate <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+      <textarea id="qa-extra-context" placeholder="e.g., Include my work leading the Kroger NPS program — I managed a cross-functional team of 12 and reduced escalations by 40%. Also relevant: my Oakland civic tech project for property rights advocacy." rows="4" style="min-height:90px;"></textarea>
+
       <label>Word limit (optional)</label>
       <input type="text" id="word-limit" placeholder="e.g., 250 words or ~3 paragraphs">
 
@@ -1535,6 +1542,7 @@
       <div class="result-box" id="qa-result">
         <button class="copy-btn" onclick="copyResult('qa-output')">Copy</button>
         <div class="stream-output" id="qa-output"></div>
+        <div id="qa-counter" style="margin-top:0.6rem;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.08em;color:var(--mid);text-align:right;display:none;">0 words · 0 characters</div>
       </div>
     </div>
 
@@ -1542,7 +1550,7 @@
     <div class="panel" id="panel-job-tracker">
       <div class="panel-title">Job <em>Tracker</em></div>
       <div class="divider"></div>
-      <div class="panel-desc">Track every application in one place. Log jobs, mark your progress through each stage, and watch your weekly momentum build. Goal: <input type="number" id="daily-goal-input" value="5" min="1" max="99" style="width:3rem;font-family:inherit;font-size:inherit;border:none;border-bottom:1.5px solid var(--black);background:transparent;text-align:center;font-weight:700;color:var(--black);padding:0 2px;"> applications per day.</div>
+      <div class="panel-desc">Track every application in one place. Log jobs, mark your progress through each stage, and watch your weekly momentum build. Goal: <input type="number" id="daily-goal-input" value="5" min="1" max="99" style="width:3rem;font-family:inherit;font-size:inherit;border:none;border-bottom:1.5px solid var(--black);background:transparent;text-align:center;font-weight:700;color:var(--black);padding:0 2px;"> applications per day &nbsp;·&nbsp; LinkedIn outreach goal: <input type="number" id="linkedin-goal-input" value="5" min="1" max="99" style="width:3rem;font-family:inherit;font-size:inherit;border:none;border-bottom:1.5px solid var(--black);background:transparent;text-align:center;font-weight:700;color:var(--black);padding:0 2px;"> messages/connections per week.</div>
 
       <div class="quote-block" id="quote-block">
         <div class="quote-text" id="quote-text"></div>
@@ -1555,6 +1563,15 @@
         <div class="stat-card"><div class="stat-num" id="stat-active">0</div><div class="stat-label">In Progress</div><div class="stat-sub">(Screening or Interview)</div></div>
         <div class="stat-card"><div class="stat-num" id="stat-week-screen">0</div><div class="stat-label">Screenings This Week</div></div>
         <div class="stat-card"><div class="stat-num" id="stat-week-interview">0</div><div class="stat-label">Interviews This Week</div></div>
+        <div class="stat-card">
+          <div style="display:flex;align-items:baseline;justify-content:center;gap:0.15rem;">
+            <div class="stat-num" id="stat-li-outreach">0</div>
+            <span style="font-size:0.72rem;color:var(--mid);" id="stat-li-goal-display">/ 5</span>
+          </div>
+          <div class="stat-label">LinkedIn Outreach</div>
+          <div class="stat-sub">Messages &amp; Connections</div>
+          <button onclick="logLinkedInOutreach()" style="margin-top:0.4rem;font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;background:var(--black);color:#fff;border:none;border-radius:3px;padding:0.2rem 0.6rem;cursor:pointer;">+ Log One</button>
+        </div>
         <div class="goal-bar-wrap">
           <div class="goal-bar-label"><span>Weekly Progress (Goal: 35 applications)</span><span id="goal-bar-pct">0%</span></div>
           <div class="goal-bar-track"><div class="goal-bar-fill" id="goal-bar-fill" style="width:0%"></div></div>
@@ -1633,6 +1650,7 @@
         <div class="stream-output" id="research-output"></div>
         <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--border);">
           <button class="btn" id="research-to-edits-btn" style="font-size:0.75rem;padding:0.5rem 1.2rem;">Turn Recommendations into Line-by-Line Edits →</button>
+          <button class="btn" id="research-to-cover-btn" style="font-size:0.75rem;padding:0.5rem 1.2rem;margin-left:0.5rem;background:transparent;border:1px solid var(--border);color:var(--mid);">Turn Recommendations into Cover Letter →</button>
           <div style="font-size:0.72rem;color:var(--mid);margin-top:0.4rem;">Takes insights from this brief and generates targeted resume edits and cover letter additions.</div>
         </div>
       </div>
@@ -1920,6 +1938,10 @@
       <div class="result-box" id="fu-result">
         <button class="copy-btn" onclick="copyResult('fu-output')">Copy</button>
         <div class="stream-output" id="fu-output"></div>
+        <div style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--border);">
+          <button class="btn" id="fu-save-tasks-btn" style="font-size:0.75rem;padding:0.5rem 1.2rem;">Save Tasks to Job Tracker →</button>
+          <div style="font-size:0.72rem;color:var(--mid);margin-top:0.4rem;" id="fu-save-tasks-msg"></div>
+        </div>
       </div>
     </div>
 
@@ -3202,6 +3224,7 @@ document.getElementById('gen-why-btn').addEventListener('click', async () => {
   if (!jd) { showError('why-error', 'Please save a job description in Step 01 first.'); return; }
 
   const context = document.getElementById('why-context').value.trim();
+  const whyWordLimit = document.getElementById('why-word-limit').value.trim();
 
   showLoading('why-loading');
   hideError('why-error');
@@ -3232,6 +3255,7 @@ REQUIREMENTS:
 - Draw on real accomplishments from her background
 - Keep each answer to 2-3 focused paragraphs
 - Make the connection between her unique trajectory and this specific role feel natural and inevitable
+${whyWordLimit ? `- Word/length limit: ${whyWordLimit}` : ''}
 
 Format as:
 WHY I CHOSE THIS ROLE:
@@ -3242,11 +3266,19 @@ WHY I WILL BE A GREAT FIT:
 
   try {
     const output = document.getElementById('why-output');
+    const whyCounter = document.getElementById('why-counter');
     output.textContent = '';
     document.getElementById('why-result').classList.add('visible');
     document.getElementById('why-qc-result').style.display = 'none';
     let whyText = '';
-    await callClaude(systemPrompt, userMsg, text => { whyText = text; output.textContent = text; });
+    whyCounter.style.display = 'none';
+    await callClaude(systemPrompt, userMsg, text => {
+      whyText = text; output.textContent = text;
+      const trimmed = text.trim();
+      const w = trimmed ? trimmed.split(/\s+/).length : 0;
+      whyCounter.textContent = w + ' word' + (w !== 1 ? 's' : '') + ' · ' + trimmed.length + ' character' + (trimmed.length !== 1 ? 's' : '');
+      whyCounter.style.display = 'block';
+    });
 
     // Quality check second pass
     if (whyText && whyText.length > 100) {
@@ -3289,6 +3321,7 @@ document.getElementById('gen-qa-btn').addEventListener('click', async () => {
   if (!question) { showError('qa-error', 'Please enter a question.'); return; }
 
   const wordLimit = document.getElementById('word-limit').value.trim();
+  const extraContext = document.getElementById('qa-extra-context').value.trim();
   const jd = savedJD;
 
   showLoading('qa-loading');
@@ -3304,6 +3337,7 @@ ${wordLimit ? `WORD/LENGTH LIMIT: ${wordLimit}` : ''}
 
 ${jd ? `JOB CONTEXT:\n${jd}\n` : ''}
 ${savedRoleName ? `Role: ${savedRoleName}\n` : ''}
+${extraContext ? `ADDITIONAL EXPERIENCE TO INCORPORATE:\n${extraContext}\n` : ''}
 
 CARA'S BACKGROUND:
 ${CARA_BIO}
@@ -3323,9 +3357,18 @@ Write the answer directly (no preamble).`;
 
   try {
     const output = document.getElementById('qa-output');
+    const counter = document.getElementById('qa-counter');
     output.textContent = '';
     document.getElementById('qa-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+    counter.style.display = 'none';
+    await callClaude(systemPrompt, userMsg, text => {
+      output.textContent = text;
+      const trimmed = text.trim();
+      const words = trimmed ? trimmed.split(/\s+/).length : 0;
+      const chars = trimmed.length;
+      counter.textContent = words + ' word' + (words !== 1 ? 's' : '') + ' · ' + chars + ' character' + (chars !== 1 ? 's' : '');
+      counter.style.display = 'block';
+    });
   } catch (err) {
     showError('qa-error', 'Something went wrong: ' + err.message);
     document.getElementById('qa-result').classList.remove('visible');
@@ -3465,6 +3508,12 @@ function updateTrackerStats() {
   document.getElementById('goal-bar-fill').style.width = pct + '%';
   document.getElementById('goal-bar-pct').textContent = weekJobs.length + ' / ' + weekGoal + '  (' + pct + '%)';
   const wg = document.getElementById('stat-week-goal'); if (wg) wg.textContent = 'Goal: ' + weekGoal + ' / week';
+  const liLog = JSON.parse(localStorage.getItem('cara_li_outreach') || '[]');
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+  const liWeekCount = liLog.filter(ts => (Date.now() - ts) < weekMs).length;
+  const liGoal = parseInt(localStorage.getItem('cara_li_goal') || '5');
+  const liEl = document.getElementById('stat-li-outreach'); if (liEl) liEl.textContent = liWeekCount;
+  const liGoalEl = document.getElementById('stat-li-goal-display'); if (liGoalEl) liGoalEl.textContent = '/ ' + liGoal;
 }
 
 function formatDate(isoStr) { return new Date(isoStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
@@ -3519,9 +3568,11 @@ function renderJobs() {
       <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:0.75rem;">
         <button onclick="event.stopPropagation();switchHubTab('${j.id}','content')" id="hubtab-content-${j.id}" style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.4rem 0.8rem;border:none;border-bottom:2px solid var(--black);background:transparent;color:var(--black);cursor:pointer;font-weight:700;">Content</button>
         <button onclick="event.stopPropagation();switchHubTab('${j.id}','people')" id="hubtab-people-${j.id}" style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.4rem 0.8rem;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--mid);cursor:pointer;">People</button>
+        <button onclick="event.stopPropagation();switchHubTab('${j.id}','followup')" id="hubtab-followup-${j.id}" style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.4rem 0.8rem;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--mid);cursor:pointer;">Follow-Up</button>
       </div>
       <div id="hubpanel-content-${j.id}">${hubHtml}</div>
       <div id="hubpanel-people-${j.id}" style="display:none;">${peopleHtml}</div>
+      <div id="hubpanel-followup-${j.id}" style="display:none;">${buildFollowUpTab(j)}</div>
     </div>`;
     const detailRow = '<tr class="job-detail-row ' + isHired + '" data-detail-id="' + j.id + '" style="display:none;"><td colspan="10" style="padding:1rem 1.2rem;background:var(--bgoff);">' + chipsHtml + hubTabsHtml + '</td></tr>';
     return '<tr class="' + isHired + ' job-main-row" data-id="' + j.id + '" ' + isRejected + ' onclick="toggleDetailRow(\'' + j.id + '\')">' +
@@ -3631,7 +3682,7 @@ function escHtml(str) { return String(str || '').replace(/&/g,'&amp;').replace(/
 function toggleStage(id, field, val) { const job = jobs.find(j => j.id === id); if (!job) return; job[field] = val; saveJobs(); renderJobs(); }
 function deleteJob(id) { if (!confirm('Remove this application?')) return; jobs = jobs.filter(j => j.id !== id); saveJobs(); renderJobs(); }
 function switchHubTab(id, tab) {
-  ['content','people'].forEach(t => {
+  ['content','people','followup'].forEach(t => {
     const panel = document.getElementById('hubpanel-' + t + '-' + id);
     const btn = document.getElementById('hubtab-' + t + '-' + id);
     if (!panel || !btn) return;
@@ -3686,6 +3737,71 @@ function updatePersonField(id, idx, field, value) {
 
 function toggleDetailRow(id) { const r = document.querySelector('[data-detail-id="' + id + '"]'); if (r) r.style.display = r.style.display === 'none' ? 'table-row' : 'none'; }
 function saveJobHubField(id, field, value) { const job = jobs.find(j => j.id === id); if (!job) return; job[field] = value; saveJobs(); }
+
+function getFollowUpTasks(id) {
+  const job = jobs.find(j => j.id === id);
+  if (!job) return [];
+  try { return job.hub_followup_tasks ? JSON.parse(job.hub_followup_tasks) : []; } catch(e) { return []; }
+}
+function saveFollowUpTasks(id, tasks) {
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  job.hub_followup_tasks = JSON.stringify(tasks);
+  saveJobs();
+}
+function toggleFollowUpTask(id, idx) {
+  const tasks = getFollowUpTasks(id);
+  if (!tasks[idx]) return;
+  tasks[idx].done = !tasks[idx].done;
+  saveFollowUpTasks(id, tasks);
+  const cb = document.getElementById('futask-cb-' + id + '-' + idx);
+  const label = document.getElementById('futask-label-' + id + '-' + idx);
+  if (cb) cb.checked = tasks[idx].done;
+  if (label) label.style.textDecoration = tasks[idx].done ? 'line-through' : 'none';
+  if (label) label.style.color = tasks[idx].done ? 'var(--mid)' : 'var(--black)';
+}
+function deleteFollowUpTask(id, idx) {
+  const tasks = getFollowUpTasks(id);
+  tasks.splice(idx, 1);
+  saveFollowUpTasks(id, tasks);
+  const panel = document.getElementById('hubpanel-followup-' + id);
+  if (panel) { panel.innerHTML = buildFollowUpTab(jobs.find(j => j.id === id)); }
+}
+function addFollowUpTask(id) {
+  const input = document.getElementById('futask-new-' + id);
+  if (!input || !input.value.trim()) return;
+  const tasks = getFollowUpTasks(id);
+  tasks.push({ task: input.value.trim(), done: false, timing: '' });
+  saveFollowUpTasks(id, tasks);
+  input.value = '';
+  const panel = document.getElementById('hubpanel-followup-' + id);
+  if (panel) { panel.innerHTML = buildFollowUpTab(jobs.find(j => j.id === id)); }
+}
+function buildFollowUpTab(j) {
+  if (!j) return '';
+  const tasks = getFollowUpTasks(j.id);
+  const done = tasks.filter(t => t.done).length;
+  const taskRows = tasks.length ? tasks.map((t, i) => `
+    <div style="display:flex;align-items:flex-start;gap:0.6rem;padding:0.45rem 0;border-bottom:1px solid var(--border);">
+      <input type="checkbox" id="futask-cb-${j.id}-${i}" ${t.done ? 'checked' : ''} onclick="event.stopPropagation();toggleFollowUpTask('${j.id}',${i})" style="margin-top:0.15rem;cursor:pointer;flex-shrink:0;">
+      <div style="flex:1;">
+        ${t.timing ? `<div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:0.1rem;">${t.timing}</div>` : ''}
+        <span id="futask-label-${j.id}-${i}" style="font-size:0.82rem;line-height:1.4;${t.done ? 'text-decoration:line-through;color:var(--mid);' : 'color:var(--black);'}">${escHtml(t.task)}</span>
+      </div>
+      <button onclick="event.stopPropagation();deleteFollowUpTask('${j.id}',${i})" style="background:none;border:none;color:var(--mid);font-size:0.75rem;cursor:pointer;padding:0.1rem 0.3rem;flex-shrink:0;">✕</button>
+    </div>`).join('') : '<div style="font-size:0.82rem;color:var(--mid);padding:0.5rem 0;">No tasks yet. Run the Follow-Up Builder and save tasks here, or add one manually below.</div>';
+  return `<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
+      <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);">Follow-Up Checklist</div>
+      ${tasks.length ? `<div style="font-family:'Raleway',sans-serif;font-size:0.62rem;color:var(--mid);">${done}/${tasks.length} done</div>` : ''}
+    </div>
+    ${taskRows}
+    <div style="display:flex;gap:0.4rem;margin-top:0.75rem;align-items:center;">
+      <input type="text" id="futask-new-${j.id}" placeholder="Add a task manually…" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter'){event.preventDefault();event.stopPropagation();addFollowUpTask('${j.id}');}" style="flex:1;font-size:0.8rem;padding:0.35rem 0.6rem;border:1px solid var(--border);border-radius:3px;background:var(--bg);color:var(--black);">
+      <button onclick="event.stopPropagation();addFollowUpTask('${j.id}')" style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.35rem 0.8rem;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--mid);cursor:pointer;white-space:nowrap;">+ Add</button>
+    </div>
+  </div>`;
+}
 document.getElementById('manual-add-btn').addEventListener('click', () => {
   const wrap = document.getElementById('manual-add-wrap');
   wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
@@ -3942,6 +4058,19 @@ INTEGRITY RULES: Never add industries, titles, credentials or skills not evidenc
   finally { hideLoading('le-loading'); }
 });
 
+document.getElementById('research-to-cover-btn')?.addEventListener('click', () => {
+  const researchText = document.getElementById('research-output')?.innerText || '';
+  if (!researchText.trim()) return;
+  // Store the research brief as cover letter context and navigate
+  const clContext = document.getElementById('cl-anecdote');
+  if (clContext) clContext.value = 'Use the following company research to personalize the cover letter:\n\n' + researchText.substring(0, 1500);
+  document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const clLink = document.querySelector('nav a[data-panel="cover-letter"]');
+  if (clLink) clLink.classList.add('active');
+  document.getElementById('panel-cover-letter').classList.add('active');
+});
+
 
 let selectedInterviewStage = 'phone';
 let selectedInterviewResume = 'principal_ds';
@@ -4166,7 +4295,9 @@ function renderDashboard() {
     return sum + (scores.length ? scores.reduce((a,b) => a+b,0)/scores.length : 0);
   }, 0) / history.length) : null;
 
-  // Stat cards
+  const liOutreachRaw = JSON.parse(localStorage.getItem('cara_li_outreach') || '[]');
+  const liWeekCount = liOutreachRaw.filter(ts => (Date.now() - ts) < weekMs).length;
+  const liGoal = parseInt(localStorage.getItem('cara_li_goal') || '5');
   const stats = [
     { num: weekJobs.length, label: 'Applied This Week' },
     { num: active.length, label: 'Active Pipeline' },
@@ -4174,6 +4305,7 @@ function renderDashboard() {
     { num: rejected.length, label: 'Rejections' },
     { num: hired.length, label: 'Offers', green: true },
     { num: avgAts !== null ? avgAts + '%' : '—', label: 'Avg ATS Score' },
+    { num: liWeekCount + ' / ' + liGoal, label: 'LinkedIn Outreach (wk)' },
   ];
   const statsEl = document.getElementById('dash-stats');
   if (statsEl) statsEl.innerHTML = stats.map(s =>
@@ -4216,6 +4348,14 @@ function renderDashboard() {
       </div>`;
     }).join('') : '<span style="color:var(--mid);font-size:0.8rem;">No applications yet.</span>';
   }
+}
+
+function logLinkedInOutreach() {
+  const log = JSON.parse(localStorage.getItem('cara_li_outreach') || '[]');
+  log.push(Date.now());
+  localStorage.setItem('cara_li_outreach', JSON.stringify(log));
+  updateTrackerStats();
+  renderDashboard();
 }
 
 async function generateDashFocus() {
@@ -4620,6 +4760,35 @@ document.getElementById('gen-fu-btn')?.addEventListener('click', async () => {
     out.innerHTML = formatMarkdown(full);
   } catch(e) { showError('fu-error', e.message); document.getElementById('fu-result').classList.remove('visible'); }
   finally { hideLoading('fu-loading'); }
+});
+
+document.getElementById('fu-save-tasks-btn')?.addEventListener('click', async () => {
+  const fuText = document.getElementById('fu-output')?.innerText || '';
+  if (!fuText.trim()) return;
+  const sel = document.getElementById('fu-job-picker');
+  const jobId = sel?.value || currentJobId;
+  if (!jobId) {
+    document.getElementById('fu-save-tasks-msg').textContent = 'Please load a job from the picker above first.';
+    return;
+  }
+  const job = jobs.find(j => j.id === jobId);
+  if (!job) return;
+  const msgEl = document.getElementById('fu-save-tasks-msg');
+  msgEl.textContent = 'Extracting tasks…';
+  const sys = 'You extract follow-up action items from job search follow-up sequences. Return ONLY a JSON array, no markdown, no explanation.';
+  const msg = `Extract every discrete action item from this follow-up sequence as a JSON array. Each item: {"task":"<what to do, e.g. Send LinkedIn connection request>","timing":"<e.g. Day 1, Day 7–10, Day 12–17>"}.\n\nSEQUENCE:\n${fuText}`;
+  try {
+    let raw = '';
+    await callClaude(sys, msg, t => { raw = t; });
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    const tasks = parsed.map(t => ({ task: t.task || '', timing: t.timing || '', done: false }));
+    const existing = getFollowUpTasks(jobId);
+    saveFollowUpTasks(jobId, [...existing, ...tasks]);
+    msgEl.textContent = '✓ ' + tasks.length + ' task' + (tasks.length !== 1 ? 's' : '') + ' saved to ' + (job.role || 'job') + (job.company ? ' at ' + job.company : '') + '. Open the tracker row → Follow-Up tab to see them.';
+  } catch(e) {
+    msgEl.textContent = 'Could not parse tasks. Try adding them manually in the Follow-Up tab.';
+  }
 });
 
 // Init tracker on load
@@ -5502,7 +5671,12 @@ if (savedRoleName) document.getElementById('job-role-name').value = savedRoleNam
 
 const savedGoal = localStorage.getItem('cara_daily_goal');
 if (savedGoal) { const goalEl = document.getElementById('daily-goal-input'); if (goalEl) goalEl.value = savedGoal; }
-document.addEventListener('change', function(e) { if (e.target && e.target.id === 'daily-goal-input') { localStorage.setItem('cara_daily_goal', e.target.value); updateTrackerStats(); } });
+const savedLiGoal = localStorage.getItem('cara_li_goal');
+if (savedLiGoal) { const liGoalEl = document.getElementById('linkedin-goal-input'); if (liGoalEl) liGoalEl.value = savedLiGoal; }
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.id === 'daily-goal-input') { localStorage.setItem('cara_daily_goal', e.target.value); updateTrackerStats(); }
+  if (e.target && e.target.id === 'linkedin-goal-input') { localStorage.setItem('cara_li_goal', e.target.value); updateTrackerStats(); renderDashboard(); }
+});
 
 </script>
 <!-- Rejection Debrief Modal -->
