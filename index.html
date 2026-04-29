@@ -1354,14 +1354,7 @@
         <div id="ats-detail-output" class="stream-output" style="display:none;"></div>
       </div>
 
-      <div style="margin-top:2rem;border-top:2px solid var(--border);padding-top:1.5rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
-          <div style="font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;color:var(--black);">ATS Score History</div>
-          <button onclick="localStorage.removeItem('cara_ats_history');renderAtsHistory();" style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;background:transparent;border:1px solid var(--border);border-radius:3px;padding:0.2rem 0.6rem;color:var(--mid);cursor:pointer;">Clear</button>
-        </div>
-        <div id="ats-history-empty" style="font-size:0.82rem;color:var(--mid);">Run your first ATS analysis to start tracking score progress.</div>
-        <div id="ats-history-chart" style="display:none;overflow-x:auto;"></div>
-      </div>
+
     </div>
 
 
@@ -2567,6 +2560,8 @@ function attachPillListeners() {
       if (pill.classList.contains('selected')) {
         pill.classList.remove('selected');
         selectedLeResume = atsHighestResume || null;
+        if (atsHighestResume) localStorage.setItem('cara_sess_le_resume', atsHighestResume);
+        else localStorage.removeItem('cara_sess_le_resume');
         document.getElementById('le-auto-hint').style.display = atsHighestResume ? 'block' : 'none';
         if (confirm && confirmName) {
           confirmName.textContent = atsHighestResume ? RESUMES[atsHighestResume].label : '(none selected)';
@@ -2576,6 +2571,7 @@ function attachPillListeners() {
         document.querySelectorAll('#le-resume-pills .pill').forEach(p => p.classList.remove('selected'));
         pill.classList.add('selected');
         selectedLeResume = pill.dataset.resume;
+        localStorage.setItem('cara_sess_le_resume', pill.dataset.resume);
         document.getElementById('le-auto-hint').style.display = 'none';
         if (confirm && confirmName) { confirmName.textContent = RESUMES[pill.dataset.resume]?.label || pill.dataset.resume; confirm.style.display = 'block'; }
       }
@@ -4388,6 +4384,7 @@ function renderDashboard() {
   const liGoal = parseInt(localStorage.getItem('cara_li_goal') || '5');
   const stats = [
     { num: weekJobs.length, label: 'Applied This Week' },
+    { num: jobs.length, label: 'Total Applied' },
     { num: active.length, label: 'Active Pipeline' },
     { num: interviews.length, label: 'Total Interviews' },
     { num: rejected.length, label: 'Rejections' },
@@ -4524,7 +4521,7 @@ document.getElementById('gen-rejection-btn')?.addEventListener('click', async ()
 });
 
 
-function renderAtsHistory() {
+function renderAtsHistory() { return; // removed
   const history = JSON.parse(localStorage.getItem('cara_ats_history') || '[]');
   const empty = document.getElementById('ats-history-empty');
   const chart = document.getElementById('ats-history-chart');
@@ -4893,7 +4890,7 @@ document.getElementById('new-application-btn').addEventListener('click', () => {
   savedJD = ''; savedJDUrl = ''; savedRoleName = '';
   savedAtsKeywords = ''; savedAtsFlags = ''; savedAtsPath = '';
   atsHighestResume = null;
-  ['cara_sess_jd','cara_sess_jdurl','cara_sess_rolename','cara_sess_ats_kw','cara_sess_ats_flags','cara_sess_ats_path','cara_sess_ats_highest'].forEach(k => localStorage.removeItem(k));
+  ['cara_sess_jd','cara_sess_jdurl','cara_sess_rolename','cara_sess_ats_kw','cara_sess_ats_flags','cara_sess_ats_path','cara_sess_ats_highest','cara_sess_le_resume'].forEach(k => localStorage.removeItem(k));
   // Clear ATS outputs
   ['ats-best-output','ats-keywords-output','ats-flags-output','ats-path-output','score-cards-container'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
   document.getElementById('ats-result')?.classList.remove('visible');
@@ -4965,7 +4962,7 @@ document.getElementById('new-application-btn').addEventListener('click', () => {
   if (jdLink) jdLink.classList.add('active');
   document.getElementById('panel-job-input').classList.add('active');
 });
-let selectedLeResume = 'principal_ds';
+let selectedLeResume = localStorage.getItem('cara_sess_le_resume') || localStorage.getItem('cara_sess_ats_highest') || 'principal_ds';
 let selectedLeFocus = 'full';
 let atsHighestResume = localStorage.getItem('cara_sess_ats_highest') || null;
 
@@ -4980,6 +4977,7 @@ document.querySelectorAll('#le-focus-tabs .tab').forEach(tab => {
 function autoSelectBestResume(resumeKey, resumeLabel) {
   atsHighestResume = resumeKey;
   localStorage.setItem('cara_sess_ats_highest', resumeKey);
+  localStorage.setItem('cara_sess_le_resume', resumeKey);
   document.querySelectorAll('#le-resume-pills .pill').forEach(p => {
     p.classList.toggle('selected', p.dataset.resume === resumeKey);
   });
