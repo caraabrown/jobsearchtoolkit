@@ -1543,6 +1543,24 @@
     <div class="panel" id="panel-job-tracker">
       <div class="panel-title">Job <em>Tracker</em></div>
       <div class="divider"></div>
+
+      <!-- GitHub Sync Banner -->
+      <div id="gist-banner" style="margin-bottom:1.25rem;border:1px solid var(--border);border-radius:6px;padding:0.85rem 1rem;background:var(--bgoff);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+          <div style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:var(--black);">GitHub Sync</div>
+          <div id="gist-status" style="font-size:0.72rem;"></div>
+        </div>
+        <div id="gist-setup-area" style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">
+          <input id="gist-token-input" type="password" placeholder="Paste your GitHub personal access token…" style="flex:1;min-width:200px;font-size:0.78rem;padding:0.4rem 0.6rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--black);">
+          <button onclick="gistConnect()" style="font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.4rem 1rem;border:none;border-radius:4px;background:var(--black);color:var(--bg);cursor:pointer;white-space:nowrap;">Connect</button>
+          <div style="font-size:0.72rem;color:var(--mid);width:100%;">Connect once to save your jobs to GitHub — survives browser clears, works on any device.</div>
+        </div>
+        <div id="gist-connected-area" style="display:none;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+          <div style="font-size:0.78rem;color:var(--green);font-weight:700;">✓ Connected to GitHub</div>
+          <div style="font-size:0.72rem;color:var(--mid);">Jobs auto-save to your private GitHub Gist.</div>
+          <button onclick="gistDisconnect()" style="margin-left:auto;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.25rem 0.7rem;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--mid);cursor:pointer;">Disconnect</button>
+        </div>
+      </div>
       <div class="panel-desc">Track every application in one place. Log jobs, mark your progress through each stage, and watch your weekly momentum build. Goal: <input type="number" id="daily-goal-input" value="5" min="1" max="99" style="width:3rem;font-family:inherit;font-size:inherit;border:none;border-bottom:1.5px solid var(--black);background:transparent;text-align:center;font-weight:700;color:var(--black);padding:0 2px;"> applications per day &nbsp;·&nbsp; LinkedIn outreach goal: <input type="number" id="linkedin-goal-input" value="5" min="1" max="99" style="width:3rem;font-family:inherit;font-size:inherit;border:none;border-bottom:1.5px solid var(--black);background:transparent;text-align:center;font-weight:700;color:var(--black);padding:0 2px;"> messages/connections per week.</div>
 
       <div class="quote-block" id="quote-block">
@@ -3475,7 +3493,117 @@ loadResumeLinks();
 
 // ─── JOB TRACKER ──────────────────────────────────────────────────────────────
 let jobs = JSON.parse(localStorage.getItem('cara_jobs') || '[]');
-function saveJobs() { localStorage.setItem('cara_jobs', JSON.stringify(jobs)); if (document.getElementById('interview-job-picker')) populateInterviewJobPicker(); if (document.getElementById('fu-job-picker')) populateFollowUpPicker(); }
+
+// ─── GIST SYNC ────────────────────────────────────────────────────────────────
+const GIST_TOKEN_KEY = 'cara_gist_token';
+const GIST_ID_KEY    = 'cara_gist_id';
+const GIST_FILENAME  = 'cara_jobs.json';
+let gistSyncing = false;
+
+function getGistToken() { return localStorage.getItem(GIST_TOKEN_KEY) || ''; }
+function getGistId()    { return localStorage.getItem(GIST_ID_KEY) || ''; }
+
+function updateGistStatus(msg, color) {
+  const el = document.getElementById('gist-status');
+  if (el) { el.textContent = msg; el.style.color = color || 'var(--mid)'; }
+}
+
+async function gistSave() {
+  const token = getGistToken();
+  if (!token) return;
+  gistSyncing = true;
+  updateGistStatus('Saving…', 'var(--mid)');
+  const body = { files: { [GIST_FILENAME]: { content: JSON.stringify(jobs) } } };
+  try {
+    const id = getGistId();
+    let url = 'https://api.github.com/gists';
+    let method = 'POST';
+    if (id) { url += '/' + id; method = 'PATCH'; }
+    const res = await fetch(url, { method, headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify(id ? body : { ...body, description: 'Cara Job Tracker Data', public: false }) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!id) { localStorage.setItem(GIST_ID_KEY, data.id); }
+    updateGistStatus('✓ Saved to GitHub', 'var(--green)');
+  } catch(e) {
+    updateGistStatus('⚠ Save failed — check token', '#c0392b');
+  } finally { gistSyncing = false; }
+}
+
+async function gistLoad() {
+  const token = getGistToken();
+  const id = getGistId();
+  if (!token || !id) return;
+  updateGistStatus('Loading from GitHub…', 'var(--mid)');
+  try {
+    const res = await fetch('https://api.github.com/gists/' + id, { headers: { 'Authorization': 'token ' + token } });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const content = data.files?.[GIST_FILENAME]?.content;
+    if (content) {
+      jobs = JSON.parse(content);
+      localStorage.setItem('cara_jobs', JSON.stringify(jobs));
+      renderJobs();
+      renderDashboard?.();
+      updateGistStatus('✓ Loaded from GitHub', 'var(--green)');
+    }
+  } catch(e) {
+    updateGistStatus('⚠ Could not load from GitHub', '#c0392b');
+  }
+}
+
+async function gistConnect() {
+  const input = document.getElementById('gist-token-input');
+  if (!input) return;
+  const token = input.value.trim();
+  if (!token) { updateGistStatus('Paste your token first', '#c0392b'); return; }
+  localStorage.setItem(GIST_TOKEN_KEY, token);
+  localStorage.removeItem(GIST_ID_KEY);
+  input.value = '';
+  updateGistBanner();
+  updateGistStatus('Connecting…', 'var(--mid)');
+  // Try to find existing gist or create new one
+  try {
+    const res = await fetch('https://api.github.com/gists', { headers: { 'Authorization': 'token ' + token } });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const gists = await res.json();
+    const existing = gists.find(g => g.files?.[GIST_FILENAME]);
+    if (existing) {
+      localStorage.setItem(GIST_ID_KEY, existing.id);
+      await gistLoad();
+    } else {
+      await gistSave();
+    }
+    updateGistBanner();
+  } catch(e) {
+    updateGistStatus('⚠ Invalid token or connection error', '#c0392b');
+    localStorage.removeItem(GIST_TOKEN_KEY);
+    updateGistBanner();
+  }
+}
+
+function gistDisconnect() {
+  if (!confirm('Disconnect GitHub sync? Your jobs will stay in this browser but won\'t sync to GitHub.')) return;
+  localStorage.removeItem(GIST_TOKEN_KEY);
+  localStorage.removeItem(GIST_ID_KEY);
+  updateGistBanner();
+  updateGistStatus('', '');
+}
+
+function updateGistBanner() {
+  const setup = document.getElementById('gist-setup-area');
+  const connected = document.getElementById('gist-connected-area');
+  if (!setup || !connected) return;
+  const token = getGistToken();
+  if (token) { setup.style.display = 'none'; connected.style.display = 'flex'; }
+  else { setup.style.display = 'flex'; connected.style.display = 'none'; }
+}
+
+function saveJobs() {
+  localStorage.setItem('cara_jobs', JSON.stringify(jobs));
+  if (document.getElementById('interview-job-picker')) populateInterviewJobPicker();
+  if (document.getElementById('fu-job-picker')) populateFollowUpPicker();
+  gistSave();
+}
 function getWeekStart() { const now = new Date(); const day = now.getDay(); const diff = now.getDate() - day + (day === 0 ? -6 : 1); const mon = new Date(now.setDate(diff)); mon.setHours(0,0,0,0); return mon; }
 
 function updateTrackerStats() {
@@ -5746,6 +5874,8 @@ if (atsHighestResume && RESUMES[atsHighestResume]) {
 renderAllOptimizers();
 renderAtsHistory();
 renderDashboard();
+updateGistBanner();
+if (getGistToken()) gistLoad();
 
 // Restore session state
 if (savedJD) {
