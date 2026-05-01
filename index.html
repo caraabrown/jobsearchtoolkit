@@ -1337,8 +1337,16 @@
                 <strong style="font-family:'Open Sans',sans-serif;">Updated Resume</strong>
                 <div style="font-size:0.75rem;color:var(--mid);margin-top:0.2rem;">Review the text below, then download the print-ready HTML to save as PDF.</div>
               </div>
-              <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+              <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
                 <button class="btn btn-ghost" onclick="copyGrOutput(this)">Copy Text</button>
+                <div style="display:flex;align-items:center;gap:0.35rem;border:1px solid var(--border);border-radius:3px;overflow:hidden;">
+                  <label style="display:flex;align-items:center;gap:0.3rem;padding:0 0.65rem;height:34px;cursor:pointer;font-size:0.75rem;font-weight:500;border-right:1px solid var(--border);background:#fff;" title="Condensed — tighter bullets, shorter synopsis">
+                    <input type="radio" name="gr-pages" value="2" style="accent-color:var(--black);margin:0;"> 2-page
+                  </label>
+                  <label style="display:flex;align-items:center;gap:0.3rem;padding:0 0.65rem;height:34px;cursor:pointer;font-size:0.75rem;font-weight:500;background:#fff;" title="Detailed — full bullets, expanded synopsis">
+                    <input type="radio" name="gr-pages" value="3" checked style="accent-color:var(--black);margin:0;"> 3-page
+                  </label>
+                </div>
                 <button class="btn" onclick="downloadGrAsHTML(this)">Download Styled HTML</button>
               </div>
             </div>
@@ -1790,6 +1798,26 @@
         <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
           <div style="font-size:0.82rem;color:var(--mid);">Ready to build your tailored work sample document?</div>
           <a href="https://caraabrown.github.io/configure/" target="_blank" rel="noopener" class="btn" style="text-decoration:none;">Open Work Sample Builder ↗</a>
+        </div>
+        <!-- ── BUILDER COPY SUGGESTIONS ── -->
+        <div id="ws-suggestions" style="display:none; margin-top:1.75rem;">
+          <div style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:1rem;">Suggested Copy for Work Sample Builder</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div style="border:1px solid var(--border);border-radius:4px;overflow:hidden;">
+              <div style="background:#1a1a1a;padding:0.6rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;">Cover Subtitle Tags</span>
+                <button onclick="wscopySuggestion('ws-subtitle-text',this)" style="background:none;border:1px solid #444;color:#aaa;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.2rem 0.6rem;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='#444';this.style.color='#aaa'">Copy</button>
+              </div>
+              <div id="ws-subtitle-text" style="padding:0.85rem 1rem;font-size:0.82rem;line-height:1.6;color:var(--black);background:#fafafa;min-height:3rem;"></div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:4px;overflow:hidden;">
+              <div style="background:#1a1a1a;padding:0.6rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;">Positioning Sentence</span>
+                <button onclick="wscopySuggestion('ws-positioning-text',this)" style="background:none;border:1px solid #444;color:#aaa;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.2rem 0.6rem;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='#444';this.style.color='#aaa'">Copy</button>
+              </div>
+              <div id="ws-positioning-text" style="padding:0.85rem 1rem;font-size:0.82rem;line-height:1.6;color:var(--black);background:#fafafa;min-height:3rem;"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -4390,6 +4418,7 @@ async function downloadGrAsHTML(btn) {
   if (btn) btn.disabled = true;
   if (btn) btn.textContent = 'Formatting…';
 
+  const pageCount = document.querySelector('input[name="gr-pages"]:checked')?.value || '3';
   const label = RESUMES[window._grResumeKey || selectedLeResume]?.label || 'Resume';
   const safeLabel = label.replace(/[^a-zA-Z0-9]/g, '_');
 
@@ -4401,7 +4430,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#7a7975;-webkit-fo
 .print-bar p strong{color:#f6f5f1;font-weight:600;}
 .btn-print{background:#f6f5f1;color:var(--black);font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:8px 22px;border:none;cursor:pointer;}
 .doc{padding:56px 0 48px;display:flex;flex-direction:column;align-items:center;gap:0;}
-.page{width:8.5in;height:11in;background:#ffffff;box-shadow:0 8px 48px rgba(0,0,0,.38);padding:.38in .7in .38in;display:flex;flex-direction:column;overflow:hidden;page-break-after:always;break-after:page;}
+.page{width:8.5in;min-height:11in;background:#ffffff;box-shadow:0 8px 48px rgba(0,0,0,.38);padding:.55in .75in .5in .75in;display:flex;flex-direction:column;page-break-after:always;break-after:page;}
 .page+.page{margin-top:28px;}
 .resume-name{font-size:25pt;font-weight:700;letter-spacing:-.02em;color:var(--black);line-height:1;margin-bottom:.04in;}
 .resume-name span{font-weight:300;}
@@ -4433,15 +4462,15 @@ ul.bullets li strong{font-weight:600;color:var(--black);}
 .edu-year{font-size:7pt;font-weight:300;color:var(--mid);}
 .certs{font-size:7pt;font-weight:300;color:var(--ink);line-height:1.6;margin-top:.04in;}
 .resume-footer{margin-top:auto;padding-top:.12in;border-top:1px solid var(--rule);display:flex;justify-content:space-between;font-size:6pt;font-weight:300;letter-spacing:.05em;color:var(--mid);}
-@media print{@page{size:letter;margin:0;}body{background:#ffffff!important;}.print-bar{display:none!important;}.doc{padding:0;gap:0;}.page{box-shadow:none;margin-top:0!important;height:11in;page-break-after:always;break-after:page;}.page:last-child{page-break-after:avoid;break-after:avoid;}}`;
+@media print{@page{size:letter;margin:0;}body{background:#ffffff!important;}.print-bar{display:none!important;}.doc{padding:0;gap:0;}.page{box-shadow:none;margin-top:0!important;min-height:11in;page-break-after:always;break-after:page;}.page:last-child{page-break-after:avoid;break-after:avoid;}}`;
 
   const STRUCTURE = `HTML class reference:
-- .page — 8.5×11in page (use 2 if content overflows)
+- .page — 8.5×11in page. Use exactly ${pageCount} pages total.
 - .resume-name — Name heading; wrap "MBA" in <span>
 - .resume-title — Role title in small caps
 - .resume-contact — Contact line
-- .hbar — 2px blue accent bar (place after contact, and at top of page 2)
-- .sec-label — Section heading (SYNOPSIS, CORE COMPETENCIES, PROFESSIONAL HISTORY, etc.)
+- .hbar — 2px blue accent bar (place after contact on page 1, and at very top of pages 2+)
+- .sec-label — Section heading (SYNOPSIS, AREAS OF EXPERTISE, PROFESSIONAL HISTORY, ADDITIONAL EXPERIENCE, EDUCATION)
 - .synopsis — Paragraph text; bold key phrases with <strong>
 - .expertise-grid — 2-col competency grid wrapper
   - .exp-cat — Category label
@@ -4455,12 +4484,19 @@ ul.bullets li strong{font-weight:600;color:var(--black);}
   - .addl-desc — Description
 - .edu-row > div (.edu-deg, .edu-school) + .edu-year
 - .certs — Certs / affiliations line
-- .resume-footer — "Cara A. Brown, MBA" · "Page X of X" · "caraabrown.com"`;
+- .resume-footer — "Cara A. Brown, MBA" · "Page X of ${pageCount}" · "caraabrown.com"`;
 
-  const sysPrompt = `You are a precise resume HTML formatter. Convert the plain-text resume into a complete, print-ready HTML file using the provided CSS and class structure. Rules:
+  const pageInstructions = pageCount === '2'
+    ? `TARGET: exactly 2 pages. Be ruthlessly concise — shorten the synopsis to 3 sentences, keep only the 2 most impactful bullets per job, condense the expertise grid to the most relevant categories, omit the oldest/least relevant roles from additional experience if needed.`
+    : `TARGET: up to 3 pages. Include the full synopsis, all bullets for major roles, complete expertise grid, and full additional experience section. Use all available space — do not leave pages partially empty.`;
+
+  const sysPrompt = `You are a precise resume HTML formatter. Convert the plain-text resume into a complete, print-ready HTML file using the provided CSS and class structure.
+Rules:
+- ${pageInstructions}
 - Use ONLY the defined CSS classes — no inline styles except where the original had them
 - Bold all metrics, quantified outcomes, and key phrases using <strong>
-- Split content across .page divs if it won't fit on one page (professional history on page 2 if needed)
+- The .page uses min-height:11in — pages can grow taller than 11in if needed. NEVER truncate or omit any content. Include every bullet, every line, every section from the source text.
+- The .page padding is already set correctly — do NOT add extra padding or margin to any element that would alter the page margins
 - Output ONLY the complete HTML document starting with <!DOCTYPE html> — no markdown, no explanation
 ${STRUCTURE}`;
 
@@ -4472,7 +4508,7 @@ ${STRUCTURE}`;
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `CaraBrown_${safeLabel}_Updated.html`;
+    a.href = url; a.download = `CaraBrown_${safeLabel}_${pageCount}pg.html`;
     a.click();
     URL.revokeObjectURL(url);
     if (btn) { btn.textContent = 'Downloaded!'; setTimeout(() => { btn.textContent = 'Download Styled HTML'; btn.disabled = false; }, 2500); }
@@ -4605,7 +4641,7 @@ async function analyzeWorkSamples(btn) {
     `KEY: ${s.key}\nTITLE: ${s.title}\nCATEGORY: ${s.cat}\nSUMMARY: ${s.tldr}\nTAGS: ${s.tags.join(', ')}`
   ).join('\n\n');
 
-  const sysPrompt = `You are a career strategist helping a Principal Service Designer/Design Strategist choose the best portfolio pieces for a job application. Rank ALL 11 work samples. Top 5 get full analysis; the rest get a brief note. Output ONLY valid JSON — no markdown fences, no preamble — in this exact shape: {"top":[{"key":"...","rank":1,"fit":"High","why":"1-2 sentence relevance","jd_signal":"specific JD requirement this answers","talking_point":"one interview sentence"}],"rest":[{"key":"...","brief":"one-sentence note"}]}`;
+  const sysPrompt = `You are a career strategist helping a Principal Service Designer/Design Strategist choose the best portfolio pieces for a job application. Rank ALL 11 work samples. Top 5 get full analysis; the rest get a brief note. Also generate a cover subtitle tag line and a positioning sentence tailored to this specific JD for use in the Work Sample Builder cover page. Output ONLY valid JSON — no markdown fences, no preamble — in this exact shape: {"top":[{"key":"...","rank":1,"fit":"High","why":"1-2 sentence relevance","jd_signal":"specific JD requirement this answers","talking_point":"one interview sentence"}],"rest":[{"key":"...","brief":"one-sentence note"}],"subtitle":"Role · Discipline · Discipline · Discipline (4-5 pipe-separated tags using · character, calibrated to this JD)","positioning":"One 1-2 sentence positioning statement written in first person, calibrated to this JD and the selected top cases. Should start with 'I' and be 30-50 words."}`;
 
   try {
     let raw = '';
@@ -4622,11 +4658,26 @@ async function analyzeWorkSamples(btn) {
   }
 }
 
+function wscopySuggestion(elId, btn) {
+  const text = document.getElementById(elId)?.textContent || '';
+  navigator.clipboard.writeText(text).then(() => {
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
+  });
+}
+
 function renderWsCards(data) {
   const cardsEl = document.getElementById('ws-cards');
   const restEl = document.getElementById('ws-rest-cards');
   const restSection = document.getElementById('ws-rest-section');
   if (!cardsEl) return;
+
+  // Populate suggestion boxes
+  const subtitleEl = document.getElementById('ws-subtitle-text');
+  const positioningEl = document.getElementById('ws-positioning-text');
+  const suggestionsEl = document.getElementById('ws-suggestions');
+  if (subtitleEl && data.subtitle) { subtitleEl.textContent = data.subtitle; }
+  if (positioningEl && data.positioning) { positioningEl.textContent = data.positioning; }
+  if (suggestionsEl && (data.subtitle || data.positioning)) { suggestionsEl.style.display = 'block'; }
 
   const fitColors = { 'High':'#1a4a2e','Strong':'#1a3a5c','Moderate':'#4a2e00' };
   const fitBg    = { 'High':'#e8f5ec','Strong':'#e8f0fe','Moderate':'#fff3e0' };
