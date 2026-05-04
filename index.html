@@ -1586,6 +1586,14 @@
       <div class="divider"></div>
       <div class="panel-desc">Generates a structured intelligence brief on the target company — mission, values, culture signals, recent news, strategic priorities, and exactly how your background maps to their needs. Designed for the depth your MIT coursework emphasized.</div>
 
+      <label>Load from Tracker</label>
+      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+        <select id="cr-job-select" style="flex:1;font-family:inherit;font-size:0.88rem;padding:0.5rem 0.75rem;border:1px solid var(--border);background:var(--bgoff);">
+          <option value="">— or pick a job from your tracker —</option>
+        </select>
+        <button class="btn btn-ghost" onclick="intelLoadJob('cr-job-select','company-name','company-url',null)">Load</button>
+      </div>
+
       <div class="step-hint">Works best when you've saved a job description. Add the company website or LinkedIn URL for richer results.</div>
 
       <div class="form-row">
@@ -1617,8 +1625,49 @@
       <div class="error-msg" id="research-error"></div>
 
       <div class="result-box" id="research-result">
-        <button class="copy-btn" onclick="copyResult('research-output')">Copy</button>
-        <div class="stream-output" id="research-output"></div>
+        <button class="copy-btn" onclick="copyResult('research-copy-output')">Copy</button>
+        <div style="display:grid;grid-template-columns:1fr 210px;min-height:300px;">
+
+          <!-- Main column with tabs -->
+          <div style="border-right:1px solid var(--border);">
+            <div style="display:flex;border-bottom:1px solid var(--border);overflow-x:auto;">
+              <button class="tab active" onclick="showResearchTab('snapshot',this)" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid var(--black);margin-bottom:-1px;padding:0.5rem 1rem;cursor:pointer;color:var(--black);white-space:nowrap;">Snapshot</button>
+              <button class="tab" onclick="showResearchTab('mission',this)" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;padding:0.5rem 1rem;cursor:pointer;color:var(--mid);white-space:nowrap;">Mission + Culture</button>
+              <button class="tab" onclick="showResearchTab('priorities',this)" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;padding:0.5rem 1rem;cursor:pointer;color:var(--mid);white-space:nowrap;">Strategic Priorities</button>
+              <button class="tab" onclick="showResearchTab('watchouts',this)" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;padding:0.5rem 1rem;cursor:pointer;color:var(--mid);white-space:nowrap;">Watch-Outs</button>
+              <button class="tab" onclick="showResearchTab('full',this)" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;padding:0.5rem 1rem;cursor:pointer;color:var(--mid);white-space:nowrap;">Full Brief</button>
+            </div>
+            <div style="padding:1rem 1.25rem;">
+              <div id="research-tab-snapshot" class="stream-output"></div>
+              <div id="research-tab-mission" class="stream-output" style="display:none;"></div>
+              <div id="research-tab-priorities" class="stream-output" style="display:none;"></div>
+              <div id="research-tab-watchouts" class="stream-output" style="display:none;"></div>
+              <div id="research-tab-full" class="stream-output" style="display:none;"></div>
+            </div>
+          </div>
+
+          <!-- Side rail — always visible -->
+          <div style="background:var(--bgoff);display:flex;flex-direction:column;">
+            <div style="padding:.85rem 1rem;border-bottom:1px solid var(--border);">
+              <div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:.4rem;">Cara's fit</div>
+              <div id="research-fit-label" style="font-size:1.3rem;font-weight:700;color:#27500a;background:#eaf3de;padding:3px 10px;border-radius:4px;display:inline-block;">—</div>
+            </div>
+            <div style="padding:.85rem 1rem;border-bottom:1px solid var(--border);flex:1;">
+              <div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:.4rem;">What they want</div>
+              <div id="research-what-they-want" style="font-size:0.8rem;color:var(--black);line-height:1.55;">—</div>
+            </div>
+            <div style="padding:.85rem 1rem;border-bottom:1px solid var(--border);flex:1;">
+              <div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:.4rem;">How Cara maps</div>
+              <div id="research-how-cara-maps" style="font-size:0.8rem;color:var(--black);line-height:1.55;">—</div>
+            </div>
+            <div style="padding:.85rem 1rem;flex:1;">
+              <div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:.4rem;">Top question to ask</div>
+              <div id="research-top-question" style="font-size:0.8rem;color:var(--black);line-height:1.55;font-style:italic;">—</div>
+            </div>
+          </div>
+
+        </div>
+        <div id="research-copy-output" style="display:none;"></div>
       </div>
     </div>
 
@@ -1627,6 +1676,14 @@
       <div class="panel-title">Interview <em>Prep Studio</em></div>
       <div class="divider"></div>
       <div class="panel-desc">Generates the 10 most likely interview questions for this specific role, then crafts a tailored STAR-method answer for each one — pulled directly from your real accomplishments. Read these before your interview, not generic tips.</div>
+
+      <label>Load from Tracker</label>
+      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+        <select id="ip-job-select" style="flex:1;font-family:inherit;font-size:0.88rem;padding:0.5rem 0.75rem;border:1px solid var(--border);background:var(--bgoff);">
+          <option value="">— or pick a job from your tracker —</option>
+        </select>
+        <button class="btn btn-ghost" onclick="intelLoadJob('ip-job-select',null,null,'interview-focus')">Load</button>
+      </div>
 
       <div class="step-hint">Save a job description first. The more specific the JD, the sharper the questions and answers.</div>
 
@@ -1684,6 +1741,14 @@
       <div class="divider"></div>
       <div class="panel-desc">Craft warm, specific outreach messages — connection requests, informational interview asks, referral requests, or follow-ups after applying. These are written to feel human and earn a reply, not generic InMail.</div>
 
+      <label>Load from Tracker</label>
+      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+        <select id="li-job-select" style="flex:1;font-family:inherit;font-size:0.88rem;padding:0.5rem 0.75rem;border:1px solid var(--border);background:var(--bgoff);">
+          <option value="">— or pick a job from your tracker —</option>
+        </select>
+        <button class="btn btn-ghost" onclick="intelLoadJob('li-job-select',null,null,'li-title')">Load</button>
+      </div>
+
       <div class="form-row">
         <div>
           <label>Their Name *</label>
@@ -1728,6 +1793,14 @@
       <div class="divider"></div>
       <div class="panel-desc">Two tools in one: (1) Salary research and negotiation prep — know your number, frame your ask, and handle lowballs. (2) Recruiter vetting — when multiple recruiters reach out for the same role, figure out who's primary, who's a middleman, and how to protect yourself from duplicate submissions.</div>
 
+      <label>Load from Tracker</label>
+      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+        <select id="sal-job-select" style="flex:1;font-family:inherit;font-size:0.88rem;padding:0.5rem 0.75rem;border:1px solid var(--border);background:var(--bgoff);">
+          <option value="">— or pick a job from your tracker —</option>
+        </select>
+        <button class="btn btn-ghost" onclick="intelLoadJob('sal-job-select',null,null,'sal-role')">Load</button>
+      </div>
+
       <div class="tab-row" id="salary-mode-tabs">
         <div class="tab active" data-salmode="salary">Salary Research &amp; Negotiation</div>
         <div class="tab" data-salmode="recruiter">Recruiter Vetting</div>
@@ -1764,6 +1837,28 @@
 
         <div class="result-box" id="salary-result">
           <button class="copy-btn" onclick="copyResult('salary-active-output')">Copy</button>
+
+          <!-- ── NUMBER GRID ── -->
+          <div id="salary-number-grid" style="display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;margin-bottom:1rem;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+            <div style="padding:1.1rem 1.25rem;background:#eaf3de;">
+              <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#3b6d11;margin-bottom:.4rem;">Target — ask for this</div>
+              <div id="sal-num-target" style="font-size:2.2rem;font-weight:700;color:#27500a;letter-spacing:-.02em;line-height:1;">—</div>
+              <div style="font-size:0.72rem;color:#3b6d11;margin-top:5px;">Your opening number</div>
+            </div>
+            <div style="background:var(--border);"></div>
+            <div style="padding:1.1rem 1.25rem;">
+              <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:.4rem;">Floor — don't go below</div>
+              <div id="sal-num-floor" style="font-size:1.6rem;font-weight:700;color:var(--black);letter-spacing:-.02em;line-height:1;">—</div>
+              <div style="font-size:0.72rem;color:var(--mid);margin-top:5px;">Walk-away number</div>
+            </div>
+            <div style="background:var(--border);"></div>
+            <div style="padding:1.1rem 1.25rem;">
+              <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:.4rem;">Stretch — for senior roles</div>
+              <div id="sal-num-stretch" style="font-size:1.6rem;font-weight:700;color:var(--black);letter-spacing:-.02em;line-height:1;">—</div>
+              <div style="font-size:0.72rem;color:var(--mid);margin-top:5px;">Lead here when you can</div>
+            </div>
+          </div>
+
           <div class="tab-row" id="salary-result-tabs" style="margin-bottom:1rem;">
             <div class="tab active" data-saltab="positioning">Final Positioning</div>
             <div class="tab" data-saltab="market">Market Rate</div>
@@ -2446,6 +2541,7 @@ document.querySelectorAll('nav a[data-panel]').forEach(link => {
     document.getElementById('panel-' + panelId).classList.add('active');
     if (panelId === 'dashboard') renderDashboard();
     if (panelId === 'next-steps') setTimeout(populateNsJobSelect, 50);
+    if (['company-research','interview-prep','linkedin-outreach','salary-intel'].includes(panelId)) setTimeout(populateIntelDropdowns, 50);
   });
 });
 
@@ -3573,6 +3669,44 @@ document.getElementById('gen-li-btn').addEventListener('click', async () => {
   }
 });
 
+// ─── INTEL PANEL SHARED DROPDOWN ─────────────────────────────────────────────
+
+function populateIntelDropdowns() {
+  const ids = ['cr-job-select','ip-job-select','li-job-select','sal-job-select'];
+  const opts = '<option value="">— or pick a job from your tracker —</option>' +
+    [...jobs].sort((a,b) => new Date(b.dateAdded||b.dateApplied||0) - new Date(a.dateAdded||a.dateApplied||0))
+    .map(j => `<option value="${j.id}">${escHtml(j.company)} — ${escHtml(j.role)}</option>`).join('');
+  ids.forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = opts; });
+}
+
+function intelLoadJob(selectId, companyField, urlField, roleField) {
+  const sel = document.getElementById(selectId);
+  const job = jobs.find(j => j.id === sel?.value);
+  if (!job) { alert('Select a job first.'); return; }
+  if (companyField) { const el = document.getElementById(companyField); if (el && job.company && job.company !== '(see URL)') el.value = job.company; }
+  if (urlField) { const el = document.getElementById(urlField); if (el && job.url) el.value = job.url; }
+  if (roleField) {
+    const el = document.getElementById(roleField);
+    if (el) {
+      if (roleField === 'li-title') el.value = 'at ' + (job.company || '');
+      else el.value = (job.role || '') + (job.company && job.company !== '(see URL)' ? ' at ' + job.company : '');
+    }
+  }
+  if (job.salary) { const salEl = document.getElementById('sal-offered'); if (salEl && !salEl.value) salEl.value = job.salary; }
+  if (job.location) { const locEl = document.getElementById('sal-location'); if (locEl && !locEl.value) locEl.value = job.location; }
+}
+
+function showResearchTab(tab, btn) {
+  ['snapshot','mission','priorities','watchouts','full'].forEach(t => {
+    const el = document.getElementById('research-tab-'+t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('#research-result .tab').forEach(b => {
+    b.style.borderBottomColor = 'transparent'; b.style.color = 'var(--mid)';
+  });
+  if (btn) { btn.style.borderBottomColor = 'var(--black)'; btn.style.color = 'var(--black)'; }
+}
+
 // ─── COMPANY RESEARCH ─────────────────────────────────────────────────────────
 let selectedResearchDepth = 'standard';
 document.querySelectorAll('#research-depth-tabs .tab').forEach(tab => {
@@ -3608,14 +3742,55 @@ document.getElementById('gen-research-btn').addEventListener('click', async () =
     companyNotes ? 'What Cara knows: ' + companyNotes : null,
     savedJD ? 'Job Description: ' + savedJD.substring(0, 1500) : null,
     'Cara background: ' + CARA_BIO,
-    'Structure with these headers: 1. COMPANY SNAPSHOT  2. MISSION, VALUES & CULTURE  3. STRATEGIC PRIORITIES  4. WHAT THEY ARE REALLY LOOKING FOR  5. HOW CARA MAPS TO THEIR WORLD  6. SMART QUESTIONS TO ASK  7. WATCH-OUTS'
+    'First output a single line in this exact format (no variation):\nSIDEBAR_JSON: {"fit":"Strong","what_they_want":"one sentence","how_cara_maps":"one sentence citing a specific metric","top_question":"one specific smart interview question"}\n\nThen structure the full brief with these exact headers:\n## COMPANY SNAPSHOT\n## MISSION VALUES & CULTURE\n## STRATEGIC PRIORITIES\n## WHAT THEY ARE REALLY LOOKING FOR\n## HOW CARA MAPS TO THEIR WORLD\n## SMART QUESTIONS TO ASK\n## WATCH-OUTS'
   ].filter(Boolean).join('\n\n');
-  
+
   try {
-    const output = document.getElementById('research-output');
-    output.textContent = '';
+    const fullEl = document.getElementById('research-tab-full');
+    const snapEl = document.getElementById('research-tab-snapshot');
+    ['snapshot','mission','priorities','watchouts','full'].forEach(t => { const el = document.getElementById('research-tab-'+t); if(el){el.innerHTML='';el.style.display='none';} });
+    document.getElementById('research-tab-snapshot').style.display = 'block';
     document.getElementById('research-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+
+    let fullText = '';
+    const fmtR = raw => {
+      if (!raw) return '';
+      return '<div>' + raw.split('\n').map(line => {
+        const t = line.trim(); if (!t) return '';
+        if (/^#{1,3}\s/.test(t)) return '<div class="ats-heading">' + t.replace(/^#+\s*/,'').replace(/\*\*/g,'') + '</div>';
+        if (t.startsWith('**') && t.endsWith('**')) return '<div class="ats-subhead">' + t.replace(/\*\*/g,'') + '</div>';
+        if (/^[-•*]\s/.test(t)) return '<div class="ats-bullet">' + t.replace(/^[-•*]\s*/,'') + '</div>';
+        return '<div class="ats-paragraph">' + t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>') + '</div>';
+      }).join('') + '</div>';
+    };
+    const rSec = (txt, s, e) => { const sm = txt.search(s); if(sm<0) return ''; const em = e ? txt.search(e) : -1; return (em>sm ? txt.substring(sm,em) : txt.substring(sm)).replace(/^##\s*/gm,'').trim(); };
+
+    await callClaude(systemPrompt, userMsg, text => {
+      fullText = text;
+      document.getElementById('research-tab-snapshot').innerHTML = fmtR(text);
+    });
+
+    // Parse sidebar JSON
+    try {
+      const m = fullText.match(/SIDEBAR_JSON:\s*(\{[^}]+\})/);
+      if (m) {
+        const d = JSON.parse(m[1]);
+        const fitEl = document.getElementById('research-fit-label');
+        if (fitEl) { fitEl.textContent = d.fit || '—'; fitEl.style.background = d.fit==='Strong' ? '#eaf3de' : d.fit==='Moderate' ? '#fff3e0' : '#fce8e8'; fitEl.style.color = d.fit==='Strong' ? '#27500a' : d.fit==='Moderate' ? '#633806' : '#791f1f'; }
+        const wtw = document.getElementById('research-what-they-want'); if (wtw) wtw.textContent = d.what_they_want || '—';
+        const hcm = document.getElementById('research-how-cara-maps'); if (hcm) hcm.textContent = d.how_cara_maps || '—';
+        const tq = document.getElementById('research-top-question'); if (tq) tq.textContent = d.top_question || '—';
+      }
+    } catch(e) {}
+
+    // Strip SIDEBAR_JSON line from text before sectioning
+    const cleaned = fullText.replace(/SIDEBAR_JSON:.*\n?/,'');
+    document.getElementById('research-tab-snapshot').innerHTML = fmtR(rSec(cleaned, /##\s*COMPANY SNAPSHOT/i, /##\s*MISSION/i));
+    document.getElementById('research-tab-mission').innerHTML = fmtR(rSec(cleaned, /##\s*MISSION/i, /##\s*STRATEGIC/i));
+    document.getElementById('research-tab-priorities').innerHTML = fmtR(rSec(cleaned, /##\s*STRATEGIC PRIORITIES/i, /##\s*WHAT THEY/i) + rSec(cleaned, /##\s*WHAT THEY ARE REALLY/i, /##\s*HOW CARA/i));
+    document.getElementById('research-tab-watchouts').innerHTML = fmtR(rSec(cleaned, /##\s*WATCH.OUTS/i, null) + rSec(cleaned, /##\s*SMART QUESTIONS/i, /##\s*WATCH/i));
+    document.getElementById('research-tab-full').innerHTML = fmtR(cleaned);
+    document.getElementById('research-copy-output').innerHTML = document.getElementById('research-tab-full').innerHTML;
   } catch (err) {
     showError('research-error', 'Error: ' + err.message);
     document.getElementById('research-result').classList.remove('visible');
@@ -3714,7 +3889,7 @@ document.getElementById('gen-salary-btn').addEventListener('click', async () => 
   document.getElementById('salary-result').classList.remove('visible');
   const systemPrompt = 'You are an expert salary negotiation coach with deep knowledge of design, strategy, and consulting markets. Give specific numbers and exact language.';
   const userMsg = ['Build a salary research brief and negotiation strategy for Cara Brown.', 'Role: ' + role, location ? 'Location: ' + location : null, companyType ? 'Company type: ' + companyType : null, offered ? 'Offered or mentioned: ' + offered : null, situation ? 'Situation: ' + situation : null, 'Cara: 15+ years, MBA, Principal-level, $270M enterprise impact, C-suite partnerships.',
-    'Output EXACTLY these five sections with these headers:\n\n## FINAL POSITIONING\n[2-3 sentence confident summary]\n\n## MARKET RATE\n[Realistic salary ranges by level and sector]\n\n## CARAS NUMBERS\n[Target, floor, and stretch — specific dollar amounts]\n\n## NEGOTIATION SCRIPTS\n[Exact language for: salary expectations question, countering a lowball, asking for time, negotiating total comp]\n\n## TRAPS TO AVOID\n[3-4 specific mistakes and how to handle them]'
+    'Output EXACTLY these five sections with these headers:\n\n## FINAL POSITIONING\n[2-3 sentence confident summary]\n\n## MARKET RATE\n[Realistic salary ranges by level and sector]\n\n## CARAS NUMBERS\n[Target, floor, and stretch — specific dollar amounts]\nAlso include a line formatted EXACTLY like this (no variation):\nNUMBERS_JSON: {"target":"$155K","floor":"$130K","stretch":"$170K"}\n\n## NEGOTIATION SCRIPTS\n[Exact language for: salary expectations question, countering a lowball, asking for time, negotiating total comp]\n\n## TRAPS TO AVOID\n[3-4 specific mistakes and how to handle them]'
   ].filter(Boolean).join('\n\n');
   ['positioning','market','numbers','scripts','traps'].forEach(tab => { const el = document.getElementById('salary-tab-' + tab); if (el) { el.innerHTML = ''; el.style.display = 'none'; } });
   document.getElementById('salary-tab-positioning').style.display = 'block';
@@ -3744,6 +3919,19 @@ document.getElementById('gen-salary-btn').addEventListener('click', async () => 
     document.getElementById('salary-tab-scripts').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*NEGOTIATION SCRIPTS/i, /##\s*TRAPS TO AVOID/i));
     document.getElementById('salary-tab-traps').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*TRAPS TO AVOID/i, null));
     document.getElementById('salary-active-output').innerHTML = document.getElementById('salary-tab-positioning').innerHTML;
+    // Populate number grid
+    try {
+      const m = fullSalText.match(/NUMBERS_JSON:\s*(\{[^}]+\})/);
+      if (m) {
+        const nums = JSON.parse(m[1]);
+        const tEl = document.getElementById('sal-num-target');
+        const fEl = document.getElementById('sal-num-floor');
+        const sEl = document.getElementById('sal-num-stretch');
+        if (tEl) tEl.textContent = nums.target || '—';
+        if (fEl) fEl.textContent = nums.floor || '—';
+        if (sEl) sEl.textContent = nums.stretch || '—';
+      }
+    } catch(e) {}
   } catch (err) { showError('salary-error', 'Error: ' + err.message); document.getElementById('salary-result').classList.remove('visible');
   } finally { hideLoading('salary-loading'); }
 });
