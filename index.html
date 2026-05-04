@@ -1017,8 +1017,9 @@
   <nav>
     <div class="nav-section">Setup</div>
     <ul>
+      <li><a href="#" data-panel="dashboard" class="active"><span class="num">◈</span> Dashboard</a></li>
       <li><a href="#" data-panel="my-resumes"><span class="num">00</span> My Resumes</a></li>
-      <li><a href="#" class="active" data-panel="job-input"><span class="num">01</span> Job Description</a></li>
+      <li><a href="#" data-panel="job-input"><span class="num">01</span> Job Description</a></li>
     </ul>
     <div class="nav-section">Analysis</div>
     <ul>
@@ -1028,24 +1029,25 @@
     </ul>
     <div class="nav-section">Application</div>
     <ul>
-      <li><a href="#" data-panel="cover-letter"><span class="num">04</span> Cover Letter</a></li>
-      <li><a href="#" data-panel="why-this-job"><span class="num">05</span> Why This Job</a></li>
-      <li><a href="#" data-panel="custom-qa"><span class="num">06</span> Custom Q&amp;A</a></li>
+      <li><a href="#" data-panel="cover-letter"><span class="num">05</span> Cover Letter</a></li>
+      <li><a href="#" data-panel="why-this-job"><span class="num">06</span> Why This Job</a></li>
+      <li><a href="#" data-panel="custom-qa"><span class="num">07</span> Custom Q&amp;A</a></li>
     </ul>
     <div class="nav-section">Tracker</div>
     <ul>
-      <li><a href="#" data-panel="job-tracker"><span class="num">07</span> Job Tracker</a></li>
+      <li><a href="#" data-panel="job-tracker"><span class="num">08</span> Job Tracker</a></li>
+      <li><a href="#" data-panel="next-steps"><span class="num">09</span> Next Steps</a></li>
     </ul>
     <div class="nav-section">Intelligence</div>
     <ul>
-      <li><a href="#" data-panel="company-research"><span class="num">08</span> Company Research</a></li>
-      <li><a href="#" data-panel="interview-prep"><span class="num">09</span> Interview Prep</a></li>
-      <li><a href="#" data-panel="linkedin-outreach"><span class="num">10</span> LinkedIn Outreach</a></li>
-      <li><a href="#" data-panel="salary-intel"><span class="num">11</span> Salary &amp; Recruiter Intel</a></li>
+      <li><a href="#" data-panel="company-research"><span class="num">10</span> Company Research</a></li>
+      <li><a href="#" data-panel="interview-prep"><span class="num">11</span> Interview Prep</a></li>
+      <li><a href="#" data-panel="linkedin-outreach"><span class="num">12</span> LinkedIn Outreach</a></li>
+      <li><a href="#" data-panel="salary-intel"><span class="num">13</span> Salary &amp; Recruiter Intel</a></li>
     </ul>
     <div class="nav-section">Portfolio</div>
     <ul>
-      <li><a href="#" data-panel="work-samples"><span class="num">12</span> Work Samples Advisor</a></li>
+      <li><a href="#" data-panel="work-samples"><span class="num">14</span> Work Samples Advisor</a></li>
     </ul>
   </nav>
 
@@ -1053,6 +1055,46 @@
   <main>
 
     <!-- ── PANEL 1: JOB DESCRIPTION ── -->
+
+    <!-- ── DASHBOARD ── -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="panel-title">Job Search <em>Dashboard</em></div>
+      <div class="divider"></div>
+
+      <div id="dash-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.75rem;margin-bottom:1.5rem;"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+        <div style="border:1px solid var(--border);border-radius:6px;padding:1rem;">
+          <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.75rem;">Pipeline</div>
+          <div id="dash-pipeline" style="font-size:0.82rem;color:var(--black);line-height:2;"></div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:6px;padding:1rem;">
+          <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.75rem;">Recent Activity</div>
+          <div id="dash-recent" style="font-size:0.82rem;color:var(--black);line-height:1.8;"></div>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--border);border-radius:6px;padding:1rem;margin-bottom:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+          <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);">Weekly Focus Recommendation</div>
+          <button class="slot-btn upload-trigger-btn" id="dash-focus-btn" onclick="generateDashFocus()">Generate</button>
+        </div>
+        <div class="loading" id="dash-focus-loading" style="display:none;"><div class="spinner"></div>Analyzing your search…</div>
+        <div id="dash-focus-output" style="font-size:0.85rem;color:var(--black);line-height:1.6;"></div>
+      </div>
+
+      <div style="border:1px solid var(--border);border-radius:6px;padding:1rem;">
+        <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.75rem;">Quick Actions</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+          <button class="slot-btn upload-trigger-btn" onclick="document.querySelector('nav a[data-panel=job-input]').click()">+ New JD</button>
+          <button class="slot-btn upload-trigger-btn" onclick="document.querySelector('nav a[data-panel=ats-check]').click()">Run ATS Check</button>
+          <button class="slot-btn upload-trigger-btn" onclick="document.querySelector('nav a[data-panel=line-edits]').click()">Line-by-Line Edits</button>
+          <button class="slot-btn upload-trigger-btn" onclick="document.querySelector('nav a[data-panel=next-steps]').click()">Next Steps</button>
+          <button class="slot-btn upload-trigger-btn" onclick="document.querySelector('nav a[data-panel=job-tracker]').click()">View Tracker</button>
+          <button class="slot-btn upload-trigger-btn" onclick="document.querySelector('nav a[data-panel=work-samples]').click()">Work Samples</button>
+        </div>
+      </div>
+    </div>
 
     <!-- ── PANEL 0: MY RESUMES ── -->
     <div class="panel" id="panel-my-resumes">
@@ -1215,7 +1257,7 @@
       </div>
     </div>
 
-    <div class="panel active" id="panel-job-input">
+    <div class="panel" id="panel-job-input">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
         <div>
           <div class="panel-title">Job <em>Description</em></div>
@@ -1763,6 +1805,44 @@
           <button class="copy-btn" onclick="copyResult('recruiter-output')">Copy</button>
           <div class="stream-output" id="recruiter-output"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- ── PANEL 07b: NEXT STEPS GENERATOR ── -->
+    <div class="panel" id="panel-next-steps">
+      <div class="panel-title">Next Steps <em>Generator</em></div>
+      <div class="divider"></div>
+      <div class="panel-desc">Select an application and get a precise, AI-generated action plan for what to do next — tailored to your current stage, contacts, and notes. Results are added directly to that job's Next Steps tab.</div>
+
+      <label>Select Application</label>
+      <select id="ns-job-select" style="font-family:inherit;font-size:0.88rem;padding:0.6rem 0.75rem;border:1px solid var(--border);background:var(--bgoff);width:100%;margin-bottom:1rem;">
+        <option value="">— choose a job —</option>
+      </select>
+
+      <div id="ns-job-preview" style="display:none;background:var(--bgoff);border:1px solid var(--border);border-radius:4px;padding:0.85rem 1rem;margin-bottom:1.25rem;">
+        <div style="font-family:'Open Sans',sans-serif;font-size:0.9rem;font-weight:600;color:var(--black);" id="ns-preview-title"></div>
+        <div style="font-size:0.78rem;color:var(--mid);margin-top:0.25rem;" id="ns-preview-stage"></div>
+        <div style="font-size:0.78rem;color:var(--mid);margin-top:0.1rem;" id="ns-preview-contacts"></div>
+      </div>
+
+      <label>Additional context (optional)</label>
+      <textarea id="ns-context" rows="3" placeholder="e.g., I have a second interview Thursday, I know the hiring manager is focused on supply chain — any intel I should surface…"></textarea>
+
+      <div class="btn-row">
+        <button class="btn" id="ns-generate-btn" onclick="generateNextStepsPanel()">Generate Next Steps</button>
+      </div>
+
+      <div class="loading" id="ns-panel-loading" style="display:none;"><div class="spinner"></div>Building your action plan…</div>
+      <div class="error-msg" id="ns-panel-error"></div>
+
+      <div id="ns-panel-result" style="display:none;">
+        <div style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.75rem;">Your Next Steps</div>
+        <div id="ns-panel-items"></div>
+        <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <button class="btn" onclick="saveNextStepsToJob()">Save to Job Tracker</button>
+          <button class="btn btn-ghost" onclick="copyResult('ns-panel-copy-output')">Copy</button>
+        </div>
+        <div id="ns-panel-copy-output" style="display:none;"></div>
       </div>
     </div>
 
@@ -2364,6 +2444,8 @@ document.querySelectorAll('nav a[data-panel]').forEach(link => {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     link.classList.add('active');
     document.getElementById('panel-' + panelId).classList.add('active');
+    if (panelId === 'dashboard') renderDashboard();
+    if (panelId === 'next-steps') setTimeout(populateNsJobSelect, 50);
   });
 });
 
@@ -3208,7 +3290,60 @@ function renderJobs() {
         const val = escHtml(j[f.key] || '');
         return `<div><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.3rem;">${f.label}</div><textarea rows="4" style="width:100%;box-sizing:border-box;font-size:0.8rem;line-height:1.5;padding:0.5rem 0.6rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--black);resize:vertical;" placeholder="Paste or type ${f.label.toLowerCase()} here…" onchange="event.stopPropagation();saveJobHubField('${j.id}','${f.key}',this.value)">${val}</textarea></div>`;
       }).join('') + '</div>';
-    const detailRow = '<tr class="job-detail-row ' + isHired + '" data-detail-id="' + j.id + '" style="display:none;"><td colspan="10" style="padding:1rem 1.2rem;background:var(--bgoff);">' + chipsHtml + hubHtml + '</td></tr>';
+
+    // Contacts tab
+    const contacts = j.contacts || [];
+    const contactsHtml = `<div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+        <div style="font-size:0.78rem;color:var(--mid);">Track people at ${escHtml(j.company)} — recruiters, hiring managers, champions.</div>
+        <button onclick="event.stopPropagation();addJobContact('${j.id}')" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;background:var(--black);color:#fff;border:none;padding:0.35rem 0.9rem;cursor:pointer;">+ Add Contact</button>
+      </div>
+      <div id="contacts-list-${j.id}">${contacts.length === 0 ? '<div style="font-size:0.8rem;color:var(--mid);font-style:italic;padding:0.5rem 0;">No contacts yet.</div>' : contacts.map((c,ci) => `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0.5rem;align-items:start;padding:0.65rem 0.75rem;border:1px solid var(--border);border-radius:4px;margin-bottom:0.4rem;background:#fff;">
+          <div><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">Name</div><input type="text" value="${escHtml(c.name||'')}" style="width:100%;font-size:0.8rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'name',this.value)" onclick="event.stopPropagation()"></div>
+          <div><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">Title</div><input type="text" value="${escHtml(c.title||'')}" style="width:100%;font-size:0.8rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'title',this.value)" onclick="event.stopPropagation()"></div>
+          <div><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">LinkedIn / Email</div><input type="text" value="${escHtml(c.linkedin||'')}" style="width:100%;font-size:0.8rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'linkedin',this.value)" onclick="event.stopPropagation()"></div>
+          <button onclick="event.stopPropagation();deleteJobContact('${j.id}',${ci})" style="background:none;border:none;cursor:pointer;color:var(--mid);font-size:1rem;padding:0.2rem 0.4rem;align-self:center;" title="Remove">✕</button>
+          <div style="grid-column:1/-1;"><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">Notes</div><textarea rows="2" style="width:100%;font-size:0.78rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);resize:vertical;" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'notes',this.value)" onclick="event.stopPropagation()">${escHtml(c.notes||'')}</textarea></div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+
+    // Next Steps tab
+    const nsText = escHtml(j.hub_nextsteps || '');
+    const nsItems = j.nextstep_items || [];
+    const nextStepsHtml = `<div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;flex-wrap:wrap;gap:0.5rem;">
+        <div style="font-size:0.78rem;color:var(--mid);">Track your next actions for this application.</div>
+        <button onclick="event.stopPropagation();genNextStepsInline('${j.id}')" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;background:var(--black);color:#fff;border:none;padding:0.35rem 0.9rem;cursor:pointer;" id="ns-gen-btn-${j.id}">Generate with AI</button>
+      </div>
+      <div id="ns-loading-${j.id}" style="display:none;font-size:0.78rem;color:var(--mid);font-style:italic;margin-bottom:0.5rem;">Generating next steps…</div>
+      <div id="ns-items-${j.id}" style="margin-bottom:0.75rem;">${nsItems.length === 0 ? '' : nsItems.map((item,ii) => `
+        <div style="display:flex;align-items:flex-start;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid var(--border);">
+          <input type="checkbox" ${item.done?'checked':''} style="margin-top:0.2rem;flex-shrink:0;accent-color:var(--black);" onchange="event.stopPropagation();toggleNextStepItem('${j.id}',${ii},this.checked)">
+          <span style="font-size:0.82rem;line-height:1.5;flex:1;${item.done?'text-decoration:line-through;color:var(--mid);':''}">${escHtml(item.text)}</span>
+          <button onclick="event.stopPropagation();deleteNextStepItem('${j.id}',${ii})" style="background:none;border:none;cursor:pointer;color:var(--mid);font-size:0.8rem;">✕</button>
+        </div>`).join('')}
+      </div>
+      <div style="display:flex;gap:0.5rem;">
+        <input type="text" id="ns-input-${j.id}" placeholder="Add a next step…" style="flex:1;font-size:0.8rem;padding:0.4rem 0.6rem;border:1px solid var(--border);background:var(--bgoff);" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter'){event.stopPropagation();addNextStepItem('${j.id}');}">
+        <button onclick="event.stopPropagation();addNextStepItem('${j.id}')" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;background:var(--black);color:#fff;border:none;padding:0.4rem 0.8rem;cursor:pointer;">Add</button>
+      </div>
+      <div style="margin-top:1rem;"><div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.3rem;">Notes</div><textarea rows="3" style="width:100%;font-size:0.8rem;padding:0.5rem 0.6rem;border:1px solid var(--border);background:var(--bgoff);resize:vertical;" placeholder="Any notes about next steps…" onclick="event.stopPropagation()" onchange="event.stopPropagation();saveJobHubField('${j.id}','hub_nextsteps',this.value)">${nsText}</textarea></div>
+    </div>`;
+
+    // Assemble tabbed detail
+    const detailInner = `${chipsHtml}
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:1rem;" id="job-tabs-${j.id}">
+        <button onclick="event.stopPropagation();showJobTab('${j.id}','hub')" id="jt-hub-${j.id}" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid var(--black);margin-bottom:-2px;padding:0.4rem 1rem;cursor:pointer;color:var(--black);">Application Hub</button>
+        <button onclick="event.stopPropagation();showJobTab('${j.id}','contacts')" id="jt-contacts-${j.id}" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:0.4rem 1rem;cursor:pointer;color:var(--mid);">Contacts</button>
+        <button onclick="event.stopPropagation();showJobTab('${j.id}','nextsteps')" id="jt-nextsteps-${j.id}" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:0.4rem 1rem;cursor:pointer;color:var(--mid);">Next Steps</button>
+      </div>
+      <div id="jtc-hub-${j.id}">${hubHtml}</div>
+      <div id="jtc-contacts-${j.id}" style="display:none;">${contactsHtml}</div>
+      <div id="jtc-nextsteps-${j.id}" style="display:none;">${nextStepsHtml}</div>`;
+
+    const detailRow = '<tr class="job-detail-row ' + isHired + '" data-detail-id="' + j.id + '" style="display:none;"><td colspan="10" style="padding:1rem 1.2rem;background:var(--bgoff);">' + detailInner + '</td></tr>';
     return '<tr class="' + isHired + ' job-main-row" data-id="' + j.id + '" ' + isRejected + ' onclick="toggleDetailRow(\'' + j.id + '\')">' +
       '<td><strong>' + escHtml(j.company) + '</strong> ' + urlCell + '</td>' +
       '<td>' + escHtml(j.role) + '</td>' +
@@ -3274,6 +3409,95 @@ function toggleStage(id, field, val) { const job = jobs.find(j => j.id === id); 
 function deleteJob(id) { if (!confirm('Remove this application?')) return; jobs = jobs.filter(j => j.id !== id); saveJobs(); renderJobs(); }
 function toggleDetailRow(id) { const r = document.querySelector('[data-detail-id="' + id + '"]'); if (r) r.style.display = r.style.display === 'none' ? 'table-row' : 'none'; }
 function saveJobHubField(id, field, value) { const job = jobs.find(j => j.id === id); if (!job) return; job[field] = value; saveJobs(); }
+
+function showJobTab(jobId, tab) {
+  ['hub','contacts','nextsteps'].forEach(t => {
+    const btn = document.getElementById('jt-'+t+'-'+jobId);
+    const pane = document.getElementById('jtc-'+t+'-'+jobId);
+    if (!btn || !pane) return;
+    const active = t === tab;
+    btn.style.borderBottomColor = active ? 'var(--black)' : 'transparent';
+    btn.style.color = active ? 'var(--black)' : 'var(--mid)';
+    pane.style.display = active ? 'block' : 'none';
+  });
+}
+
+function addJobContact(jobId) {
+  const job = jobs.find(j => j.id === jobId); if (!job) return;
+  if (!job.contacts) job.contacts = [];
+  job.contacts.push({ name:'', title:'', linkedin:'', notes:'' });
+  saveJobs(); renderJobs();
+  // Re-open detail and switch to contacts tab
+  const r = document.querySelector('[data-detail-id="'+jobId+'"]');
+  if (r) r.style.display = 'table-row';
+  setTimeout(() => showJobTab(jobId, 'contacts'), 10);
+}
+
+function updateJobContact(jobId, idx, field, value) {
+  const job = jobs.find(j => j.id === jobId); if (!job || !job.contacts) return;
+  if (job.contacts[idx]) { job.contacts[idx][field] = value; saveJobs(); }
+}
+
+function deleteJobContact(jobId, idx) {
+  const job = jobs.find(j => j.id === jobId); if (!job || !job.contacts) return;
+  job.contacts.splice(idx, 1); saveJobs(); renderJobs();
+  const r = document.querySelector('[data-detail-id="'+jobId+'"]');
+  if (r) r.style.display = 'table-row';
+  setTimeout(() => showJobTab(jobId, 'contacts'), 10);
+}
+
+function addNextStepItem(jobId) {
+  const inp = document.getElementById('ns-input-'+jobId); if (!inp) return;
+  const text = inp.value.trim(); if (!text) return;
+  const job = jobs.find(j => j.id === jobId); if (!job) return;
+  if (!job.nextstep_items) job.nextstep_items = [];
+  job.nextstep_items.push({ text, done: false });
+  inp.value = ''; saveJobs(); renderJobs();
+  const r = document.querySelector('[data-detail-id="'+jobId+'"]');
+  if (r) r.style.display = 'table-row';
+  setTimeout(() => showJobTab(jobId, 'nextsteps'), 10);
+}
+
+function toggleNextStepItem(jobId, idx, done) {
+  const job = jobs.find(j => j.id === jobId); if (!job || !job.nextstep_items) return;
+  if (job.nextstep_items[idx]) { job.nextstep_items[idx].done = done; saveJobs(); renderJobs();
+    const r = document.querySelector('[data-detail-id="'+jobId+'"]');
+    if (r) r.style.display = 'table-row';
+    setTimeout(() => showJobTab(jobId, 'nextsteps'), 10); }
+}
+
+function deleteNextStepItem(jobId, idx) {
+  const job = jobs.find(j => j.id === jobId); if (!job || !job.nextstep_items) return;
+  job.nextstep_items.splice(idx, 1); saveJobs(); renderJobs();
+  const r = document.querySelector('[data-detail-id="'+jobId+'"]');
+  if (r) r.style.display = 'table-row';
+  setTimeout(() => showJobTab(jobId, 'nextsteps'), 10);
+}
+
+async function genNextStepsInline(jobId) {
+  const job = jobs.find(j => j.id === jobId); if (!job) return;
+  const loadEl = document.getElementById('ns-loading-'+jobId);
+  const btn = document.getElementById('ns-gen-btn-'+jobId);
+  if (btn) btn.disabled = true;
+  if (loadEl) loadEl.style.display = 'block';
+  const stage = job.hired ? 'Offer received' : job.interview ? 'Interview stage' : job.screening ? 'Screening stage' : 'Applied';
+  const contacts = (job.contacts||[]).map(c => c.name + (c.title ? ', '+c.title : '')).filter(Boolean).join('; ') || 'None logged';
+  const sys = `You are a senior career coach helping a Principal Service Designer. Given a job application's details, return a JSON array of 5-7 concrete next steps — no fluff, no generic advice, specific and immediately actionable. Return ONLY a JSON array of strings, no markdown, no preamble.`;
+  const msg = `Company: ${job.company}\nRole: ${job.role}\nStage: ${stage}\nHow Applied: ${job.howApplied||'Unknown'}\nContacts: ${contacts}\nNotes: ${job.hub_nextsteps||'None'}`;
+  try {
+    let raw = '';
+    await callClaude(sys, msg, t => { raw = t; });
+    raw = raw.replace(/```json|```/g,'').trim();
+    const items = JSON.parse(raw);
+    if (!job.nextstep_items) job.nextstep_items = [];
+    items.forEach(text => job.nextstep_items.push({ text, done: false }));
+    saveJobs(); renderJobs();
+    const r = document.querySelector('[data-detail-id="'+jobId+'"]');
+    if (r) r.style.display = 'table-row';
+    setTimeout(() => showJobTab(jobId, 'nextsteps'), 10);
+  } catch(e) { alert('Could not generate next steps: '+e.message); }
+  finally { if (btn) btn.disabled = false; if (loadEl) loadEl.style.display = 'none'; }
+}
 document.getElementById('manual-add-btn').addEventListener('click', () => {
   const wrap = document.getElementById('manual-add-wrap');
   wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
@@ -4348,6 +4572,101 @@ function renderStarStories() {
 
 renderStarStories();
 
+// ─── DASHBOARD ───────────────────────────────────────────────────────────────
+
+function renderDashboard() {
+  const now = Date.now();
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+  const weekJobs = jobs.filter(j => (now - new Date(j.dateAdded || j.dateApplied || now).getTime()) < weekMs);
+  const active = jobs.filter(j => (j.screening || j.interview) && !j.hired && !j.rejected);
+  const interviews = jobs.filter(j => j.interview && !j.rejected);
+  const rejected = jobs.filter(j => j.rejected);
+  const hired = jobs.filter(j => j.hired);
+  const history = JSON.parse(localStorage.getItem('cara_ats_history') || '[]');
+  const avgAts = history.length ? Math.round(history.reduce((sum, h) => {
+    const scores = Object.values(h.scores || {}).map(s => s.pct);
+    return sum + (scores.length ? scores.reduce((a,b) => a+b,0)/scores.length : 0);
+  }, 0) / history.length) : null;
+
+  const stats = [
+    { num: weekJobs.length, label: 'Applied This Week' },
+    { num: active.length, label: 'Active Pipeline' },
+    { num: interviews.length, label: 'Total Interviews' },
+    { num: rejected.length, label: 'Rejections' },
+    { num: hired.length, label: 'Offers', green: true },
+    { num: avgAts !== null ? avgAts + '%' : '—', label: 'Avg ATS Score' },
+  ];
+  const statsEl = document.getElementById('dash-stats');
+  if (statsEl) statsEl.innerHTML = stats.map(s =>
+    `<div style="border:1px solid var(--border);border-radius:6px;padding:0.85rem 1rem;text-align:center;">
+      <div style="font-size:1.6rem;font-weight:800;color:${s.green ? 'var(--green,#1a7a4a)' : 'var(--black)'};">${s.num}</div>
+      <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-top:0.2rem;">${s.label}</div>
+    </div>`
+  ).join('');
+
+  const pipelineEl = document.getElementById('dash-pipeline');
+  if (pipelineEl) {
+    const stages = [
+      { label: 'Applied',    count: jobs.filter(j => !j.screening && !j.interview && !j.rejected && !j.hired).length },
+      { label: 'Screening',  count: jobs.filter(j => j.screening && !j.interview && !j.rejected).length },
+      { label: 'Interview',  count: interviews.length },
+      { label: 'Rejected',   count: rejected.length },
+      { label: 'Hired',      count: hired.length },
+    ];
+    pipelineEl.innerHTML = stages.map(s =>
+      `<div style="display:flex;align-items:center;gap:0.75rem;">
+        <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);width:70px;flex-shrink:0;">${s.label}</div>
+        <div style="flex:1;height:8px;background:var(--bgoff);border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:${jobs.length ? Math.round((s.count/jobs.length)*100) : 0}%;background:var(--black);border-radius:4px;"></div>
+        </div>
+        <div style="font-size:0.78rem;font-weight:700;width:20px;text-align:right;">${s.count}</div>
+      </div>`
+    ).join('');
+  }
+
+  const recentEl = document.getElementById('dash-recent');
+  if (recentEl) {
+    const recent = [...jobs].sort((a,b) => new Date(b.dateAdded||b.dateApplied||0) - new Date(a.dateAdded||a.dateApplied||0)).slice(0, 5);
+    recentEl.innerHTML = recent.length ? recent.map(j => {
+      const stage = j.hired ? '✓ Hired' : j.rejected ? '✕ Rejected' : j.interview ? '◎ Interview' : j.screening ? '◉ Screening' : '○ Applied';
+      return `<div style="display:flex;justify-content:space-between;gap:0.5rem;border-bottom:1px solid var(--border);padding:0.2rem 0;">
+        <span>${escHtml(j.role||'')} <span style="color:var(--mid);font-size:0.75rem;">@ ${escHtml(j.company||'')}</span></span>
+        <span style="font-size:0.72rem;color:var(--mid);white-space:nowrap;">${stage}</span>
+      </div>`;
+    }).join('') : '<span style="color:var(--mid);font-size:0.8rem;">No applications yet.</span>';
+  }
+}
+
+async function generateDashFocus() {
+  const out = document.getElementById('dash-focus-output');
+  const loading = document.getElementById('dash-focus-loading');
+  const btn = document.getElementById('dash-focus-btn');
+  if (out) out.innerHTML = '';
+  if (loading) loading.style.display = 'flex';
+  if (btn) btn.disabled = true;
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+  const weekJobs = jobs.filter(j => (Date.now() - new Date(j.dateAdded||j.dateApplied||Date.now()).getTime()) < weekMs);
+  const active = jobs.filter(j => (j.screening||j.interview) && !j.hired && !j.rejected);
+  const history = JSON.parse(localStorage.getItem('cara_ats_history') || '[]');
+  const sys = 'You are a direct, no-fluff job search strategist. Give one clear weekly focus recommendation — specific, honest, actionable.';
+  const msg = [
+    'Give Cara Brown a weekly focus recommendation for her job search.',
+    'Applications this week: ' + weekJobs.length,
+    'Active pipeline: ' + active.length + ' roles',
+    'Total applications: ' + jobs.length,
+    'ATS runs this session: ' + history.length,
+    active.length ? 'Active roles: ' + active.map(j => (j.role||'') + ' at ' + (j.company||'')).join(', ') : null,
+    'Cara is a Principal Service Designer and Design Strategist with 15+ years experience. Target roles: Principal Service Designer, Principal Design Strategist. Salary target: $145K–$165K.',
+    'Give: 1. THIS WEEK\'S FOCUS — one specific strategic priority. 2. TOP 3 ACTIONS — concrete things to do this week. 3. WATCH OUT FOR — one thing to stop or avoid. Under 200 words. Be direct.'
+  ].filter(Boolean).join('\n\n');
+  try {
+    let full = '';
+    await callClaude(sys, msg, t => { full = t; if (out) out.innerHTML = formatMarkdown ? formatMarkdown(full) : full; });
+    if (out) out.innerHTML = typeof formatMarkdown === 'function' ? formatMarkdown(full) : full;
+  } catch(e) { if (out) out.textContent = 'Error: ' + e.message; }
+  finally { if (loading) loading.style.display = 'none'; if (btn) btn.disabled = false; }
+}
+
 // ─── GENERATE RESUME FROM SELECTED EDITS ──────────────────────────────────────
 
 async function generateResumeFromEdits(btn) {
@@ -4518,6 +4837,84 @@ ${STRUCTURE}`;
   }
 }
 
+
+// ─── NEXT STEPS GENERATOR PANEL ──────────────────────────────────────────────
+
+function populateNsJobSelect() {
+  const sel = document.getElementById('ns-job-select'); if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— choose a job —</option>' +
+    [...jobs].sort((a,b) => new Date(b.dateAdded||b.dateApplied||0) - new Date(a.dateAdded||a.dateApplied||0))
+    .map(j => `<option value="${j.id}">${escHtml(j.company)} — ${escHtml(j.role)}</option>`).join('');
+  if (cur) sel.value = cur;
+}
+
+document.getElementById('ns-job-select')?.addEventListener('change', function() {
+  const job = jobs.find(j => j.id === this.value);
+  const preview = document.getElementById('ns-job-preview');
+  if (!job) { if (preview) preview.style.display = 'none'; return; }
+  const stage = job.hired ? 'Offer received' : job.interview ? 'Interview stage' : job.screening ? 'Screening / Phone screen' : 'Applied — awaiting response';
+  const contacts = (job.contacts||[]).filter(c=>c.name).map(c=>c.name+(c.title?', '+c.title:'')).join(' · ') || 'No contacts logged';
+  document.getElementById('ns-preview-title').textContent = job.role + ' at ' + job.company;
+  document.getElementById('ns-preview-stage').textContent = 'Stage: ' + stage;
+  document.getElementById('ns-preview-contacts').textContent = 'Contacts: ' + contacts;
+  if (preview) preview.style.display = 'block';
+  document.getElementById('ns-panel-result').style.display = 'none';
+});
+
+let _nsPanelItems = [];
+let _nsPanelJobId = null;
+
+async function generateNextStepsPanel() {
+  const sel = document.getElementById('ns-job-select');
+  const jobId = sel?.value;
+  const job = jobs.find(j => j.id === jobId);
+  if (!job) { alert('Select an application first.'); return; }
+  const btn = document.getElementById('ns-generate-btn');
+  const loadEl = document.getElementById('ns-panel-loading');
+  const errEl = document.getElementById('ns-panel-error');
+  const resultEl = document.getElementById('ns-panel-result');
+  if (btn) btn.disabled = true;
+  if (loadEl) loadEl.style.display = 'flex';
+  if (errEl) { errEl.textContent = ''; errEl.classList.remove('visible'); }
+  if (resultEl) resultEl.style.display = 'none';
+
+  const stage = job.hired ? 'Offer received' : job.interview ? 'Interview stage' : job.screening ? 'Screening / Phone screen' : 'Applied — awaiting response';
+  const contacts = (job.contacts||[]).map(c => `${c.name||''}${c.title?', '+c.title:''}${c.linkedin?' ('+c.linkedin+')':''}`).filter(c=>c.trim()).join('; ') || 'None';
+  const context = document.getElementById('ns-context')?.value?.trim() || '';
+  const sys = `You are a senior career coach for a Principal Service Designer/Design Strategist. Generate 6-8 concrete, immediately actionable next steps for this job application. Be specific to the company, stage, and context — no generic advice. Return ONLY a JSON array of strings.`;
+  const msg = `Company: ${job.company}\nRole: ${job.role}\nHow Applied: ${job.howApplied||'Unknown'}\nStage: ${stage}\nContacts on file: ${contacts}\nAdditional context: ${context||'None'}\nExisting notes: ${job.hub_nextsteps||'None'}`;
+
+  try {
+    let raw = '';
+    await callClaude(sys, msg, t => { raw = t; });
+    raw = raw.replace(/```json|```/g,'').trim();
+    _nsPanelItems = JSON.parse(raw);
+    _nsPanelJobId = jobId;
+    const itemsEl = document.getElementById('ns-panel-items');
+    if (itemsEl) itemsEl.innerHTML = _nsPanelItems.map((text,i) =>
+      `<div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid var(--border);">
+        <span style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;color:var(--mid);min-width:1.5rem;padding-top:0.1rem;">${String(i+1).padStart(2,'0')}</span>
+        <span style="font-size:0.85rem;line-height:1.6;flex:1;">${escHtml(text)}</span>
+      </div>`).join('');
+    const copyOut = document.getElementById('ns-panel-copy-output');
+    if (copyOut) copyOut.textContent = _nsPanelItems.map((t,i) => (i+1)+'. '+t).join('\n');
+    if (resultEl) resultEl.style.display = 'block';
+  } catch(e) {
+    if (errEl) { errEl.textContent = 'Failed: '+e.message; errEl.classList.add('visible'); }
+  } finally {
+    if (loadEl) loadEl.style.display = 'none';
+    if (btn) btn.disabled = false;
+  }
+}
+
+function saveNextStepsToJob() {
+  const job = jobs.find(j => j.id === _nsPanelJobId); if (!job || !_nsPanelItems.length) return;
+  if (!job.nextstep_items) job.nextstep_items = [];
+  _nsPanelItems.forEach(text => job.nextstep_items.push({ text, done: false }));
+  saveJobs();
+  alert('Saved to job tracker. Open the job row → Next Steps tab to see them.');
+}
 
 // ─── WORK SAMPLES ADVISOR ─────────────────────────────────────────────────────
 
@@ -4725,6 +5122,7 @@ function renderWsCards(data) {
 loadSavedResumes();
 buildUploadSlots();
 renderAllOptimizers();
+renderDashboard();
 
 // Restore session state
 if (savedJD) {
