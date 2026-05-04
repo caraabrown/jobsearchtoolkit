@@ -1388,7 +1388,7 @@
         <div style="margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
           <div style="display:flex;align-items:center;gap:0.75rem;">
             <h3 style="margin:0;">Edits to Apply</h3>
-            <div id="le-sel-btns" style="display:none;gap:0.4rem;display:none;">
+            <div id="le-sel-btns" style="display:none;gap:0.4rem;">
               <button onclick="leSelectAll(true)" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--black);color:#fff;border:none;padding:0.25rem 0.7rem;cursor:pointer;border-radius:2px;">Select All</button>
               <button onclick="leSelectAll(false)" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--mid);border:1px solid var(--border);padding:0.25rem 0.7rem;cursor:pointer;border-radius:2px;">Deselect All</button>
             </div>
@@ -3467,7 +3467,13 @@ function renderJobs() {
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0.5rem;align-items:start;padding:0.65rem 0.75rem;border:1px solid var(--border);border-radius:4px;margin-bottom:0.4rem;background:#fff;">
           <div><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">Name</div><input type="text" value="${escHtml(c.name||'')}" style="width:100%;font-size:0.8rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'name',this.value)" onclick="event.stopPropagation()"></div>
           <div><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">Title</div><input type="text" value="${escHtml(c.title||'')}" style="width:100%;font-size:0.8rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'title',this.value)" onclick="event.stopPropagation()"></div>
-          <div><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">LinkedIn / Email</div><input type="text" value="${escHtml(c.linkedin||'')}" style="width:100%;font-size:0.8rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'linkedin',this.value)" onclick="event.stopPropagation()"></div>
+          <div><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">LinkedIn / Email / URL</div>
+            <div style="display:flex;gap:4px;">
+              <input type="text" value="${escHtml(c.linkedin||'')}" id="clink-${j.id}-${ci}" style="flex:1;font-size:0.8rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'linkedin',this.value)" onclick="event.stopPropagation()">
+              ${c.linkedin ? `<button onclick="event.stopPropagation();var el=document.getElementById('clink-${j.id}-${ci}');navigator.clipboard.writeText(el.value);this.textContent='✓';var b=this;setTimeout(()=>b.textContent='Copy',1800);" style="flex-shrink:0;font-size:0.65rem;font-weight:700;font-family:'Raleway',sans-serif;letter-spacing:.04em;padding:0.2rem 0.55rem;background:var(--black);color:#fff;border:none;border-radius:2px;cursor:pointer;white-space:nowrap;">Copy</button>` : ''}
+              ${c.linkedin && !c.linkedin.includes('@') ? `<a href="${c.linkedin.startsWith('http')?escHtml(c.linkedin):'https://'+escHtml(c.linkedin)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="flex-shrink:0;display:inline-flex;align-items:center;padding:0.2rem 0.55rem;background:var(--bgoff);border:1px solid var(--border);border-radius:2px;font-size:0.65rem;font-weight:700;font-family:'Raleway',sans-serif;color:var(--black);text-decoration:none;white-space:nowrap;">Open ↗</a>` : ''}
+            </div>
+          </div>
           <button onclick="event.stopPropagation();deleteJobContact('${j.id}',${ci})" style="background:none;border:none;cursor:pointer;color:var(--mid);font-size:1rem;padding:0.2rem 0.4rem;align-self:center;" title="Remove">✕</button>
           <div style="grid-column:1/-1;"><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">Notes</div><textarea rows="2" style="width:100%;font-size:0.78rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);resize:vertical;" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'notes',this.value)" onclick="event.stopPropagation()">${escHtml(c.notes||'')}</textarea></div>
         </div>`).join('')}
@@ -5606,4 +5612,3 @@ document.addEventListener('change', function(e) { if (e.target && e.target.id ==
 </script>
 </body>
 </html>
-                
