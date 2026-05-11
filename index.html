@@ -981,6 +981,10 @@
     <div class="sub">ATS Analysis · Cover Letters · Interview Prep · Company Research · Salary &amp; Recruiter Intel</div>
   </div>
   <button class="settings-btn" id="settings-open-btn">⚙ API Key</button>
+  <div id="gh-sync-indicator" title="GitHub Sync" style="display:none;align-items:center;gap:5px;font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--mid);cursor:default;">
+    <span id="gh-sync-dot" style="width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0;display:inline-block;"></span>
+    <span id="gh-sync-label">Synced</span>
+  </div>
 </header>
 
 <!-- SETTINGS MODAL -->
@@ -1000,7 +1004,19 @@
     <div id="key-status-msg" class="key-status unset" style="margin-top:1rem;">No API key saved</div>
 
     <hr style="border:none;border-top:1px solid var(--border);margin:1.8rem 0;">
-    <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;margin-bottom:0.3rem;">Resume <em style="font-style:italic;color:var(--gold);">Links</em></h2>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;margin-bottom:0.3rem;">Job Tracker <em>Cloud Sync</em></h2>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem;line-height:1.6;">Your job tracker data is saved to a <strong>private GitHub Gist</strong> — it will never be erased by clearing your browser cache. Enter a GitHub Personal Access Token (with <strong>gist</strong> scope) once and your data syncs permanently to GitHub.</p>
+    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">Get a token at <a href="https://github.com/settings/tokens/new?scopes=gist&description=ApplyKit+Toolkit" target="_blank" style="color:var(--black);font-weight:600;">github.com/settings/tokens</a> — select only the <strong>gist</strong> scope, set no expiry.</p>
+
+    <label>GitHub Personal Access Token</label>
+    <input type="password" id="gh-token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="margin-bottom:0.75rem;">
+    <label>Gist ID <span style="font-weight:400;color:var(--light);font-size:0.78rem;">(leave blank on first setup — will be created automatically)</span></label>
+    <input type="text" id="gh-gist-id-input" placeholder="Leave blank to create a new Gist" style="margin-bottom:1rem;">
+    <div class="btn-row">
+      <button class="btn" id="save-gh-btn">Connect GitHub</button>
+      <button class="btn btn-ghost" id="clear-gh-btn">Disconnect</button>
+    </div>
+    <div id="gh-status-msg" style="margin-top:0.75rem;font-size:0.82rem;font-weight:600;"></div>
     <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6;">Save your GoDaddy resume URLs here so you can copy and paste them instantly when applications ask you to link or upload a resume. These are stored in your browser.</p>
 
     <div id="resume-links-form">
@@ -1034,21 +1050,6 @@
       <button class="btn" id="save-resume-links-btn">Save Resume Links</button>
     </div>
     <div id="resume-links-saved-msg" style="display:none;margin-top:0.8rem;color:var(--success);font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.1em;">✓ LINKS SAVED</div>
-
-    <hr style="border:none;border-top:1px solid var(--border);margin:1.8rem 0;">
-    <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;margin-bottom:0.3rem;">Job Tracker <em style="font-style:italic;">Cloud Backup</em></h2>
-    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6;">Connect a GitHub Gist so your job tracker data survives browser resets, file renames, and new downloads. Your data is saved automatically on every change.<br><br>
-    <strong>Setup (one time):</strong> Go to <a href="https://github.com/settings/tokens/new?scopes=gist&description=Job+Toolkit" target="_blank">github.com/settings/tokens</a> → Generate new token (classic) → check <strong>gist</strong> scope → copy the token. Then go to <a href="https://gist.github.com" target="_blank">gist.github.com</a> → create a new secret gist named <code>cara_jobs.json</code> with content <code>[]</code> → copy the Gist ID from the URL.</p>
-
-    <label>GitHub Personal Access Token (gist scope)</label>
-    <input type="password" id="gh-pat-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="margin-bottom:0.8rem;">
-    <label>Gist ID</label>
-    <input type="text" id="gh-gist-input" placeholder="e.g. a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4" style="margin-bottom:1rem;">
-    <div class="btn-row">
-      <button class="btn" id="save-gh-btn">Save & Test Connection</button>
-      <button class="btn btn-ghost" id="clear-gh-btn">Clear</button>
-    </div>
-    <div id="gh-status-msg" style="margin-top:0.8rem;font-family:'Raleway',sans-serif;font-size:0.72rem;letter-spacing:0.06em;"></div>
   </div>
 </div>
 
@@ -1625,23 +1626,12 @@
       </div>
 
       <div class="step-hint" style="margin-bottom:1rem;">Applications are logged automatically when you save a Job Description in Step 01. Use <strong>+ Add Manually</strong> for any others. Click any row to see details.</div>
-
-      <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+      <div class="btn-row" style="margin-bottom:1.5rem;gap:0.5rem;">
         <button class="btn" id="manual-add-btn" style="font-size:0.75rem;padding:0.5rem 1.2rem;">+ Add Manually</button>
-        <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;">
-          <button id="filter-7d-btn" onclick="setTrackerFilter('7d')" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.9rem;background:transparent;color:var(--mid);border:none;cursor:pointer;">Last 7D</button>
-          <button id="filter-30d-btn" onclick="setTrackerFilter('30d')" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.9rem;background:transparent;color:var(--mid);border:none;cursor:pointer;">Last 30D</button>
-          <button id="filter-all-btn" onclick="setTrackerFilter('all')" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.9rem;background:var(--black);color:#fff;border:none;cursor:pointer;">All Time</button>
-        </div>
-        <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;">
+        <div style="margin-left:auto;display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;">
           <button id="view-board-btn" onclick="setTrackerView('board')" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.9rem;background:var(--black);color:#fff;border:none;cursor:pointer;">Board</button>
           <button id="view-table-btn" onclick="setTrackerView('table')" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.9rem;background:transparent;color:var(--mid);border:none;cursor:pointer;">Table</button>
         </div>
-        <div style="display:flex;gap:0.4rem;margin-left:auto;">
-          <button onclick="exportJobsJSON()" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.9rem;background:transparent;color:var(--mid);border:1px solid var(--border);border-radius:4px;cursor:pointer;">Export JSON</button>
-          <label style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.9rem;background:transparent;color:var(--mid);border:1px solid var(--border);border-radius:4px;cursor:pointer;display:inline-block;">Import JSON<input type="file" accept=".json" style="display:none;" onchange="importJobsJSON(this)"></label>
-        </div>
-        <div id="gist-sync-status" style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.06em;color:var(--mid);width:100%;margin-top:0.25rem;"></div>
       </div>
 
       <div id="jobs-empty" class="empty-state">No applications logged yet. Add your first one above.</div>
@@ -3365,6 +3355,72 @@ document.getElementById('clear-key-btn').addEventListener('click', () => {
 // Init key status on load
 updateKeyStatus();
 
+// ─── GITHUB GIST SETTINGS ────────────────────────────────────────────────────
+
+function loadGhSettingsFields() {
+  const ti = document.getElementById('gh-token-input');
+  const gi = document.getElementById('gh-gist-id-input');
+  if (ti) ti.value = ghToken ? '••••••••••••••••••••' : '';
+  if (gi) gi.value = ghGistId || '';
+}
+
+document.getElementById('settings-open-btn').addEventListener('click', loadGhSettingsFields, { capture: true });
+
+document.getElementById('save-gh-btn').addEventListener('click', async () => {
+  const tokenInput = document.getElementById('gh-token-input').value.trim();
+  const gistInput  = document.getElementById('gh-gist-id-input').value.trim();
+  const msg = document.getElementById('gh-status-msg');
+
+  const token = tokenInput.startsWith('•') ? ghToken : tokenInput;
+  if (!token) { msg.textContent = '✕ Paste your GitHub Personal Access Token.'; msg.style.color = 'var(--red)'; return; }
+
+  msg.textContent = 'Connecting…'; msg.style.color = 'var(--mid)';
+
+  // Verify token works
+  const testRes = await fetch('https://api.github.com/user', {
+    headers: { 'Authorization': `token ${token}` }
+  });
+  if (!testRes.ok) { msg.textContent = '✕ Token invalid or expired. Check and try again.'; msg.style.color = 'var(--red)'; return; }
+
+  ghToken = token;
+  localStorage.setItem('cara_gh_token', ghToken);
+
+  // Create Gist if none provided
+  if (!gistInput) {
+    msg.textContent = 'Creating private Gist…'; msg.style.color = 'var(--mid)';
+    const newId = await gistCreate();
+    if (!newId) { msg.textContent = '✕ Could not create Gist. Check token has gist scope.'; msg.style.color = 'var(--red)'; return; }
+    ghGistId = newId;
+    localStorage.setItem('cara_gh_gist_id', ghGistId);
+    document.getElementById('gh-gist-id-input').value = ghGistId;
+    // Save existing local data into the new Gist
+    await gistPatch({ jobs, starStories, lastSaved: new Date().toISOString() });
+    _gistReady = true;
+  } else {
+    ghGistId = gistInput;
+    localStorage.setItem('cara_gh_gist_id', ghGistId);
+    const loaded = await loadFromGist(); // sets _gistReady=true internally
+    if (!loaded) { msg.textContent = '✕ Could not read that Gist. Check the ID and token.'; msg.style.color = 'var(--red)'; return; }
+    renderJobs();
+    renderDashboard();
+  }
+
+  setGhSyncStatus('saved');
+  msg.textContent = '✓ Connected! Your jobs are now saved permanently to GitHub.';
+  msg.style.color = 'var(--green)';
+});
+
+document.getElementById('clear-gh-btn').addEventListener('click', () => {
+  ghToken = ''; ghGistId = '';
+  localStorage.removeItem('cara_gh_token');
+  localStorage.removeItem('cara_gh_gist_id');
+  setGhSyncStatus('');
+  document.getElementById('gh-token-input').value = '';
+  document.getElementById('gh-gist-id-input').value = '';
+  document.getElementById('gh-status-msg').textContent = 'Disconnected. Jobs now save to browser only.';
+  document.getElementById('gh-status-msg').style.color = 'var(--mid)';
+});
+
 // ─── RESUME LINKS ────────────────────────────────────────────────────────────
 const RESUME_LINK_KEYS = {
   'rl-principal-ds': 'rl_principal_ds',
@@ -3411,156 +3467,145 @@ document.getElementById('settings-open-btn').addEventListener('click', loadResum
 // Init on page load too
 loadResumeLinks();
 
-// ── GitHub Gist settings wiring ───────────────────────────────────────────────
-document.getElementById('settings-open-btn').addEventListener('click', () => {
-  const { pat, gistId } = getGistConfig();
-  const patEl = document.getElementById('gh-pat-input');
-  const gistEl = document.getElementById('gh-gist-input');
-  if (patEl) patEl.value = pat;
-  if (gistEl) gistEl.value = gistId;
-}, { capture: true });
 
-document.getElementById('save-gh-btn').addEventListener('click', async () => {
-  const pat = document.getElementById('gh-pat-input').value.trim();
-  const gistId = document.getElementById('gh-gist-input').value.trim();
-  const statusEl = document.getElementById('gh-status-msg');
-  if (!pat || !gistId) { statusEl.textContent = 'Both fields are required.'; statusEl.style.color = 'var(--red)'; return; }
-  statusEl.textContent = 'Testing connection…'; statusEl.style.color = 'var(--mid)';
+
+// ─── GITHUB GIST STORAGE ─────────────────────────────────────────────────────
+// Jobs live permanently in a private GitHub Gist.
+// localStorage is only a fast-read cache — Gist is the source of truth.
+// Clearing browser storage loses only the credential, never the data.
+
+const GIST_FILENAME = 'applykit_tracker.json';
+let ghToken = localStorage.getItem('cara_gh_token') || '';
+let ghGistId = 'a6d92ba7e84e3bc462000db1c4a02e92'; // hardcoded — survives any browser/cache/storage clear
+localStorage.setItem('cara_gh_gist_id', ghGistId);
+let _gistSaveTimer = null;
+let _gistReady = false; // WRITE LOCK — nothing writes to Gist until initial load is done
+
+function setGhSyncStatus(state) {
+  const ind = document.getElementById('gh-sync-indicator');
+  const dot = document.getElementById('gh-sync-dot');
+  const lbl = document.getElementById('gh-sync-label');
+  if (!ind) return;
+  if (!ghToken || !ghGistId) { ind.style.display = 'none'; return; }
+  ind.style.display = 'flex';
+  const map = { saving:['#c9a84c','Saving…'], saved:['#1e6b35','Synced'], error:['#8b2020','Sync error'], auth:['#8b2020','Token expired'], connecting:['#999','Connecting…'] };
+  const [color, text] = map[state] || ['#999', state];
+  dot.style.background = color; lbl.textContent = text;
+}
+
+function showSyncBanner(msg, isError) {
+  let b = document.getElementById('gh-sync-banner');
+  if (!b) {
+    b = document.createElement('div');
+    b.id = 'gh-sync-banner';
+    b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;padding:12px 24px;font-family:sans-serif;font-size:13px;font-weight:600;text-align:center;cursor:pointer;line-height:1.5;';
+    b.onclick = () => b.remove();
+    document.body.appendChild(b);
+  }
+  b.style.background = isError ? '#8b2020' : '#1e6b35';
+  b.style.color = '#fff';
+  b.textContent = msg + ' (click to dismiss)';
+  if (!isError) setTimeout(() => { if (b) b.remove(); }, 5000);
+}
+
+async function gistGet() {
+  const res = await fetch(`https://api.github.com/gists/${ghGistId}`, {
+    headers: { 'Authorization': `token ${ghToken}`, 'Accept': 'application/vnd.github.v3+json' }
+  });
+  if (res.status === 401 || res.status === 403) throw { type: 'auth' };
+  if (res.status === 404) throw { type: 'notfound' };
+  if (!res.ok) throw { type: 'network', status: res.status };
+  const data = await res.json();
+  const content = data.files?.[GIST_FILENAME]?.content;
+  if (!content) throw { type: 'empty' };
+  return JSON.parse(content);
+}
+
+async function gistPatch(payload) {
+  if (!ghToken || !ghGistId || !_gistReady) return false;
+  const res = await fetch(`https://api.github.com/gists/${ghGistId}`, {
+    method: 'PATCH',
+    headers: { 'Authorization': `token ${ghToken}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+    body: JSON.stringify({ files: { [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) } } })
+  });
+  if (res.status === 401 || res.status === 403) {
+    _gistReady = false;
+    setGhSyncStatus('auth');
+    showSyncBanner('⚠ GitHub token expired. Open ⚙ Settings → Job Tracker Cloud Sync → paste a new token. Your data is safe in GitHub.', true);
+    return false;
+  }
+  return res.ok;
+}
+
+async function gistCreate() {
+  if (!ghToken) return null;
+  const payload = { jobs: [], starStories: [], created: new Date().toISOString() };
+  const res = await fetch('https://api.github.com/gists', {
+    method: 'POST',
+    headers: { 'Authorization': `token ${ghToken}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+    body: JSON.stringify({ description: 'ApplyKit Job Tracker Data — DO NOT DELETE', public: false, files: { [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) } } })
+  });
+  if (!res.ok) return null;
+  return (await res.json()).id;
+}
+
+async function loadFromGist() {
+  if (!ghToken || !ghGistId) return false;
+  setGhSyncStatus('connecting');
   try {
-    const res = await fetch('https://api.github.com/gists/' + gistId, { headers: { Authorization: 'token ' + pat } });
-    if (res.ok) {
-      localStorage.setItem('cara_gh_pat', pat);
-      localStorage.setItem('cara_gh_gist', gistId);
-      statusEl.textContent = '✓ Connected! Jobs will sync automatically.'; statusEl.style.color = 'var(--green)';
-      await pushToGist(jobs);
-    } else {
-      statusEl.textContent = '✗ Connection failed (' + res.status + ') — check your token and Gist ID.'; statusEl.style.color = 'var(--red)';
+    const parsed = await gistGet();
+    jobs        = Array.isArray(parsed.jobs)        ? parsed.jobs        : [];
+    starStories = Array.isArray(parsed.starStories) ? parsed.starStories : [];
+    localStorage.setItem('cara_jobs',         JSON.stringify(jobs));
+    localStorage.setItem('cara_star_stories', JSON.stringify(starStories));
+    _gistReady = true;
+    setGhSyncStatus('saved');
+    return true;
+  } catch(err) {
+    if (err && err.type === 'auth') {
+      _gistReady = false;
+      setGhSyncStatus('auth');
+      showSyncBanner('⚠ GitHub token expired or invalid — your data is safe in GitHub but cannot load until you reconnect. Open ⚙ Settings → Job Tracker Cloud Sync → paste a new token (no expiry).', true);
+      return false;
     }
-  } catch(e) { statusEl.textContent = '✗ Network error — check credentials.'; statusEl.style.color = 'var(--red)'; }
-});
+    if (err && err.type === 'notfound') {
+      _gistReady = false;
+      setGhSyncStatus('error');
+      showSyncBanner('⚠ Gist not found. Check the Gist ID in ⚙ Settings → Job Tracker Cloud Sync.', true);
+      return false;
+    }
+    if (err && err.type === 'empty') {
+      // Gist exists but file not there yet — seed it with current local data
+      _gistReady = true;
+      await gistPatch({ jobs, starStories, lastSaved: new Date().toISOString() });
+      setGhSyncStatus('saved');
+      return true;
+    }
+    // Network error — use localStorage as-is, allow writes so user isn't blocked
+    _gistReady = true;
+    setGhSyncStatus('error');
+    showSyncBanner('⚠ Could not reach GitHub. Using local data — changes will sync when connection restores.', false);
+    return false;
+  }
+}
 
-document.getElementById('clear-gh-btn').addEventListener('click', () => {
-  localStorage.removeItem('cara_gh_pat');
-  localStorage.removeItem('cara_gh_gist');
-  document.getElementById('gh-pat-input').value = '';
-  document.getElementById('gh-gist-input').value = '';
-  const statusEl = document.getElementById('gh-status-msg');
-  statusEl.textContent = 'GitHub sync cleared.'; statusEl.style.color = 'var(--mid)';
-});
-
-
+function scheduleSave() {
+  localStorage.setItem('cara_jobs', JSON.stringify(jobs));
+  localStorage.setItem('cara_star_stories', JSON.stringify(starStories));
+  if (!ghToken || !ghGistId || !_gistReady) return;
+  setGhSyncStatus('saving');
+  clearTimeout(_gistSaveTimer);
+  _gistSaveTimer = setTimeout(async () => {
+    try {
+      const ok = await gistPatch({ jobs, starStories, lastSaved: new Date().toISOString() });
+      setGhSyncStatus(ok ? 'saved' : 'error');
+    } catch(e) { setGhSyncStatus('error'); }
+  }, 2000);
+}
 
 // ─── JOB TRACKER ──────────────────────────────────────────────────────────────
 let jobs = JSON.parse(localStorage.getItem('cara_jobs') || '[]');
-let trackerFilter = 'all'; // '7d' | '30d' | 'all'
-
-// ── GitHub Gist sync ──────────────────────────────────────────────────────────
-function getGistConfig() {
-  return {
-    pat: localStorage.getItem('cara_gh_pat') || '',
-    gistId: localStorage.getItem('cara_gh_gist') || ''
-  };
-}
-function setGistStatus(msg, ok) {
-  const el = document.getElementById('gist-sync-status');
-  if (el) { el.textContent = msg; el.style.color = ok === true ? 'var(--green)' : ok === false ? 'var(--red)' : 'var(--mid)'; }
-}
-async function pushToGist(jobsData) {
-  const { pat, gistId } = getGistConfig();
-  if (!pat || !gistId) return;
-  try {
-    const res = await fetch('https://api.github.com/gists/' + gistId, {
-      method: 'PATCH',
-      headers: { Authorization: 'token ' + pat, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ files: { 'cara_jobs.json': { content: JSON.stringify(jobsData) } } })
-    });
-    if (res.ok) {
-      setGistStatus('✓ Synced to GitHub · ' + new Date().toLocaleTimeString(), true);
-    } else {
-      setGistStatus('⚠ Gist sync failed (' + res.status + ') — data saved locally', false);
-    }
-  } catch(e) {
-    setGistStatus('⚠ Gist sync error — data saved locally', false);
-  }
-}
-async function pullFromGist() {
-  const { pat, gistId } = getGistConfig();
-  if (!pat || !gistId) return null;
-  try {
-    setGistStatus('Syncing from GitHub…', null);
-    const res = await fetch('https://api.github.com/gists/' + gistId, {
-      headers: { Authorization: 'token ' + pat }
-    });
-    if (!res.ok) { setGistStatus('⚠ Could not reach Gist — using local data', false); return null; }
-    const data = await res.json();
-    const raw = data.files && data.files['cara_jobs.json'] && data.files['cara_jobs.json'].content;
-    if (!raw) return null;
-    const remote = JSON.parse(raw);
-    if (!Array.isArray(remote)) return null;
-    // Merge: union of local + remote, keyed by id, remote wins on conflict
-    const local = JSON.parse(localStorage.getItem('cara_jobs') || '[]');
-    const map = {};
-    local.forEach(j => { map[j.id] = j; });
-    remote.forEach(j => { map[j.id] = j; }); // remote overwrites local on same id
-    const merged = Object.values(map);
-    localStorage.setItem('cara_jobs', JSON.stringify(merged));
-    setGistStatus('✓ Loaded from GitHub · ' + new Date().toLocaleTimeString(), true);
-    return merged;
-  } catch(e) {
-    setGistStatus('⚠ Gist load error — using local data', false);
-    return null;
-  }
-}
-function saveJobs() {
-  localStorage.setItem('cara_jobs', JSON.stringify(jobs));
-  pushToGist(jobs);
-}
-
-// ── Export / Import JSON ──────────────────────────────────────────────────────
-function exportJobsJSON() {
-  const blob = new Blob([JSON.stringify(jobs, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'cara_jobs_backup_' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-}
-function importJobsJSON(input) {
-  const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const imported = JSON.parse(e.target.result);
-      if (!Array.isArray(imported)) { alert('Invalid file — expected a JSON array.'); return; }
-      if (!confirm('Import ' + imported.length + ' jobs? This will merge with your existing data (keeping all unique entries).')) return;
-      const map = {};
-      jobs.forEach(j => { map[j.id] = j; });
-      imported.forEach(j => { map[j.id] = j; });
-      jobs = Object.values(map);
-      saveJobs(); renderJobs();
-      alert('Imported successfully.');
-    } catch(err) { alert('Could not parse file.'); }
-  };
-  reader.readAsText(file);
-  input.value = '';
-}
-
-// ── Time-range filter ─────────────────────────────────────────────────────────
-function setTrackerFilter(f) {
-  trackerFilter = f;
-  ['7d','30d','all'].forEach(k => {
-    const btn = document.getElementById('filter-' + k + '-btn');
-    if (!btn) return;
-    btn.style.background = k === f ? 'var(--black)' : 'transparent';
-    btn.style.color = k === f ? '#fff' : 'var(--mid)';
-  });
-  renderJobs();
-}
-function getFilteredJobs() {
-  if (trackerFilter === 'all') return jobs;
-  const ms = trackerFilter === '7d' ? 7 * 86400000 : 30 * 86400000;
-  return jobs.filter(j => (Date.now() - new Date(j.dateAdded || j.dateApplied || Date.now()).getTime()) <= ms);
-}
-
+function saveJobs() { scheduleSave(); }
 function getWeekStart() { const now = new Date(); const day = now.getDay(); const diff = now.getDate() - day + (day === 0 ? -6 : 1); const mon = new Date(now.setDate(diff)); mon.setHours(0,0,0,0); return mon; }
 
 function updateTrackerStats() {
@@ -3596,10 +3641,9 @@ function formatDate(isoStr) { return new Date(isoStr).toLocaleDateString('en-US'
 function renderJobs() {
   updateTrackerStats();
   const tbody = document.getElementById('jobs-tbody'), empty = document.getElementById('jobs-empty'), tw = document.getElementById('jobs-table-wrap'), kb = document.getElementById('jobs-kanban');
-  const filtered = getFilteredJobs();
-  if (filtered.length === 0) { empty.style.display = 'block'; tw.style.display = 'none'; if(kb) kb.style.display='none'; return; }
+  if (jobs.length === 0) { empty.style.display = 'block'; tw.style.display = 'none'; if(kb) kb.style.display='none'; return; }
   empty.style.display = 'none';
-  const sorted = [...filtered].sort((a, b) => { if (a.hired && !b.hired) return 1; if (!a.hired && b.hired) return -1; if (b.fav && !a.fav) return 1; if (a.fav && !b.fav) return -1; return new Date(b.dateApplied || b.dateAdded) - new Date(a.dateApplied || a.dateAdded); });
+  const sorted = [...jobs].sort((a, b) => { if (a.hired && !b.hired) return 1; if (!a.hired && b.hired) return -1; if (b.fav && !a.fav) return 1; if (a.fav && !b.fav) return -1; return new Date(b.dateApplied || b.dateAdded) - new Date(a.dateApplied || a.dateAdded); });
   if (trackerView === 'board') {
     tw.style.display = 'none'; if(kb) kb.style.display = 'block';
     renderKanban(sorted); return;
@@ -4299,12 +4343,8 @@ document.getElementById('gen-recruiter-btn').addEventListener('click', async () 
 
 
 
-// Init tracker — pull from Gist if configured, else use localStorage
-(async function initTracker() {
-  const remote = await pullFromGist();
-  if (remote) jobs = remote;
-  renderJobs();
-})();
+// Init tracker on load
+renderJobs();
 
 
 // ─── NEW APPLICATION ──────────────────────────────────────────────────────────
@@ -4981,7 +5021,7 @@ function renderAllOptimizers() {
 let starStories = JSON.parse(localStorage.getItem('cara_star_stories') || '[]');
 let starTagFilter = 'all';
 
-function saveStarStories() { localStorage.setItem('cara_star_stories', JSON.stringify(starStories)); }
+function saveStarStories() { scheduleSave(); }
 
 function addStarStory() {
   const id = 'star_' + Date.now();
@@ -5769,9 +5809,32 @@ function renderWsCards(data) {
 loadSavedResumes();
 buildUploadSlots();
 renderAllOptimizers();
-renderDashboard();
-updateNavStates();
-setTimeout(maybeAutoFocus, 800);
+
+// Load from GitHub Gist on startup (async — fast fallback to localStorage already loaded above)
+(async () => {
+  if (ghToken && ghGistId) {
+    const loaded = await loadFromGist();
+    if (loaded) {
+      renderJobs();
+      renderStarStories();
+      setGhSyncStatus('saved');
+    } else {
+      // Load failed — _gistReady stays false, Gist writes blocked until reconnect
+      // Show local data (from localStorage cache) but warn user
+      setGhSyncStatus('error');
+      const dot = document.getElementById('gh-sync-dot');
+      const lbl = document.getElementById('gh-sync-label');
+      if (dot) dot.title = 'Could not reach GitHub — open ⚙ Settings and reconnect';
+      if (lbl) lbl.textContent = 'Sync error — reconnect';
+      document.getElementById('gh-sync-indicator').style.display = 'flex';
+    }
+  } else {
+    _gistReady = false; // local-only mode — localStorage writes still work via scheduleSave
+  }
+  renderDashboard();
+  updateNavStates();
+  setTimeout(maybeAutoFocus, 800);
+})();
 
 // Restore session state
 if (savedJD) {
