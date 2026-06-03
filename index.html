@@ -537,11 +537,38 @@
     margin-bottom: 0.3rem;
   }
 
+  /* ─── MOBILE NAV ─── */
+  .hamburger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:4px; flex-shrink:0; margin-right:0.5rem; }
+  .hamburger span { display:block; width:22px; height:2px; background:#aaaaaa; border-radius:1px; transition:background 0.15s; }
+  .hamburger:hover span { background:#ffffff; }
+  .nav-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:499; opacity:0; pointer-events:none; transition:opacity 0.25s; }
+  .nav-overlay.open { opacity:1; pointer-events:auto; }
+
   @media (max-width: 768px) {
-    .app { flex-direction: column; }
-    nav { display: none; }
-    .panel { padding: 1.5rem; }
+    html, body { overflow-x: hidden; max-width: 100%; }
+    .app { flex-direction: column; width: 100%; }
+    main { width: 100%; min-width: 0; overflow-x: hidden; }
+    nav { display:block; position:fixed; top:0; left:0; bottom:0; z-index:500; width:280px; height:100vh; transform:translateX(-100%); transition:transform 0.25s ease; }
+    nav.open { transform:translateX(0); }
+    .nav-overlay { display:block; }
+    .panel { padding: 1rem; width: 100%; box-sizing: border-box; }
     .form-row { grid-template-columns: 1fr; }
+    .job-form-grid { grid-template-columns: 1fr; }
+    .hamburger { display:flex; }
+    header { padding: 1rem 1.2rem; }
+    header h1 { font-size: 0.95rem; white-space: normal; line-height: 1.3; }
+    header .sub { display: none; }
+    .tracker-stats { grid-template-columns: repeat(2, 1fr); }
+    .kb-cols { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .score-cards { grid-template-columns: repeat(2, 1fr); }
+    .tab-row { overflow-x: auto; flex-wrap: nowrap; }
+    .panel-title { font-size: 1.8rem; }
+    .btn-row { flex-wrap: wrap; }
+    #dash-two-col { grid-template-columns: 1fr; }
+    #salary-number-grid { grid-template-columns: 1fr; }
+    .resume-slot-actions, .slot-actions { flex-wrap: wrap; }
+    .jobs-table-wrap { font-size: 0.75rem; }
+    .jobs-table th, .jobs-table td { padding: 0.5rem 0.4rem; }
   }
 
   .error-msg {
@@ -980,6 +1007,7 @@
     <h1>Job Application Toolkit — <em>built by Cara A. Brown</em> · www.getclarity.consulting</h1>
     <div class="sub">ATS Analysis · Cover Letters · Interview Prep · Company Research · Salary &amp; Recruiter Intel</div>
   </div>
+  <button class="hamburger" id="nav-hamburger" onclick="toggleMobileNav()" aria-label="Open navigation"><span></span><span></span><span></span></button>
   <button class="settings-btn" id="settings-open-btn">⚙ API Key</button>
   <div id="gh-sync-indicator" title="GitHub Sync" style="display:none;align-items:center;gap:5px;font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--mid);cursor:default;">
     <span id="gh-sync-dot" style="width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0;display:inline-block;"></span>
@@ -1053,6 +1081,7 @@
   </div>
 </div>
 
+<div class="nav-overlay" id="nav-overlay" onclick="toggleMobileNav()"></div>
 <div class="app">
   <!-- SIDEBAR NAV -->
   <nav>
@@ -1104,7 +1133,7 @@
 
       <div id="dash-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.75rem;margin-bottom:1.5rem;"></div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+      <div id="dash-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
         <div style="border:1px solid var(--border);border-radius:6px;padding:1rem;">
           <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.75rem;">Pipeline</div>
           <div id="dash-pipeline" style="font-size:0.82rem;color:var(--black);line-height:2;"></div>
@@ -2594,6 +2623,14 @@ let selectedResumeForCL = 'principal_ds';
 let selectedCLTone = 'strategic';
 
 // ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function toggleMobileNav() {
+  const nav = document.querySelector('nav');
+  const overlay = document.getElementById('nav-overlay');
+  const isOpen = nav.classList.contains('open');
+  nav.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+}
+
 document.querySelectorAll('nav a[data-panel]').forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();
@@ -2602,6 +2639,9 @@ document.querySelectorAll('nav a[data-panel]').forEach(link => {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     link.classList.add('active');
     document.getElementById('panel-' + panelId).classList.add('active');
+    // Close mobile nav on selection
+    document.querySelector('nav').classList.remove('open');
+    document.getElementById('nav-overlay').classList.remove('open');
     if (panelId === 'dashboard') { renderDashboard(); maybeAutoFocus(); }
     if (panelId === 'next-steps') setTimeout(populateNsJobSelect, 50);
     if (['company-research','interview-prep','linkedin-outreach','salary-intel'].includes(panelId)) {
@@ -5436,42 +5476,39 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#7a7975;-webkit-fo
 .print-bar p strong{color:#f6f5f1;font-weight:600;}
 .btn-print{background:#f6f5f1;color:var(--black);font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:8px 22px;border:none;cursor:pointer;}
 .doc{padding:56px 0 48px;display:flex;flex-direction:column;align-items:center;gap:0;}
-.page{width:8.5in;min-height:11in;background:#ffffff;box-shadow:0 8px 48px rgba(0,0,0,.38);padding:.55in .75in .5in .75in;display:flex;flex-direction:column;page-break-after:always;break-after:page;}
-.page+.page{margin-top:28px;}
-.resume-name{font-size:25pt;font-weight:700;letter-spacing:-.02em;color:var(--black);line-height:1;margin-bottom:.04in;}
+.page{width:8.5in;height:11in;background:#ffffff;margin:24px auto;padding:0.38in 0.7in;box-shadow:0 2px 8px rgba(0,0,0,0.1);overflow:hidden;display:flex;flex-direction:column;}
+.resume-name{font-size:25pt;font-weight:700;letter-spacing:-0.02em;color:#0d0d0b;line-height:1;margin-bottom:2px;}
 .resume-name span{font-weight:300;}
-.resume-title{font-size:8.5pt;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:.08in;line-height:1.4;}
-.resume-contact{font-size:7.5pt;font-weight:300;color:var(--mid);letter-spacing:.03em;margin-bottom:.14in;}
-.hbar{height:2px;background:var(--accent);margin-bottom:.14in;}
-.sec-label{font-size:6pt;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--rule);padding-bottom:.04in;margin-bottom:.08in;margin-top:.14in;}
-.synopsis{font-size:7.5pt;font-weight:400;color:var(--ink);line-height:1.65;}
-.synopsis strong{font-weight:600;color:var(--black);}
-.expertise-grid{display:grid;grid-template-columns:1fr 1fr;gap:.04in .18in;}
-.exp-cat{font-size:6pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);margin-bottom:.015in;}
-.exp-detail{font-size:7pt;font-weight:300;color:var(--mid);line-height:1.5;}
-.job{margin-bottom:.12in;}
-.job:last-child{margin-bottom:0;}
-.job-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.015in;}
-.job-org{font-size:8.5pt;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--black);}
-.job-date{font-size:7pt;font-weight:300;color:var(--mid);letter-spacing:.04em;white-space:nowrap;}
-.job-title{font-size:8pt;font-weight:600;color:var(--accent);margin-bottom:.06in;}
-ul.bullets{list-style:none;display:flex;flex-direction:column;gap:.038in;}
-ul.bullets li{font-size:7.5pt;color:var(--ink);line-height:1.58;padding-left:.15in;position:relative;}
-ul.bullets li::before{content:'—';position:absolute;left:0;color:var(--accent);font-weight:600;}
-ul.bullets li strong{font-weight:600;color:var(--black);}
-.addl-item{margin-bottom:.055in;}
-.addl-org{font-size:8pt;font-weight:700;color:var(--black);text-transform:uppercase;letter-spacing:.03em;}
-.addl-desc{font-size:7pt;font-weight:300;color:var(--ink);line-height:1.52;}
-.edu-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.04in;}
-.edu-deg{font-size:8pt;font-weight:600;color:var(--black);}
-.edu-school{font-size:7.5pt;font-weight:300;color:var(--mid);}
-.edu-year{font-size:7pt;font-weight:300;color:var(--mid);}
-.certs{font-size:7pt;font-weight:300;color:var(--ink);line-height:1.6;margin-top:.04in;}
-.resume-footer{margin-top:auto;padding-top:.12in;border-top:1px solid var(--rule);display:flex;justify-content:space-between;font-size:6pt;font-weight:300;letter-spacing:.05em;color:var(--mid);}
-@media print{@page{size:letter;margin:0;}body{background:#ffffff!important;}.print-bar{display:none!important;}.doc{padding:0;gap:0;}.page{box-shadow:none;margin-top:0!important;min-height:11in;page-break-after:always;break-after:page;}.page:last-child{page-break-after:avoid;break-after:avoid;}}`;
+.resume-title{font-size:8.5pt;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#2a4080;margin-top:4px;line-height:1.4;}
+.resume-contact{font-size:7.5pt;font-weight:300;letter-spacing:0.03em;color:#888680;margin-top:4px;}
+.hbar{height:2px;background:#2a4080;margin:0.14in 0;}
+.sec-label{font-size:6pt;font-weight:700;letter-spacing:0.3em;text-transform:uppercase;color:#2a4080;border-bottom:1px solid #dddad3;padding-bottom:0.04in;margin-top:0.14in;margin-bottom:0.12in;}
+.synopsis{font-size:7.5pt;font-weight:400;line-height:1.65;color:#1e1e1c;margin-bottom:0.12in;}
+.synopsis strong{font-weight:600;color:#0d0d0b;}
+.expertise-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.04in 0.18in;margin-bottom:0.12in;}
+.exp-cat{font-size:6pt;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#1e1e1c;margin-top:0.04in;}
+.exp-detail{font-size:7pt;font-weight:300;line-height:1.5;color:#888680;}
+.job-block{margin-bottom:0.16in;}
+.job-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.02in;}
+.job-org{font-size:8.5pt;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#0d0d0b;}
+.job-date{font-size:7pt;font-weight:300;letter-spacing:0.04em;color:#888680;white-space:nowrap;}
+.job-title{font-size:8pt;font-weight:600;color:#2a4080;margin-bottom:0.06in;}
+.bullets{list-style:none;margin:0;padding:0;}
+.bullets li{font-size:7.5pt;font-weight:400;color:#1e1e1c;line-height:1.58;margin-bottom:0.038in;padding-left:0.15in;position:relative;}
+.bullets li::before{content:'—';position:absolute;left:0;color:#2a4080;font-weight:600;}
+.bullets strong{font-weight:600;color:#0d0d0b;}
+.addl-item{margin-bottom:0.1in;}
+.addl-org{font-size:8pt;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#0d0d0b;}
+.addl-desc{font-size:7pt;font-weight:300;line-height:1.52;color:#1e1e1c;}
+.edu-row{display:flex;align-items:baseline;margin-bottom:0.08in;gap:0;}
+.edu-deg{font-size:8pt;font-weight:600;color:#0d0d0b;flex:0 0 3in;}
+.edu-school{font-size:7.5pt;font-weight:300;color:#888680;flex:1;}
+.certs{font-size:7pt;font-weight:300;line-height:1.6;color:#1e1e1c;}
+.resume-footer{margin-top:auto;padding-top:0.1in;border-top:1px solid #dddad3;display:flex;justify-content:space-between;font-size:6pt;font-weight:300;letter-spacing:0.05em;color:#888680;}
+@media print{@page{size:8.5in 11in;margin:0;}body{background:#ffffff;}.print-bar{display:none!important;}.doc{padding:0;gap:0;}.page{box-shadow:none;margin:0;page-break-after:always;}.page:last-child{page-break-after:avoid;}}`;
 
   const STRUCTURE = `HTML class reference:
-- .page — 8.5×11in page. Use exactly ${pageCount} pages total.
+- .page — fixed 8.5×11in page (height:11in, overflow:hidden). Use exactly ${pageCount} pages total. Content that does not fit on one page MUST flow to the next .page div — never overflows a single page.
 - .resume-name — Name heading; wrap "MBA" in <span>
 - .resume-title — Role title in small caps
 - .resume-contact — Contact line
@@ -5481,14 +5518,14 @@ ul.bullets li strong{font-weight:600;color:var(--black);}
 - .expertise-grid — 2-col competency grid wrapper
   - .exp-cat — Category label
   - .exp-detail — Pipe-separated skill list
-- .job — One work entry
+- .job-block — One work entry. When a role is too long, split bullets across pages; repeat .job-header with "(continued)" on the new page.
   - .job-header > .job-org + .job-date
   - .job-title — Role title in accent color
-  - ul.bullets > li — Bullet points; bold metrics with <strong>
-- .addl-item — Additional experience entry
+  - ul.bullets > li — Bullet points; bold metrics with <strong>. Use class="bullets" not ul.bullets.
+- .addl-item — Additional experience entry. NO dates on GardaWorld.
   - .addl-org — Org name
   - .addl-desc — Description
-- .edu-row > div (.edu-deg, .edu-school) + .edu-year
+- .edu-row > div (.edu-deg flex:0 0 3in, .edu-school flex:1) — NO graduation years
 - .certs — Certs / affiliations line
 - .resume-footer — "Cara A. Brown, MBA" · "Page X of ${pageCount}" · "caraabrown.com"`;
 
@@ -5501,7 +5538,7 @@ Rules:
 - ${pageInstructions}
 - Use ONLY the defined CSS classes — no inline styles except where the original had them
 - Bold all metrics, quantified outcomes, and key phrases using <strong>
-- The .page uses min-height:11in — pages can grow taller than 11in if needed. NEVER truncate or omit any content. Include every bullet, every line, every section from the source text.
+- Each .page is exactly 8.5×11in with overflow:hidden — content MUST NOT exceed one page div. Split roles across multiple .page divs if needed; repeat the .job-header with "(continued)" appended to the org name. NEVER truncate or omit content — every bullet, section, and line must appear somewhere in the output.
 - The .page padding is already set correctly — do NOT add extra padding or margin to any element that would alter the page margins
 - Output ONLY the complete HTML document starting with <!DOCTYPE html> — no markdown, no explanation
 ${STRUCTURE}`;
