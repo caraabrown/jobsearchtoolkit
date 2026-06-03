@@ -1153,6 +1153,13 @@
         <div id="dash-nextsteps"></div>
       </div>
 
+      <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:1.5rem;">
+        <div style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);">
+          <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);">Search Analytics</div>
+        </div>
+        <div id="dash-analytics" style="padding:1rem;"></div>
+      </div>
+
       <div style="border:1px solid var(--border);border-radius:6px;padding:1rem;margin-bottom:1.5rem;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
           <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);">Weekly Focus Recommendation</div>
@@ -1657,9 +1664,17 @@
       <div class="step-hint" style="margin-bottom:1rem;">Applications are logged automatically when you save a Job Description in Step 01. Use <strong>+ Add Manually</strong> for any others. Click any row to see details.</div>
       <div class="btn-row" style="margin-bottom:1.5rem;gap:0.5rem;">
         <button class="btn" id="manual-add-btn" style="font-size:0.75rem;padding:0.5rem 1.2rem;">+ Add Manually</button>
-        <div style="margin-left:auto;display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;">
-          <button id="view-board-btn" onclick="setTrackerView('board')" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.9rem;background:var(--black);color:#fff;border:none;cursor:pointer;">Board</button>
-          <button id="view-table-btn" onclick="setTrackerView('table')" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.9rem;background:transparent;color:var(--mid);border:none;cursor:pointer;">Table</button>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;margin-left:auto;">
+          <div id="tracker-filter-btns" style="display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;">
+            <button class="tfilter-btn active" onclick="setTrackerFilter('all')" style="font-family:'Raleway',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.7rem;background:var(--black);color:#fff;border:none;cursor:pointer;">All</button>
+            <button class="tfilter-btn" onclick="setTrackerFilter('week')" style="font-family:'Raleway',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.7rem;background:transparent;color:var(--mid);border:none;cursor:pointer;">Week</button>
+            <button class="tfilter-btn" onclick="setTrackerFilter('month')" style="font-family:'Raleway',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.7rem;background:transparent;color:var(--mid);border:none;cursor:pointer;">Month</button>
+            <button class="tfilter-btn" onclick="setTrackerFilter('quarter')" style="font-family:'Raleway',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.7rem;background:transparent;color:var(--mid);border:none;cursor:pointer;">Quarter</button>
+          </div>
+          <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;">
+            <button id="view-board-btn" onclick="setTrackerView('board')" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.9rem;background:var(--black);color:#fff;border:none;cursor:pointer;">Board</button>
+            <button id="view-table-btn" onclick="setTrackerView('table')" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.4rem 0.9rem;background:transparent;color:var(--mid);border:none;cursor:pointer;">Table</button>
+          </div>
         </div>
       </div>
 
@@ -3683,7 +3698,9 @@ function renderJobs() {
   const tbody = document.getElementById('jobs-tbody'), empty = document.getElementById('jobs-empty'), tw = document.getElementById('jobs-table-wrap'), kb = document.getElementById('jobs-kanban');
   if (jobs.length === 0) { empty.style.display = 'block'; tw.style.display = 'none'; if(kb) kb.style.display='none'; return; }
   empty.style.display = 'none';
-  const sorted = [...jobs].sort((a, b) => { if (a.hired && !b.hired) return 1; if (!a.hired && b.hired) return -1; if (b.fav && !a.fav) return 1; if (a.fav && !b.fav) return -1; return new Date(b.dateApplied || b.dateAdded) - new Date(a.dateApplied || a.dateAdded); });
+  var filterMs2 = { week: 7*864e5, month: 30*864e5, quarter: 91*864e5 };
+  var filteredJobs = trackerFilter === 'all' ? jobs : jobs.filter(function(j) { return (Date.now() - new Date(j.dateAdded||j.dateApplied||Date.now()).getTime()) <= filterMs2[trackerFilter]; });
+  const sorted = [...filteredJobs].sort((a, b) => { if (a.hired && !b.hired) return 1; if (!a.hired && b.hired) return -1; if (b.fav && !a.fav) return 1; if (a.fav && !b.fav) return -1; return new Date(b.dateApplied || b.dateAdded) - new Date(a.dateApplied || a.dateAdded); });
   if (trackerView === 'board') {
     tw.style.display = 'none'; if(kb) kb.style.display = 'block';
     renderKanban(sorted); return;
@@ -3749,6 +3766,7 @@ function renderJobs() {
         <div style="display:flex;align-items:flex-start;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid var(--border);">
           <input type="checkbox" ${item.done?'checked':''} style="margin-top:0.2rem;flex-shrink:0;accent-color:var(--black);" onchange="event.stopPropagation();toggleNextStepItem('${j.id}',${ii},this.checked)">
           <span style="font-size:0.82rem;line-height:1.5;flex:1;${item.done?'text-decoration:line-through;color:var(--mid);':''}">${escHtml(item.text)}</span>
+          <button onclick="event.stopPropagation();addStepToCalendar('${item.text.replace(/'/g,String.fromCharCode(39))}','${j.company}','${j.role}')" title="Add to Google Calendar" style="background:none;border:none;cursor:pointer;font-size:0.75rem;color:var(--mid);padding:0 0.15rem;flex-shrink:0;">&#128197;</button>
           <button onclick="event.stopPropagation();deleteNextStepItem('${j.id}',${ii})" style="background:none;border:none;cursor:pointer;color:var(--mid);font-size:0.8rem;">✕</button>
         </div>`).join('')}
       </div>
@@ -3838,6 +3856,18 @@ function updateJobHowApplied(id, val) { const job = jobs.find(j => j.id === id);
 function toggleFav(id) { const job = jobs.find(j => j.id === id); if (!job) return; job.fav = !job.fav; saveJobs(); renderJobs(); }
 
 let trackerView = 'board';
+let trackerFilter = 'all';
+
+function setTrackerFilter(f) {
+  trackerFilter = f;
+  document.querySelectorAll('.tfilter-btn').forEach(function(b) {
+    var label = b.textContent.trim().toLowerCase();
+    var isActive = (f==='all' && label==='all') || label===f;
+    b.style.background = isActive ? 'var(--black)' : 'transparent';
+    b.style.color = isActive ? '#fff' : 'var(--mid)';
+  });
+  renderJobs();
+}
 
 function setTrackerView(v) {
   trackerView = v;
@@ -3992,7 +4022,9 @@ document.getElementById('man-add-save-btn').addEventListener('click', () => {
   if (!company || !role) { alert('Company and Role are required.'); return; }
   const dateVal = document.getElementById('man-date').value;
   jobs.unshift({ id: Date.now().toString(), company, role, url: document.getElementById('man-url').value.trim(), howApplied: document.getElementById('man-how-applied').value, workType: document.getElementById('man-work-type').value, location: document.getElementById('man-location').value.trim(), salary: document.getElementById('man-salary').value.trim(), dateAdded: dateVal ? new Date(dateVal).toISOString() : new Date().toISOString(), screening: false, interview: false, rejected: false, hired: false });
+  var _newId = jobs[0].id;
   saveJobs(); renderJobs();
+  if (apiKey) setTimeout(function(){genNextStepsInline(_newId);}, 400);
   ['man-company','man-role','man-url','man-location','man-salary'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('man-how-applied').value = ''; document.getElementById('man-work-type').value = '';
   document.getElementById('manual-add-wrap').style.display = 'none';
@@ -5256,7 +5288,27 @@ function autoSaveRevisedResumeToHub(text) {
   activeJob.hub_resume = text; saveJobs();
 }
 
-// ─── AUTO-GENERATE WEEKLY FOCUS IF JOBS EXIST (#4) ───────────────────────────
+function formatMarkdown(text) {
+  if (!text) return '';
+  var html = '';
+  text.split('\n').forEach(function(line) {
+    var t = line.trim(); if (!t) return;
+    if (/^#{1,3} /.test(t)) { html += '<div class="ats-heading">' + t.replace(/^#+ /,'').replace(/\*\*/g,'') + '</div>'; return; }
+    if (t.slice(0,2)==='**' && t.slice(-2)==='**') { html += '<div class="ats-subhead">' + t.slice(2,-2) + '</div>'; return; }
+    if (/^[\-\u2022] /.test(t)) { html += '<div class="ats-bullet">' + t.replace(/^[\-\u2022] /,'').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>') + '</div>'; return; }
+    html += '<div class="ats-paragraph">' + t.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>') + '</div>';
+  });
+  return '<div>' + html + '</div>';
+}
+
+function addStepToCalendar(text, company, role) {
+  var d = new Date(); d.setDate(d.getDate() + 2);
+  var pad = function(n) { return String(n).padStart(2,'0'); };
+  var ds = d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
+  window.open('https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(text+' — '+company)+'&details='+encodeURIComponent('Job: '+role+' at '+company)+'&dates='+ds+'T090000/'+ds+'T100000','_blank');
+}
+
+// AUTO-GENERATE WEEKLY FOCUS IF JOBS EXIST (#4)
 
 function maybeAutoFocus() {
   const out = document.getElementById('dash-focus-output');
@@ -5315,6 +5367,27 @@ function renderDashboard() {
     ).join('');
   }
 
+  // Analytics
+  var analyticsEl = document.getElementById('dash-analytics');
+  if (analyticsEl) {
+    var srcMap = {};
+    jobs.forEach(function(j) { var s=j.howApplied||'Not specified'; if(!srcMap[s]) srcMap[s]={total:0,response:0}; srcMap[s].total++; if(j.screening||j.interview||j.hired) srcMap[s].response++; });
+    var maxSrc = Math.max(1,...Object.values(srcMap).map(function(x){return x.total;}));
+    var srcRows = Object.entries(srcMap).sort(function(a,b){return b[1].total-a[1].total;}).map(function(entry) {
+      var src=entry[0],d=entry[1],rate=d.total?Math.round((d.response/d.total)*100):0,bw=Math.round((d.total/maxSrc)*100);
+      return '<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.35rem;"><div style="font-size:0.75rem;color:var(--black);width:140px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(src)+'</div><div style="flex:1;height:6px;background:var(--bgoff);border-radius:3px;overflow:hidden;"><div style="height:100%;width:'+bw+'%;background:var(--black);border-radius:3px;"></div></div><div style="font-size:0.72rem;font-weight:700;width:22px;text-align:right;">'+d.total+'</div><div style="font-size:0.7rem;color:'+(rate>0?'var(--green)':'var(--mid)')+';width:42px;text-align:right;font-weight:600;">'+(rate>0?rate+'% ✓':'--')+'</div></div>';
+    }).join('');
+    var nsDone=0,nsTotal=0;
+    jobs.forEach(function(j){(j.nextstep_items||[]).forEach(function(i){nsTotal++;if(i.done)nsDone++;});});
+    var nsRate=nsTotal?Math.round((nsDone/nsTotal)*100):0;
+    var weekCounts=[];
+    for(var w=3;w>=0;w--){var ws=new Date(Date.now()-(w+1)*7*864e5),we=new Date(Date.now()-w*7*864e5);weekCounts.push(jobs.filter(function(j){var d=new Date(j.dateAdded||j.dateApplied||0);return d>=ws&&d<we;}).length);}
+    var maxW=Math.max(1,...weekCounts);
+    var velBars=weekCounts.map(function(n,i){return '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;"><div style="width:100%;background:var(--bgoff);border-radius:2px;height:40px;display:flex;align-items:flex-end;"><div style="width:100%;background:var(--black);border-radius:2px;height:'+Math.round((n/maxW)*100)+'%;min-height:'+(n>0?'4px':'0')+';"></div></div><div style="font-size:0.6rem;color:var(--mid);">'+n+'</div></div>';}).join('');
+    var trackTips=['How Applied (every job)','Resume used per app','Recruiter name + agency','Days to first response','Salary range on posting','Interview stage reached','Workday vs direct ATS'];
+    analyticsEl.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">'+'<div><div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Source Effectiveness (count | response rate)</div>'+(jobs.length===0?'<div style="font-size:0.8rem;color:var(--mid);font-style:italic;">No applications yet.</div>':srcRows)+'</div>'+'<div><div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Applications — Last 4 Weeks</div><div style="display:flex;gap:4px;align-items:flex-end;height:60px;">'+velBars+'</div>'+'<div style="margin-top:0.75rem;"><div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.3rem;">Next Steps Completion</div><div style="display:flex;align-items:center;gap:0.6rem;"><div style="flex:1;height:6px;background:var(--bgoff);border-radius:3px;overflow:hidden;"><div style="height:100%;width:'+nsRate+'%;background:var(--green);border-radius:3px;"></div></div><div style="font-size:0.72rem;font-weight:700;">'+nsDone+'/'+nsTotal+'</div></div></div></div></div>'+'<div style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--border);"><div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.4rem;">What to track for better analysis</div><div style="display:flex;flex-wrap:wrap;gap:0.35rem;">'+trackTips.map(function(t){return '<span style="font-size:0.72rem;padding:0.15rem 0.55rem;border:1px solid var(--border);border-radius:20px;color:var(--mid);">'+t+'</span>';}).join('')+'</div></div>';
+  }
+
   const recentEl = document.getElementById('dash-recent');
   if (recentEl) {
     const recent = [...jobs].sort((a,b) => new Date(b.dateAdded||b.dateApplied||0) - new Date(a.dateAdded||a.dateApplied||0)).slice(0, 5);
@@ -5336,17 +5409,28 @@ function renderDashboard() {
       .sort((a,b) => stageRank(b) - stageRank(a));
 
     const rows = activeJobs.map(j => {
-      const nextItem = (j.nextstep_items || []).find(i => !i.done);
+      const allItems = j.nextstep_items || [];
+      const pendingItems = allItems.filter(i => !i.done);
       const stage = j.interview ? '◎ Interview' : j.screening ? '◉ Screening' : '○ Applied';
       const stageBg = j.interview ? '#e8f5ec' : j.screening ? '#e8f0fe' : 'var(--bgoff)';
       const stageColor = j.interview ? '#1a4a2e' : j.screening ? '#1a3a5c' : 'var(--mid)';
-
-      return `<div style="display:flex;align-items:baseline;gap:0.75rem;padding:0.65rem 1rem;border-bottom:1px solid var(--border);">
-        <span style="flex-shrink:0;font-size:0.68rem;font-weight:600;padding:0.15rem 0.55rem;border-radius:3px;background:${stageBg};color:${stageColor};white-space:nowrap;">${stage}</span>
-        <span style="font-size:0.82rem;font-weight:600;color:var(--black);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">${escHtml(j.company||'')} — ${escHtml(j.role||'')}</span>
-        <span style="flex:1;font-size:0.82rem;color:${nextItem ? 'var(--black)' : 'var(--mid)'};font-style:${nextItem ? 'normal' : 'italic'};">${nextItem ? escHtml(nextItem.text) : 'No next steps yet'}</span>
-        ${nextItem ? `<button onclick="dashMarkStepDone('${j.id}')" style="flex-shrink:0;font-size:0.65rem;font-weight:700;font-family:'Raleway',sans-serif;letter-spacing:.06em;text-transform:uppercase;background:none;border:1px solid var(--border);color:var(--mid);padding:0.2rem 0.6rem;cursor:pointer;border-radius:2px;white-space:nowrap;">Done</button>` : ''}
-      </div>`;
+      const stepRows = pendingItems.length === 0
+        ? '<div style="font-size:0.8rem;color:var(--mid);font-style:italic;padding:0.2rem 0;">No next steps yet</div>'
+        : pendingItems.map(function(item) {
+            var ri = allItems.indexOf(item);
+            var co = escHtml(j.company||''), ro = escHtml(j.role||''), tx = escHtml(item.text);
+            return '<div style="display:flex;align-items:flex-start;gap:0.5rem;padding:0.25rem 0;border-bottom:1px solid var(--border);">'
+              + '<input type="checkbox" style="margin-top:0.22rem;flex-shrink:0;accent-color:var(--black);" onchange="dashToggleStep(\''+j.id+'\','+ri+',this.checked)">'
+              + '<span style="font-size:0.82rem;line-height:1.5;flex:1;">'+tx+'</span>'
+              + '<button onclick="addStepToCalendar(\''+item.text.replace(/\\/g,'\\\\').replace(/\'/g,"\\'")+'\',' + '\''+j.company.replace(/\'/g,"\\'")+'\',' + '\''+j.role.replace(/\'/g,"\\'")+'\')" title="Add to Google Calendar" style="background:none;border:none;cursor:pointer;font-size:0.75rem;color:var(--mid);padding:0 0.15rem;flex-shrink:0;">&#128197;</button>'
+              + '</div>';
+          }).join('');
+      return '<div style="padding:0.65rem 1rem;border-bottom:1px solid var(--border);">'
+        + '<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.35rem;">'
+        + '<span style="flex-shrink:0;font-size:0.65rem;font-weight:700;padding:0.12rem 0.5rem;border-radius:3px;background:'+stageBg+';color:'+stageColor+';white-space:nowrap;">'+stage+'</span>'
+        + '<span style="font-size:0.82rem;font-weight:700;color:var(--black);">'+escHtml(j.company||'')+' — '+escHtml(j.role||'')+'</span>'
+        + '</div>'
+        + stepRows + '</div>';
     });
 
     nsEl.innerHTML = rows.length
@@ -5360,8 +5444,12 @@ function dashMarkStepDone(jobId) {
   const idx = (job.nextstep_items||[]).findIndex(i => !i.done);
   if (idx < 0) return;
   job.nextstep_items[idx].done = true;
-  saveJobs();
-  renderDashboard();
+  saveJobs(); renderDashboard();
+}
+function dashToggleStep(jobId, idx, done) {
+  const job = jobs.find(j => j.id === jobId); if (!job || !job.nextstep_items) return;
+  job.nextstep_items[idx].done = done;
+  saveJobs(); renderDashboard();
 }
 
 async function generateDashFocus() {
