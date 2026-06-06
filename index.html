@@ -1086,39 +1086,36 @@
 <div class="app">
   <!-- SIDEBAR NAV -->
   <nav>
-    <div class="nav-section">Setup</div>
+    <div class="nav-section">Set Up</div>
     <ul>
       <li><a href="#" data-panel="dashboard" class="active"><span class="num">◈</span> Dashboard</a></li>
-      <li><a href="#" data-panel="my-resumes"><span class="num">00</span> My Resumes</a></li>
-      <li><a href="#" data-panel="job-input"><span class="num">01</span> Job Description</a></li>
+      <li><a href="#" data-panel="job-tracker"><span class="num">00</span> Job Tracker</a></li>
+      <li><a href="#" data-panel="my-resumes"><span class="num">01</span> My Resumes</a></li>
     </ul>
     <div class="nav-section">Intelligence</div>
     <ul>
       <li><a href="#" data-panel="company-research"><span class="num">02</span> Company Research<span class="nav-dot"></span></a></li>
-      <li><a href="#" data-panel="interview-prep"><span class="num">03</span> Interview Prep<span class="nav-dot"></span></a></li>
-      <li><a href="#" data-panel="linkedin-outreach"><span class="num">04</span> LinkedIn Outreach<span class="nav-dot"></span></a></li>
-      <li><a href="#" data-panel="salary-intel"><span class="num">05</span> Salary &amp; Recruiter Intel<span class="nav-dot"></span></a></li>
+      <li><a href="#" data-panel="salary-intel"><span class="num">03</span> Salary &amp; Recruiter Intel<span class="nav-dot"></span></a></li>
     </ul>
     <div class="nav-section">Analysis</div>
     <ul>
-      <li><a href="#" data-panel="ats-check"><span class="num">06</span> ATS Check<span class="nav-dot"></span></a></li>
-      <li><a href="#" data-panel="line-edits"><span class="num">07</span> Line-by-Line Edits<span class="nav-dot"></span></a></li>
-      <li><a href="#" data-panel="resume-update"><span class="num">08</span> Revised Resume Check<span class="nav-dot"></span></a></li>
+      <li><a href="#" data-panel="job-input"><span class="num">04</span> Job Description<span class="nav-dot"></span></a></li>
+      <li><a href="#" data-panel="ats-check"><span class="num">05</span> ATS Check<span class="nav-dot"></span></a></li>
+      <li><a href="#" data-panel="line-edits"><span class="num">06</span> Line-by-Line Edits<span class="nav-dot"></span></a></li>
+      <li><a href="#" data-panel="resume-update"><span class="num">07</span> Revised Resume Check<span class="nav-dot"></span></a></li>
     </ul>
-    <div class="nav-section">Application</div>
+    <div class="nav-section">Documents</div>
     <ul>
-      <li><a href="#" data-panel="cover-letter"><span class="num">09</span> Cover Letter<span class="nav-dot"></span></a></li>
+      <li><a href="#" data-panel="cover-letter"><span class="num">08</span> Cover Letter<span class="nav-dot"></span></a></li>
+      <li><a href="#" data-panel="work-samples"><span class="num">09</span> Work Samples Advisor<span class="nav-dot"></span></a></li>
       <li><a href="#" data-panel="why-this-job"><span class="num">10</span> Why This Job<span class="nav-dot"></span></a></li>
       <li><a href="#" data-panel="custom-qa"><span class="num">11</span> Custom Q&amp;A<span class="nav-dot"></span></a></li>
     </ul>
-    <div class="nav-section">Tracker</div>
+    <div class="nav-section">Engage</div>
     <ul>
-      <li><a href="#" data-panel="job-tracker"><span class="num">12</span> Job Tracker</a></li>
-      <li><a href="#" data-panel="next-steps"><span class="num">13</span> Next Steps</a></li>
-    </ul>
-    <div class="nav-section">Portfolio</div>
-    <ul>
-      <li><a href="#" data-panel="work-samples"><span class="num">14</span> Work Samples Advisor</a></li>
+      <li><a href="#" data-panel="next-steps"><span class="num">12</span> Next Steps</a></li>
+      <li><a href="#" data-panel="linkedin-outreach"><span class="num">13</span> LinkedIn Outreach<span class="nav-dot"></span></a></li>
+      <li><a href="#" data-panel="interview-prep"><span class="num">14</span> Interview Prep<span class="nav-dot"></span></a></li>
     </ul>
   </nav>
 
@@ -1360,8 +1357,10 @@
       <label>Job Posting URL</label>
       <input type="url" id="jd-url" placeholder="https://company.com/careers/job-title">
 
-      <label>Company & Role (optional, helps with cover letter tone)</label>
-      <input type="text" id="job-role-name" placeholder="e.g., Principal Service Designer at Accenture Federal Services">
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div><label>Company</label><input type="text" id="jd-company" placeholder="e.g., Accenture Federal Services"></div>
+        <div><label>Role / Title</label><input type="text" id="jd-role" placeholder="e.g., Principal Service Designer"></div>
+      </div>
 
       <div class="btn-row">
         <button class="btn" id="save-jd-btn">Save & Continue →</button>
@@ -1489,6 +1488,18 @@
           </div>
         </div>
 
+        <!-- ── CHAT ── -->
+        <div id="le-chat" style="display:none;margin-top:1.5rem;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+          <div style="padding:0.6rem 1rem;background:var(--bgoff);border-bottom:1px solid var(--border);font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--black);">Add Notes / Answer Questions</div>
+          <div style="padding:0.4rem 1rem;font-size:0.75rem;color:var(--mid);border-bottom:1px solid var(--border);">Notes you send here will be incorporated when you click Generate Resume.</div>
+          <div id="le-chat-thread" style="max-height:280px;overflow-y:auto;padding:0.75rem;"></div>
+          <div style="display:flex;border-top:1px solid var(--border);">
+            <textarea id="le-chat-input" rows="2" placeholder="Add context, correct something, or answer Claude's questions…" style="flex:1;border:none;border-right:1px solid var(--border);padding:0.6rem 0.75rem;font-size:0.85rem;font-family:inherit;resize:none;background:transparent;color:var(--black);"></textarea>
+            <button id="le-chat-send" style="background:var(--black);color:#fff;border:none;padding:0 1rem;font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;flex-shrink:0;">Send →</button>
+          </div>
+          <div class="loading" id="le-chat-loading" style="display:none;"><div class="spinner"></div>Thinking…</div>
+        </div>
+
       </div>
     </div>
 
@@ -1584,14 +1595,26 @@
       <div class="error-msg" id="why-error"></div>
 
       <div class="result-box" id="why-result">
-        <button class="copy-btn" onclick="copyResult('why-output')">Copy</button>
-        <div class="stream-output" id="why-output"></div>
+        <div id="why-stream" style="white-space:pre-wrap;font-size:0.88rem;line-height:1.8;"></div>
+        <div id="why-tabs-wrap" style="display:none;">
+          <div class="tab-row" id="why-tab-row" style="margin-bottom:0;"></div>
+          <div id="why-tab-panels" style="padding-top:1rem;"></div>
+          <div id="why-notes-box" style="display:none;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.75rem;">
+            <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--mid);margin-bottom:0.4rem;">Notes &amp; Questions from Claude</div>
+            <div id="why-notes-content" style="font-size:0.85rem;line-height:1.7;color:var(--black);white-space:pre-wrap;"></div>
+          </div>
+        </div>
+        <button class="copy-btn" onclick="copyActiveTab('why')">Copy</button>
       </div>
 
-      <div class="loading" id="why-qc-loading"><div class="spinner"></div>Running quality check…</div>
-      <div id="why-qc-result" style="display:none;margin-top:1rem;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
-        <div style="background:var(--bgoff);padding:0.6rem 1rem;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:var(--black);">Quality Check</div>
-        <div id="why-qc-output" style="padding:0.85rem 1rem;font-size:0.85rem;line-height:1.7;"></div>
+      <div id="why-chat" style="display:none;margin-top:1rem;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+        <div style="padding:0.6rem 1rem;background:var(--bgoff);border-bottom:1px solid var(--border);font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--black);">Answer Questions / Refine</div>
+        <div id="why-chat-thread" style="max-height:280px;overflow-y:auto;padding:0.75rem;"></div>
+        <div style="display:flex;border-top:1px solid var(--border);">
+          <textarea id="why-chat-input" rows="2" placeholder="Answer Claude's questions or ask for a different angle…" style="flex:1;border:none;border-right:1px solid var(--border);padding:0.6rem 0.75rem;font-size:0.85rem;font-family:inherit;resize:none;background:transparent;color:var(--black);"></textarea>
+          <button id="why-chat-send" style="background:var(--black);color:#fff;border:none;padding:0 1rem;font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;flex-shrink:0;">Send →</button>
+        </div>
+        <div class="loading" id="why-chat-loading" style="display:none;"><div class="spinner"></div>Thinking…</div>
       </div>
     </div>
 
@@ -1615,8 +1638,26 @@
       <div class="error-msg" id="qa-error"></div>
 
       <div class="result-box" id="qa-result">
-        <button class="copy-btn" onclick="copyResult('qa-output')">Copy</button>
-        <div class="stream-output" id="qa-output"></div>
+        <div id="qa-stream" style="white-space:pre-wrap;font-size:0.88rem;line-height:1.8;"></div>
+        <div id="qa-tabs-wrap" style="display:none;">
+          <div class="tab-row" id="qa-tab-row" style="margin-bottom:0;"></div>
+          <div id="qa-tab-panels" style="padding-top:1rem;"></div>
+          <div id="qa-notes-box" style="display:none;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.75rem;">
+            <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--mid);margin-bottom:0.4rem;">Notes &amp; Questions from Claude</div>
+            <div id="qa-notes-content" style="font-size:0.85rem;line-height:1.7;color:var(--black);white-space:pre-wrap;"></div>
+          </div>
+        </div>
+        <button class="copy-btn" onclick="copyActiveTab('qa')">Copy</button>
+      </div>
+
+      <div id="qa-chat" style="display:none;margin-top:1rem;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+        <div style="padding:0.6rem 1rem;background:var(--bgoff);border-bottom:1px solid var(--border);font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--black);">Answer Questions / Refine</div>
+        <div id="qa-chat-thread" style="max-height:280px;overflow-y:auto;padding:0.75rem;"></div>
+        <div style="display:flex;border-top:1px solid var(--border);">
+          <textarea id="qa-chat-input" rows="2" placeholder="Answer Claude's questions or ask for a different version…" style="flex:1;border:none;border-right:1px solid var(--border);padding:0.6rem 0.75rem;font-size:0.85rem;font-family:inherit;resize:none;background:transparent;color:var(--black);"></textarea>
+          <button id="qa-chat-send" style="background:var(--black);color:#fff;border:none;padding:0 1rem;font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;flex-shrink:0;">Send →</button>
+        </div>
+        <div class="loading" id="qa-chat-loading" style="display:none;"><div class="spinner"></div>Thinking…</div>
       </div>
     </div>
 
@@ -2425,8 +2466,19 @@ async function extractPdfText(file) {
   return text.trim();
 }
 
+function makeSlotHtml(key, label, text) {
+  const preview = text ? escHtml(text.substring(0, 220)) + '…' : 'No file uploaded yet.';
+  const previewCls = text ? 'slot-preview has-text' : 'slot-preview';
+  return `<div class="resume-slot" id="slot-${key}"><div class="resume-slot-header"><input type="text" class="resume-slot-title-input" id="title-${key}" value="${escHtml(label)}" onchange="renameSlot('${key}',this.value)"><span class="resume-slot-status slot-status-custom" id="status-${key}">\u2713 Your version loaded</span></div><div class="resume-slot-body"><div class="${previewCls}" id="preview-${key}">${preview}</div><div class="slot-actions"><button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-${key}').click()">&#11014; Upload PDF / TXT</button><input type="file" accept=".pdf,.txt" id="file-${key}" style="display:none" onchange="handleFileUpload('${key}',this.files[0])"><button class="slot-btn" onclick="showPasteArea('${key}')">&#9998; Paste Text</button><button class="slot-btn danger" id="remove-${key}" onclick="clearSlot('${key}')">&#10005; Remove</button></div></div><div class="slot-paste-area" id="paste-area-${key}"><textarea id="paste-text-${key}" placeholder="Paste your full resume text here\u2026"></textarea><div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><button class="slot-btn upload-trigger-btn" onclick="savePastedResume('${key}')">Save This Resume</button><button class="slot-btn" onclick="hidePasteArea('${key}')">Cancel</button></div></div></div>`;
+}
+
 function buildUploadSlots() {
+  const slotsDiv = document.getElementById('resume-upload-slots');
   RESUME_KEYS.forEach(({ key }) => {
+    // If no slot exists in DOM yet (custom resume loaded from storage on reload), inject it
+    if (!document.getElementById('slot-' + key) && RESUMES[key] && RESUMES[key].custom) {
+      if (slotsDiv) slotsDiv.insertAdjacentHTML('beforeend', makeSlotHtml(key, RESUMES[key].label, RESUMES[key].text));
+    }
     const isCustom = !!RESUMES[key].custom;
     const statusEl = document.getElementById('status-' + key);
     const previewEl = document.getElementById('preview-' + key);
@@ -2570,8 +2622,7 @@ document.getElementById('add-resume-btn').addEventListener('click', () => {
   localStorage.setItem('cara_custom_resume_keys', JSON.stringify(customKeys));
   // Add slot to UI
   const slotsDiv = document.getElementById('resume-upload-slots');
-  const slotHtml = `<div class="resume-slot" id="slot-${key}"><div class="resume-slot-header"><input type="text" class="resume-slot-title-input" id="title-${key}" value="${escHtml(name)}" onchange="renameSlot('${key}',this.value)"><span class="resume-slot-status slot-status-custom" id="status-${key}">✓ Your version loaded</span></div><div class="resume-slot-body"><div class="slot-preview has-text" id="preview-${key}">${escHtml(text.substring(0,220))}…</div><div class="slot-actions"><button class="slot-btn upload-trigger-btn" onclick="document.getElementById('file-${key}').click()">&#11014; Upload PDF / TXT</button><input type="file" accept=".pdf,.txt" id="file-${key}" style="display:none" onchange="handleFileUpload('${key}',this.files[0])"><button class="slot-btn" onclick="showPasteArea('${key}')">&#9998; Paste Text</button><button class="slot-btn danger" id="remove-${key}" onclick="clearSlot('${key}')">&#10005; Remove</button></div></div><div class="slot-paste-area" id="paste-area-${key}"><textarea id="paste-text-${key}" placeholder="Paste your full resume text here…"></textarea><div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><button class="slot-btn upload-trigger-btn" onclick="savePastedResume('${key}')">Save This Resume</button><button class="slot-btn" onclick="hidePasteArea('${key}')">Cancel</button></div></div></div>`;
-  slotsDiv.insertAdjacentHTML('beforeend', slotHtml);
+  slotsDiv.insertAdjacentHTML('beforeend', makeSlotHtml(key, name, text));
   // Regenerate pills
   buildUploadSlots();
   document.getElementById('new-resume-name').value = '';
@@ -2632,6 +2683,8 @@ function attachPillListeners() {
 let savedJD        = localStorage.getItem('cara_sess_jd') || '';
 let savedJDUrl     = localStorage.getItem('cara_sess_jdurl') || '';
 let savedRoleName  = localStorage.getItem('cara_sess_rolename') || '';
+let savedCompany   = localStorage.getItem('cara_sess_company') || '';
+let savedRoleTitle = localStorage.getItem('cara_sess_roletitle') || '';
 let savedAtsKeywords = localStorage.getItem('cara_sess_ats_kw') || '';
 let savedAtsFlags  = localStorage.getItem('cara_sess_ats_flags') || '';
 let savedAtsPath   = localStorage.getItem('cara_sess_ats_path') || '';
@@ -2692,11 +2745,17 @@ document.querySelectorAll('#cl-tone .tab').forEach(tab => {
 document.getElementById('save-jd-btn').addEventListener('click', () => {
   savedJD = document.getElementById('jd-text').value.trim();
   savedJDUrl = document.getElementById('jd-url').value.trim();
-  savedRoleName = document.getElementById('job-role-name').value.trim();
+  savedCompany = (document.getElementById('jd-company').value || '').trim();
+  savedRoleTitle = (document.getElementById('jd-role').value || '').trim();
+  savedRoleName = savedRoleTitle + (savedCompany ? ' at ' + savedCompany : '');
   if (!savedJD) { alert('Please paste a job description first.'); return; }
   localStorage.setItem('cara_sess_jd', savedJD);
   localStorage.setItem('cara_sess_jdurl', savedJDUrl);
   localStorage.setItem('cara_sess_rolename', savedRoleName);
+  localStorage.setItem('cara_sess_company', savedCompany);
+  localStorage.setItem('cara_sess_roletitle', savedRoleTitle);
+  // Auto-fill company research company name
+  if (savedCompany) { const cnEl = document.getElementById('company-name'); if (cnEl && !cnEl.value) cnEl.value = savedCompany; }
 
   // Auto-pull salary range from JD
   const salMatch = savedJD.match(/\$[\d,]+(?:K|k)?(?:\s*[-–—to]+\s*\$[\d,]+(?:K|k)?)?(?:\s*(?:per year|\/yr|annually|a year))?/i);
@@ -2705,26 +2764,19 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
     if (salEl && !salEl.value) salEl.value = salMatch[0].trim();
   }
   // Auto-fill sal-role from role name
-  if (savedRoleName) {
+  if (savedRoleTitle || savedRoleName) {
     const roleEl = document.getElementById('sal-role');
-    const rolePart = savedRoleName.replace(/\s+at\s+.+$/i, '').trim();
+    const rolePart = savedRoleTitle || savedRoleName.replace(/\s+at\s+.+$/i, '').trim();
     if (roleEl && !roleEl.value && rolePart) roleEl.value = rolePart;
   }
   document.getElementById('jd-saved-msg').style.display = 'block';
 
   // Auto-add to job tracker
   if (savedRoleName || savedJDUrl) {
-    // Parse "Role at Company" from savedRoleName
-    let autoRole = savedRoleName, autoCompany = '';
-    const atIdx = savedRoleName.lastIndexOf(' at ');
-    if (atIdx > 0) {
-      autoRole = savedRoleName.substring(0, atIdx).trim();
-      autoCompany = savedRoleName.substring(atIdx + 4).trim();
-    }
     const newJob = {
       id: Date.now().toString(),
-      company: autoCompany || '(see URL)',
-      role: autoRole || savedRoleName,
+      company: savedCompany || '(see URL)',
+      role: savedRoleTitle || savedRoleName,
       url: savedJDUrl,
       source: '',
       notes: '',
@@ -3231,6 +3283,103 @@ REQUIREMENTS:
 });
 
 // ─── WHY THIS JOB ─────────────────────────────────────────────────────────────
+// ─── VARIATION TABS (Why This Job + Custom Q&A) ──────────────────────────────────
+function parseVariations(text) {
+  var parts = text.split(/\n(?=\*{0,2}(?:VERSION|VARIATION|OPTION)\s*\d+\b)/i);
+  var versions=[]; var notes='';
+  parts.forEach(function(part){
+    var hm=part.match(/^\*{0,2}((?:VERSION|VARIATION|OPTION)\s*\d+)\b[.:\s]?\*{0,2}\s*/i);
+    if(hm){versions.push({label:hm[1].charAt(0).toUpperCase()+hm[1].slice(1).toLowerCase().replace(/^(version|variation|option)/i,function(m){return m.charAt(0).toUpperCase()+m.slice(1).toLowerCase();}),content:part.slice(hm[0].length).trim()});return;}
+    var nm=part.match(/^\*{0,2}(?:NOTES?|QUESTIONS?|CLARIFYING\s*QUESTIONS?)\b[.:\s]?\*{0,2}\s*/i);
+    if(nm){notes=part.slice(nm[0].length).trim();return;}
+    if(part.trim()&&versions.length===0)versions.push({label:'Version 1',content:part.trim()});
+  });
+  if(!versions.length&&text.trim())versions.push({label:'Version 1',content:text.trim()});
+  return {versions:versions,notes:notes};
+}
+function renderVariationTabs(prefix,text){
+  var parsed=parseVariations(text);
+  var versions=parsed.versions; var notes=parsed.notes;
+  var tabRow=document.getElementById(prefix+'-tab-row');
+  var tabPanels=document.getElementById(prefix+'-tab-panels');
+  var notesBox=document.getElementById(prefix+'-notes-box');
+  var notesContent=document.getElementById(prefix+'-notes-content');
+  var stream=document.getElementById(prefix+'-stream');
+  var tabsWrap=document.getElementById(prefix+'-tabs-wrap');
+  var chatEl=document.getElementById(prefix+'-chat');
+  if(!tabRow||!tabPanels)return;
+  tabRow.innerHTML=versions.map(function(v,i){return '<div class="tab'+(i===0?' active':'')+'" onclick="switchVarTab(\'"+prefix+"\',"+(i)+")">'+escHtml(v.label)+'</div>';}).join('');
+  tabPanels.innerHTML=versions.map(function(v,i){return '<div id="'+prefix+'-panel-'+i+'" style="display:'+(i===0?'block':'none')+';white-space:pre-wrap;font-size:0.88rem;line-height:1.8;color:var(--black);">'+escHtml(v.content)+'</div>';}).join('');
+  if(notes&&notesContent){notesContent.textContent=notes;if(notesBox)notesBox.style.display='block';}
+  if(stream)stream.style.display='none';
+  if(tabsWrap)tabsWrap.style.display='block';
+  if(chatEl)chatEl.style.display='block';
+}
+function switchVarTab(prefix,idx){
+  document.querySelectorAll('#'+prefix+'-tab-row .tab').forEach(function(t,i){t.classList.toggle('active',i===idx);});
+  var i=0;while(true){var p=document.getElementById(prefix+'-panel-'+i);if(!p)break;p.style.display=(i===idx)?'block':'none';i++;}
+}
+function copyActiveTab(prefix){
+  var idx=0;document.querySelectorAll('#'+prefix+'-tab-row .tab').forEach(function(t,i){if(t.classList.contains('active'))idx=i;});
+  var p=document.getElementById(prefix+'-panel-'+idx);if(p)navigator.clipboard.writeText(p.textContent).catch(function(){});
+}
+async function callClaudeChat(systemPrompt,messages,onChunk){
+  var apiKey=localStorage.getItem('cara_api_key')||'';
+  if(!apiKey)throw new Error('No API key saved.');
+  var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4096,system:systemPrompt,messages:messages})});
+  if(!res.ok)throw new Error('API error '+res.status);
+  var data=await res.json(); var text=data.content[0].text; onChunk(text); return text;
+}
+var whyHistory=[];
+var qaHistory=[];
+var leHistory=[];
+var whySysPrompt='';
+var qaSysPrompt='';
+var leSysPrompt='';
+async function sendVariantChat(prefix,history,sysPrompt){
+  var input=document.getElementById(prefix+'-chat-input');
+  var thread=document.getElementById(prefix+'-chat-thread');
+  var loading=document.getElementById(prefix+'-chat-loading');
+  var msg=input.value.trim();if(!msg)return;
+  history.push({role:'user',content:msg});
+  thread.insertAdjacentHTML('beforeend','<div style="margin-bottom:0.5rem;padding:0.4rem 0.7rem;background:var(--bgoff);border-radius:4px;font-size:0.83rem;"><div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:0.15rem;">You</div>'+escHtml(msg)+'</div>');
+  input.value='';thread.scrollTop=thread.scrollHeight;
+  loading.style.display='flex';
+  var replyId=prefix+'-cr'+Date.now();
+  thread.insertAdjacentHTML('beforeend','<div style="margin-bottom:0.5rem;padding:0.4rem 0.7rem;border-left:3px solid var(--black);font-size:0.83rem;"><div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:0.15rem;">Claude</div><div id="'+replyId+'" style="white-space:pre-wrap;"></div></div>');
+  try{
+    var replyText='';
+    await callClaudeChat(sysPrompt,history,function(t){replyText=t;var el=document.getElementById(replyId);if(el)el.textContent=t;thread.scrollTop=thread.scrollHeight;});
+    history.push({role:'assistant',content:replyText});
+    var parsed=parseVariations(replyText);
+    if(parsed.versions.length>0)renderVariationTabs(prefix,replyText);
+  }catch(e){var el=document.getElementById(replyId);if(el)el.textContent='Error: '+e.message;}
+  finally{loading.style.display='none';}
+}
+
+async function sendLeChat(){
+  var input=document.getElementById('le-chat-input');
+  var thread=document.getElementById('le-chat-thread');
+  var loading=document.getElementById('le-chat-loading');
+  var msg=input.value.trim();if(!msg)return;
+  leHistory.push({role:'user',content:msg});
+  var msgId='le-um-'+Date.now();
+  thread.insertAdjacentHTML('beforeend','<div id="'+msgId+'" data-role="user" style="margin-bottom:0.5rem;padding:0.4rem 0.7rem;background:var(--bgoff);border-radius:4px;font-size:0.83rem;"><div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:0.15rem;">You</div><div class="le-bubble">'+escHtml(msg)+'</div></div>');
+  input.value='';thread.scrollTop=thread.scrollHeight;
+  loading.style.display='flex';
+  var replyId='le-cr-'+Date.now();
+  thread.insertAdjacentHTML('beforeend','<div style="margin-bottom:0.5rem;padding:0.4rem 0.7rem;border-left:3px solid var(--black);font-size:0.83rem;"><div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:0.15rem;">Claude</div><div id="'+replyId+'" style="white-space:pre-wrap;"></div></div>');
+  try{
+    var replyText='';
+    await callClaudeChat(leSysPrompt,leHistory,function(t){replyText=t;var el=document.getElementById(replyId);if(el)el.textContent=t;thread.scrollTop=thread.scrollHeight;});
+    leHistory.push({role:'assistant',content:replyText});
+    // Green check on user bubble
+    var ub=document.getElementById(msgId);
+    if(ub){var bc=ub.querySelector('.le-bubble');if(bc)bc.insertAdjacentHTML('beforeend',' <span style="color:#1e6b35;font-size:0.76rem;font-weight:700;font-family:\'Raleway\',sans-serif;letter-spacing:0.04em;">✓ incorporated</span>');}
+  }catch(e){var el=document.getElementById(replyId);if(el)el.textContent='Error: '+e.message;}
+  finally{loading.style.display='none';}
+}
+
 document.getElementById('gen-why-btn').addEventListener('click', async () => {
   const jd = savedJD || document.getElementById('jd-text').value.trim();
   if (!jd) { showError('why-error', 'Please save a job description in Step 01 first.'); return; }
@@ -3267,48 +3416,33 @@ REQUIREMENTS:
 - Keep each answer to 2-3 focused paragraphs
 - Make the connection between her unique trajectory and this specific role feel natural and inevitable
 
-Format as:
+Provide exactly 2 complete versions, each answering both questions with a distinct angle or emphasis.
+Label each version exactly as VERSION 1, VERSION 2, etc.
+Under each version include both:
 WHY I CHOSE THIS ROLE:
 [answer]
 
 WHY I WILL BE A GREAT FIT:
-[answer]`;
+[answer]
+
+If you have any clarifying questions or notes for Cara, add them at the end under:
+NOTES:
+[questions or notes]
+
+No preamble before VERSION 1.`;
 
   try {
-    const output = document.getElementById('why-output');
-    output.textContent = '';
+    const stream = document.getElementById('why-stream');
+    const tabsWrap = document.getElementById('why-tabs-wrap');
+    stream.textContent = ''; stream.style.display = 'block';
+    tabsWrap.style.display = 'none';
+    document.getElementById('why-chat').style.display = 'none';
     document.getElementById('why-result').classList.add('visible');
-    document.getElementById('why-qc-result').style.display = 'none';
+    whyHistory = [];
     let whyText = '';
-    await callClaude(systemPrompt, userMsg, text => { whyText = text; output.textContent = text; });
-
-    // Quality check second pass
-    if (whyText && whyText.length > 100) {
-      document.getElementById('why-qc-loading').classList.add('visible');
-      const qcPrompt = `You are a quality reviewer for job application essays. Evaluate this "Why This Job / Why I'm a Great Fit" response on two dimensions only.`;
-      const qcMsg = `JOB DESCRIPTION:\n${jd}\n\nRESPONSE TO EVALUATE:\n${whyText}\n\nScore this response on:\n1. SPECIFICITY (0-10): Does it reference actual language, requirements, or context from the JD? Or is it generic?\n2. AUTHENTICITY (0-10): Does it draw on real, specific accomplishments? Or rely on vague claims?\n\nOutput EXACTLY this format:\nSPECIFICITY: [score]/10 — [one sentence]\nAUTHENTICITY: [score]/10 — [one sentence]\nGENERIC PHRASES: [comma-separated list of any generic phrases found, or "None"]\nSUGGESTIONS:\n1. [specific improvement]\n2. [specific improvement]`;
-      try {
-        let qcText = '';
-        await callClaude(qcPrompt, qcMsg, text => { qcText = text; });
-        const qcOut = document.getElementById('why-qc-output');
-        // Format the QC output
-        const lines = qcText.split('\n').filter(l => l.trim());
-        qcOut.innerHTML = lines.map(l => {
-          const t = l.trim();
-          if (/^(SPECIFICITY|AUTHENTICITY):/.test(t)) {
-            const score = t.match(/(\d+)\/10/);
-            const color = score && parseInt(score[1]) >= 7 ? '#1e6b35' : score && parseInt(score[1]) >= 5 ? '#a05000' : '#c0392b';
-            return `<div style="margin-bottom:0.5rem;"><strong style="color:${color};">${t.split('—')[0].trim()}</strong>${t.includes('—') ? ' — ' + t.split('—').slice(1).join('—').trim() : ''}</div>`;
-          }
-          if (/^GENERIC PHRASES:/.test(t)) return `<div style="margin-bottom:0.5rem;color:var(--mid);">${t}</div>`;
-          if (/^SUGGESTIONS:/.test(t)) return `<div style="margin-top:0.75rem;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.4rem;">Suggestions</div>`;
-          if (/^\d+\./.test(t)) return `<div style="margin-bottom:0.35rem;padding-left:0.5rem;border-left:3px solid var(--border);">${t.replace(/^\d+\.\s*/,'')}</div>`;
-          return `<div>${t}</div>`;
-        }).join('');
-        document.getElementById('why-qc-result').style.display = 'block';
-      } catch(qcErr) { /* silent fail on QC */ }
-      finally { hideLoading('why-qc-loading'); }
-    }
+    await callClaude(systemPrompt, userMsg, function(text) { whyText = text; stream.textContent = text; });
+    whyHistory = [{ role:'user', content:userMsg },{ role:'assistant', content:whyText }]; whySysPrompt = systemPrompt;
+    renderVariationTabs('why', whyText);
   } catch (err) {
     showError('why-error', 'Something went wrong: ' + err.message);
     document.getElementById('why-result').classList.remove('visible');
@@ -3317,7 +3451,10 @@ WHY I WILL BE A GREAT FIT:
   }
 });
 
-// ─── CUSTOM Q&A ───────────────────────────────────────────────────────────────
+document.getElementById('why-chat-send').addEventListener('click', function(){ sendVariantChat('why', whyHistory, whySysPrompt); });
+document.getElementById('why-chat-input').addEventListener('keydown', function(e){ if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){sendVariantChat('why',whyHistory,whySysPrompt);} });
+
+// ─── CUSTOM Q&A ─────────────────────────────────────────────────────────────────────
 document.getElementById('gen-qa-btn').addEventListener('click', async () => {
   const question = document.getElementById('custom-question').value.trim();
   if (!question) { showError('qa-error', 'Please enter a question.'); return; }
@@ -3353,13 +3490,23 @@ REQUIREMENTS:
 - Do not use clichés or generic statements — every claim should be supported by evidence from her background
 - Write in a confident, professional tone
 
-Write the answer directly (no preamble).`;
+Provide 2-3 distinct versions of the answer with different angles, tones, or emphasis.
+Label each exactly as VERSION 1, VERSION 2, VERSION 3.
+If you have questions or notes for Cara, put them at the end under NOTES:
+No preamble before VERSION 1.`;
 
   try {
-    const output = document.getElementById('qa-output');
-    output.textContent = '';
+    const stream = document.getElementById('qa-stream');
+    const tabsWrap = document.getElementById('qa-tabs-wrap');
+    stream.textContent = ''; stream.style.display = 'block';
+    tabsWrap.style.display = 'none';
+    document.getElementById('qa-chat').style.display = 'none';
     document.getElementById('qa-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
+    qaHistory = [];
+    let qaText = '';
+    await callClaude(systemPrompt, userMsg, function(text) { qaText = text; stream.textContent = text; });
+    qaHistory = [{ role:'user', content:userMsg },{ role:'assistant', content:qaText }]; qaSysPrompt = systemPrompt;
+    renderVariationTabs('qa', qaText);
   } catch (err) {
     showError('qa-error', 'Something went wrong: ' + err.message);
     document.getElementById('qa-result').classList.remove('visible');
@@ -3367,6 +3514,9 @@ Write the answer directly (no preamble).`;
     hideLoading('qa-loading');
   }
 });
+
+document.getElementById('qa-chat-send').addEventListener('click', function(){ sendVariantChat('qa', qaHistory, qaSysPrompt); });
+document.getElementById('qa-chat-input').addEventListener('keydown', function(e){ if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){sendVariantChat('qa',qaHistory,qaSysPrompt);} });
 
 
 // ─── SETTINGS MODAL ───────────────────────────────────────────────────────────
@@ -3863,8 +4013,11 @@ function prepJob(id, destination) {
   if (!job) return;
   document.querySelectorAll('.prep-menu').forEach(m => m.style.display = 'none');
   if (job.role || job.company) {
-    savedRoleName = (job.role || '') + (job.company && job.company !== '(see URL)' ? ' at ' + job.company : '');
-    document.getElementById('job-role-name').value = savedRoleName;
+    savedRoleTitle = job.role || '';
+    savedCompany = (job.company && job.company !== '(see URL)') ? job.company : '';
+    savedRoleName = savedRoleTitle + (savedCompany ? ' at ' + savedCompany : '');
+    const jdCompEl = document.getElementById('jd-company'); if (jdCompEl) jdCompEl.value = savedCompany;
+    const jdRoleEl = document.getElementById('jd-role'); if (jdRoleEl) jdRoleEl.value = savedRoleTitle;
   }
   if (job.url) { savedJDUrl = job.url; document.getElementById('jd-url').value = job.url; }
   if (destination === 'company-research') {
@@ -4335,6 +4488,95 @@ document.querySelectorAll('#salary-mode-tabs .tab').forEach(tab => {
   });
 });
 
+function buildSalTab(name,raw){
+  if(!raw||!raw.trim())return '<div style="color:var(--mid);font-size:0.85rem;padding:0.5rem 0;">No data for this section.</div>';
+  var lines=raw.split('\n').map(function(l){return l.trim();}).filter(function(l){return l&&!/^NUMBERS_JSON/.test(l);});
+  var html='';
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function md(s){return s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');}
+  if(name==='positioning'){
+    var hero=[],rest=[],inHero=true;
+    lines.forEach(function(l){if(inHero&&(l.startsWith('-')||l.startsWith('\u2022')||/^\d+\./.test(l)))inHero=false;if(inHero)hero.push(l);else rest.push(l);});
+    if(hero.length)html+='<div style="background:#f7f6f4;border-left:4px solid var(--black);border-radius:0 6px 6px 0;padding:1.1rem 1.25rem;margin-bottom:1rem;font-size:0.9rem;line-height:1.85;color:var(--black);">'+md(esc(hero.join(' ')))+'</div>';
+    rest.forEach(function(l){
+      if(/^[-\u2022*]\s/.test(l))html+='<div style="display:flex;align-items:flex-start;gap:0.55rem;padding:0.55rem 0.75rem;border:1px solid var(--border);border-radius:5px;margin-bottom:0.45rem;font-size:0.86rem;line-height:1.65;"><span style="color:var(--black);font-weight:700;flex-shrink:0;margin-top:0.05rem;">\u2192</span><span>'+md(esc(l.replace(/^[-\u2022*]\s*/,'')))+'</span></div>';
+      else html+='<div style="font-size:0.86rem;line-height:1.8;color:var(--black);margin-bottom:0.4rem;">'+md(esc(l))+'</div>';
+    });
+  }else if(name==='market'){
+    lines.forEach(function(l){
+      var rm=l.match(/^(.+?):\s*\$?([\d,]+)[Kk]?\s*[-\u2013\u2014to]+\s*\$?([\d,]+)[Kk]?/);
+      if(rm){
+        var lbl=rm[1].replace(/\*\*/g,'').trim();
+        var lo=rm[2].replace(/,/g,''),hi=rm[3].replace(/,/g,'');
+        if(lo.length>5)lo=Math.round(parseInt(lo)/1000);else lo=parseInt(lo);
+        if(hi.length>5)hi=Math.round(parseInt(hi)/1000);else hi=parseInt(hi);
+        html+='<div style="display:flex;align-items:center;gap:0.75rem;padding:0.8rem 1rem;border:1px solid var(--border);border-radius:6px;margin-bottom:0.5rem;">'
+          +'<div style="flex:1;font-size:0.86rem;font-weight:600;color:var(--black);">'+esc(lbl)+'</div>'
+          +'<div style="font-size:1.05rem;font-weight:800;color:var(--black);letter-spacing:-0.02em;white-space:nowrap;">$'+lo+'K \u2013 $'+hi+'K</div></div>';
+      }else if(/^[-\u2022*]\s/.test(l)){
+        html+='<div style="display:flex;gap:0.5rem;padding:0.45rem 0.75rem;background:#f7f6f4;border-radius:4px;margin-bottom:0.35rem;font-size:0.85rem;line-height:1.65;"><span style="color:var(--mid);flex-shrink:0;">\u2022</span><span>'+md(esc(l.replace(/^[-\u2022*]\s*/,'')))+'</span></div>';
+      }else if(l){
+        html+='<div style="font-size:0.85rem;line-height:1.8;margin-bottom:0.35rem;">'+md(esc(l))+'</div>';
+      }
+    });
+  }else if(name==='numbers'){
+    var blocks=[],cur=null;
+    lines.forEach(function(l){
+      if(/\*{0,2}(target|floor|stretch|walk.?away|opening|your number)/i.test(l)&&l.length<80){
+        if(cur)blocks.push(cur);
+        cur={label:l.replace(/\*\*/g,'').replace(/:$/,'').trim(),lines:[]};
+      }else if(cur){cur.lines.push(l);}
+      else html+='<div style="font-size:0.85rem;line-height:1.8;margin-bottom:0.4rem;">'+md(esc(l))+'</div>';
+    });
+    if(cur)blocks.push(cur);
+    blocks.forEach(function(b){
+      var acc=(/target|ask/i.test(b.label)?'#3b6d11':/floor|walk|min/i.test(b.label)?'#8b1a1a':'#1a3a6b');
+      var bg=(/target|ask/i.test(b.label)?'#f0f7e8':'var(--bgoff)');
+      html+='<div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:0.75rem;">'
+        +'<div style="padding:0.5rem 1rem;background:'+bg+';border-bottom:1px solid var(--border);font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:'+acc+';">'+esc(b.label)+'</div>'
+        +'<div style="padding:0.7rem 1rem;">'+b.lines.map(function(l){return '<div style="font-size:0.85rem;line-height:1.75;margin-bottom:0.25rem;">'+md(esc(l))+'</div>';}).join('')+'</div></div>';
+    });
+  }else if(name==='scripts'){
+    var scenarios=[],cs=null;
+    lines.forEach(function(l){
+      var isH=/^\d+\.\s*\*\*/.test(l)||(/^\*\*/.test(l)&&l.endsWith('**')&&l.length<90);
+      if(isH){if(cs)scenarios.push(cs);cs={label:l.replace(/^\d+\.\s*/).replace(/\*\*/g,'').replace(/:$/,'').trim(),lines:[]};}
+      else if(cs&&l)cs.lines.push(l);
+      else if(l)scenarios.push({label:'',lines:[l]});
+    });
+    if(cs)scenarios.push(cs);
+    if(!scenarios.length){lines.forEach(function(l){html+='<div style="font-size:0.85rem;line-height:1.8;margin-bottom:0.35rem;">'+md(esc(l))+'</div>';});}
+    else scenarios.forEach(function(s){
+      html+='<div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:0.75rem;">';
+      if(s.label)html+='<div style="padding:0.5rem 1rem;background:var(--bgoff);border-bottom:1px solid var(--border);font-family:\'Raleway\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--black);">'+esc(s.label)+'</div>';
+      s.lines.forEach(function(l){
+        var isScript=l.startsWith('"')||l.startsWith('\u201c')||/^(say|script|try|response):/i.test(l);
+        html+=isScript
+          ?'<div style="margin:0.5rem 0.75rem;padding:0.65rem 0.9rem;background:#f7f6f4;border-left:3px solid var(--black);font-size:0.86rem;line-height:1.75;font-style:italic;">'+md(esc(l))+'</div>'
+          :'<div style="padding:0.3rem 1rem;font-size:0.83rem;line-height:1.65;color:var(--mid);">'+md(esc(l))+'</div>';
+      });
+      html+='</div>';
+    });
+  }else if(name==='traps'){
+    var traps=[],ct=null;
+    lines.forEach(function(l){
+      if(/^\d+\.\s/.test(l)){if(ct)traps.push(ct);ct={label:l.replace(/^\d+\.\s*/).replace(/\*\*/g,'').replace(/:$/,'').trim(),lines:[],instead:[]};}
+      else if(ct){if(/instead|do this|handle|try:/i.test(l))ct.instead.push(l);else ct.lines.push(l);}
+      else html+='<div style="font-size:0.85rem;line-height:1.8;margin-bottom:0.35rem;">'+md(esc(l))+'</div>';
+    });
+    if(ct)traps.push(ct);
+    if(!traps.length){lines.forEach(function(l){html+='<div style="font-size:0.85rem;line-height:1.8;margin-bottom:0.35rem;">'+md(esc(l))+'</div>';});}
+    else traps.forEach(function(t){
+      html+='<div style="border:1px solid #f0d49a;border-radius:6px;overflow:hidden;margin-bottom:0.75rem;">';
+      if(t.label)html+='<div style="padding:0.5rem 1rem;background:#fdf6ec;border-bottom:1px solid #f0d49a;display:flex;align-items:center;gap:0.5rem;"><span style="font-size:0.85rem;">\u26a0</span><span style="font-family:\'Raleway\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;color:#8b5000;">'+esc(t.label)+'</span></div>';
+      t.lines.forEach(function(l){html+='<div style="padding:0.4rem 1rem;font-size:0.84rem;line-height:1.65;">'+md(esc(l))+'</div>';});
+      if(t.instead.length){html+='<div style="margin:0.35rem 0.75rem 0.65rem;padding:0.5rem 0.75rem;background:#f0faf4;border-radius:4px;border:1px solid #b8e6c8;">';t.instead.forEach(function(l){html+='<div style="font-size:0.83rem;line-height:1.65;color:#1e6b35;">'+md(esc(l))+'</div>';});html+='</div>';}
+      html+='</div>';
+    });
+  }
+  return html||'<div style="font-size:0.85rem;color:var(--mid);">No content parsed.</div>';
+}
+
 // Salary result tabs
 document.getElementById('salary-result-tabs').addEventListener('click', e => {
   const tab = e.target.closest('.tab'); if (!tab) return;
@@ -4345,7 +4587,7 @@ document.getElementById('salary-result-tabs').addEventListener('click', e => {
   });
   const activeEl = document.getElementById('salary-tab-' + tab.dataset.saltab);
   const activeOut = document.getElementById('salary-active-output');
-  if (activeEl && activeOut) activeOut.textContent = activeEl.textContent;
+  if (activeEl && activeOut) activeOut.innerHTML = activeEl.innerHTML;
 });
 
 document.getElementById('gen-salary-btn').addEventListener('click', async () => {
@@ -4382,12 +4624,12 @@ document.getElementById('gen-salary-btn').addEventListener('click', async () => 
     document.getElementById('salary-result').classList.add('visible');
     let fullSalText = '';
     await callClaude(systemPrompt, userMsg, text => { fullSalText = text; document.getElementById('salary-tab-positioning').innerHTML = formatSalaryContent(text); });
-    function salSection(txt, startRe, endRe) { const sm = txt.search(startRe); if (sm < 0) return txt; const em = endRe ? txt.search(endRe) : -1; return (em > sm ? txt.substring(sm, em) : txt.substring(sm)).replace(/^##\s*/gm,'').replace(/\*\*/g,'').trim(); }
-    document.getElementById('salary-tab-positioning').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*FINAL POSITIONING/i, /##\s*MARKET RATE/i));
-    document.getElementById('salary-tab-market').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*MARKET RATE/i, /##\s*CARAS NUMBERS/i));
-    document.getElementById('salary-tab-numbers').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*CARAS NUMBERS/i, /##\s*NEGOTIATION SCRIPTS/i));
-    document.getElementById('salary-tab-scripts').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*NEGOTIATION SCRIPTS/i, /##\s*TRAPS TO AVOID/i));
-    document.getElementById('salary-tab-traps').innerHTML = formatSalaryContent(salSection(fullSalText, /##\s*TRAPS TO AVOID/i, null));
+    function salSection(txt, startRe, endRe) { var sm=txt.search(startRe); if(sm<0) return ''; var em=endRe?txt.search(endRe):-1; return (em>sm?txt.substring(sm,em):txt.substring(sm)).replace(/^##\s*/gm,'').replace(/\*\*/g,'').trim(); }
+    document.getElementById('salary-tab-positioning').innerHTML = buildSalTab('positioning', salSection(fullSalText, /##\s*FINAL POSITIONING/i, /##\s*MARKET RATE/i)||fullSalText);
+    document.getElementById('salary-tab-market').innerHTML = buildSalTab('market', salSection(fullSalText, /##\s*MARKET RATE/i, /##\s*CARAS NUMBERS/i));
+    document.getElementById('salary-tab-numbers').innerHTML = buildSalTab('numbers', salSection(fullSalText, /##\s*CARAS NUMBERS/i, /##\s*NEGOTIATION SCRIPTS/i));
+    document.getElementById('salary-tab-scripts').innerHTML = buildSalTab('scripts', salSection(fullSalText, /##\s*NEGOTIATION SCRIPTS/i, /##\s*TRAPS TO AVOID/i));
+    document.getElementById('salary-tab-traps').innerHTML = buildSalTab('traps', salSection(fullSalText, /##\s*TRAPS TO AVOID/i, null));
     document.getElementById('salary-active-output').innerHTML = document.getElementById('salary-tab-positioning').innerHTML;
     // Populate number grid
     try {
@@ -4465,34 +4707,86 @@ renderJobs();
 
 // ─── NEW APPLICATION ──────────────────────────────────────────────────────────
 document.getElementById('new-application-btn').addEventListener('click', () => {
-  if (!confirm('Start a new application? This clears the current JD and ATS results. Your saved resumes and job tracker are not affected.')) return;
-  // Clear JD fields
-  ['jd-text','jd-url','job-role-name'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  document.getElementById('jd-saved-msg').style.display = 'none';
-  // Clear session vars
-  savedJD = ''; savedJDUrl = ''; savedRoleName = '';
+  if (!confirm('Start a new application? This clears all current job content across every panel. Your saved resumes and job tracker entries are not affected.')) return;
+
+  // ── JD fields ──────────────────────────────────────────────────────────────
+  ['jd-text','jd-url','jd-company','jd-role'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const jdMsg = document.getElementById('jd-saved-msg'); if (jdMsg) jdMsg.style.display = 'none';
+
+  // ── Session state ──────────────────────────────────────────────────────────
+  savedJD = ''; savedJDUrl = ''; savedRoleName = ''; savedCompany = ''; savedRoleTitle = '';
   savedAtsKeywords = ''; savedAtsFlags = ''; savedAtsPath = '';
   atsHighestResume = null;
-  ['cara_sess_jd','cara_sess_jdurl','cara_sess_rolename','cara_sess_ats_kw','cara_sess_ats_flags','cara_sess_ats_path','cara_sess_ats_highest'].forEach(k => localStorage.removeItem(k));
-  // Clear ATS outputs
+  ['cara_sess_jd','cara_sess_jdurl','cara_sess_rolename','cara_sess_company','cara_sess_roletitle',
+   'cara_sess_ats_kw','cara_sess_ats_flags','cara_sess_ats_path','cara_sess_ats_highest',
+   'cara_intel_company-research','cara_intel_interview-prep',
+   'cara_intel_linkedin-outreach','cara_intel_salary-intel'].forEach(k => localStorage.removeItem(k));
+
+  // ── ATS Check ──────────────────────────────────────────────────────────────
   ['ats-best-output','ats-keywords-output','ats-flags-output','ats-path-output','score-cards-container'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
-  // Clear recheck
+
+  // ── Revised Resume Check ───────────────────────────────────────────────────
   ['recheck-keywords-output','recheck-improvement-output','recheck-gaps-output','recheck-ready-output'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
   const rcResult = document.getElementById('recheck-result'); if (rcResult) rcResult.classList.remove('visible');
   const rcScore = document.getElementById('recheck-score-card'); if (rcScore) { rcScore.style.display = 'none'; rcScore.innerHTML = ''; }
   const updatedTA = document.getElementById('updated-resume-text'); if (updatedTA) updatedTA.value = '';
-  // Clear line edits
+
+  // ── Line-by-Line Edits ─────────────────────────────────────────────────────
   const leOut = document.getElementById('le-output'); if (leOut) leOut.innerHTML = '';
+  const leChatEl = document.getElementById('le-chat'); if (leChatEl) leChatEl.style.display = 'none';
+  const leChatThread = document.getElementById('le-chat-thread'); if (leChatThread) leChatThread.innerHTML = '';
+  leHistory = []; leSysPrompt = '';
   const leResult = document.getElementById('le-result'); if (leResult) leResult.classList.remove('visible');
-  const tracker = document.getElementById('le-score-tracker'); if (tracker) tracker.style.display = 'none';
+  const leTracker = document.getElementById('le-score-tracker'); if (leTracker) leTracker.style.display = 'none';
   const selBtns = document.getElementById('le-sel-btns'); if (selBtns) selBtns.style.display = 'none';
-  // Clear cover letter
+  const leHint = document.getElementById('le-auto-hint'); if (leHint) leHint.style.display = 'none';
+
+  // ── Cover Letter ───────────────────────────────────────────────────────────
   const clOut = document.getElementById('cl-output'); if (clOut) clOut.innerHTML = '';
   const clResult = document.getElementById('cl-result'); if (clResult) clResult.classList.remove('visible');
-  // Reset resume pill selections
+
+  // ── Why This Job ───────────────────────────────────────────────────────────
+  const whyStream = document.getElementById('why-stream'); if (whyStream) whyStream.textContent = '';
+  const whyTabsWrap = document.getElementById('why-tabs-wrap'); if (whyTabsWrap) whyTabsWrap.style.display = 'none';
+  const whyChatEl = document.getElementById('why-chat'); if (whyChatEl) whyChatEl.style.display = 'none';
+  const whyChatThread = document.getElementById('why-chat-thread'); if (whyChatThread) whyChatThread.innerHTML = '';
+  whyHistory = []; whySysPrompt = '';
+  const whyResult = document.getElementById('why-result'); if (whyResult) whyResult.classList.remove('visible');
+
+  // ── Custom Q&A ─────────────────────────────────────────────────────────────
+  const cqQ = document.getElementById('custom-question'); if (cqQ) cqQ.value = '';
+  const cqW = document.getElementById('word-limit'); if (cqW) cqW.value = '';
+  const qaStream = document.getElementById('qa-stream'); if (qaStream) qaStream.textContent = '';
+  const qaTabsWrap = document.getElementById('qa-tabs-wrap'); if (qaTabsWrap) qaTabsWrap.style.display = 'none';
+  const qaChatEl = document.getElementById('qa-chat'); if (qaChatEl) qaChatEl.style.display = 'none';
+  const qaChatThread = document.getElementById('qa-chat-thread'); if (qaChatThread) qaChatThread.innerHTML = '';
+  qaHistory = []; qaSysPrompt = '';
+  const qaResult = document.getElementById('qa-result'); if (qaResult) qaResult.classList.remove('visible');
+
+  // ── Company Research ───────────────────────────────────────────────────────
+  ['research-tab-snapshot','research-tab-mission','research-tab-priorities','research-tab-watchouts','research-tab-full'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+
+  // ── Interview Prep ─────────────────────────────────────────────────────────
+  const intOut = document.getElementById('interview-output'); if (intOut) intOut.innerHTML = '';
+
+  // ── LinkedIn Outreach ──────────────────────────────────────────────────────
+  const liOut = document.getElementById('li-output'); if (liOut) liOut.innerHTML = '';
+
+  // ── Salary & Recruiter Intel ───────────────────────────────────────────────
+  ['positioning','market','numbers','scripts','traps'].forEach(tab => { const el = document.getElementById('salary-tab-' + tab); if (el) { el.innerHTML = ''; el.style.display = 'none'; } });
+  const salOut = document.getElementById('salary-output'); if (salOut) { salOut.innerHTML = ''; salOut.style.display = 'none'; }
+  const salActive = document.getElementById('salary-active-output'); if (salActive) { salActive.innerHTML = ''; salActive.style.display = 'none'; }
+
+  // ── Work Samples ───────────────────────────────────────────────────────────
+  const wsCards = document.getElementById('ws-cards'); if (wsCards) wsCards.innerHTML = '';
+
+  // ── Resume pill selections ─────────────────────────────────────────────────
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
-  const leHint = document.getElementById('le-auto-hint'); if (leHint) leHint.style.display = 'none';
-  // Navigate to JD panel
+
+  // ── Intel dropdowns ────────────────────────────────────────────────────────
+  setTimeout(populateIntelDropdowns, 50);
+
+  // ── Navigate to JD panel ───────────────────────────────────────────────────
   document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   const jdLink = document.querySelector('nav a[data-panel="job-input"]');
@@ -4603,6 +4897,11 @@ Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.$
     initLeScoreTracker(fullText);
     // Save impactful edits to resume optimizer store
     saveEditsForOptimizers(fullText, selectedLeResume);
+    // Show chat + init history
+    leHistory = [{role:'user',content:userMsg},{role:'assistant',content:fullText}];
+    leSysPrompt = 'You are a resume coach reviewing line-by-line edits with the candidate. When they provide additional context, corrections, or answers to questions, briefly confirm (2-3 sentences) how their note will change the final resume. Be specific about which sections or bullets are affected. Notes are incorporated when they click Generate Resume.';
+    const leChatEl = document.getElementById('le-chat');
+    if (leChatEl) leChatEl.style.display = 'block';
 
   } catch (err) {
     showError('le-error', 'Something went wrong: ' + err.message);
@@ -4611,6 +4910,9 @@ Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.$
     hideLoading('le-loading');
   }
 });
+
+document.getElementById('le-chat-send').addEventListener('click', function(){ sendLeChat(); });
+document.getElementById('le-chat-input').addEventListener('keydown', function(e){ if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)) sendLeChat(); });
 
 function addCheckboxesToTable(html, tabId) {
   const saved = JSON.parse(localStorage.getItem('recheck_checks_' + tabId) || '{}');
@@ -5572,7 +5874,8 @@ Rules:
 - Never add, remove, or change anything not in the edit list
 - Output only the complete updated resume text — no preamble, no commentary`;
 
-  const userMsg = `Here is the base resume:\n\n${baseResume}\n\n---\n\nApply these ${checkedEdits.length} edit(s):\n\n${editsText}\n\nReturn the complete updated resume.`;
+  const chatNotes = leHistory.filter(function(m){return m.role==='user';}).slice(2).map(function(m,i){return 'Note '+(i+1)+': '+m.content;}).join('\n');
+  const userMsg = `Here is the base resume:\n\n${baseResume}\n\n---\n\nApply these ${checkedEdits.length} edit(s):\n\n${editsText}${chatNotes ? '\n\n---\n\nADDITIONAL NOTES FROM CANDIDATE (incorporate into the resume where relevant):\n'+chatNotes : ''}\n\nReturn the complete updated resume.`;
 
   try {
     let text = '';
@@ -6017,7 +6320,15 @@ if (savedJD) {
   document.getElementById('jd-saved-msg').style.display = 'block';
 }
 if (savedJDUrl) document.getElementById('jd-url').value = savedJDUrl;
-if (savedRoleName) document.getElementById('job-role-name').value = savedRoleName;
+if (savedCompany) { const el = document.getElementById('jd-company'); if (el) el.value = savedCompany; }
+if (savedRoleTitle) { const el = document.getElementById('jd-role'); if (el) el.value = savedRoleTitle; }
+else if (savedRoleName && !savedRoleTitle) {
+  // Backward compat: parse legacy combined string
+  const atIdx = savedRoleName.lastIndexOf(' at ');
+  const el1 = document.getElementById('jd-role'), el2 = document.getElementById('jd-company');
+  if (atIdx > 0) { if (el1) el1.value = savedRoleName.substring(0, atIdx).trim(); if (el2) el2.value = savedRoleName.substring(atIdx + 4).trim(); }
+  else { if (el1) el1.value = savedRoleName; }
+}
 
 const savedGoal = localStorage.getItem('cara_daily_goal');
 if (savedGoal) { const goalEl = document.getElementById('daily-goal-input'); if (goalEl) goalEl.value = savedGoal; }
