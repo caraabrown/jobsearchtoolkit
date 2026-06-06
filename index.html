@@ -5683,7 +5683,7 @@ function renderPrioritySteps(){
     var esc2=function(str){return (str||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");};
     var cal='<button onclick="addStepToCalendar(\''+esc2(step.text)+'\',' +'\'' +esc2(j.company)+'\','+'\'' +esc2(j.role)+'\')" title="Add to Google Calendar" style="background:none;border:none;cursor:pointer;font-size:0.75rem;color:var(--mid);flex-shrink:0;">&#128197;</button>';
     return '<div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.7rem 0;'+(i>0?'border-top:1px solid var(--border);':'')+'">'
-      +'<input type="checkbox" style="margin-top:0.25rem;flex-shrink:0;width:16px;height:16px;accent-color:var(--black);" onchange="dashToggleStep(\''+j.id+'\','+ri+',this.checked)">'
+      +'<input type="checkbox" data-job-id="'+j.id+'" data-step-idx="'+ri+'" style="margin-top:0.25rem;flex-shrink:0;width:16px;height:16px;accent-color:var(--black);cursor:pointer;">'
       +'<div style="flex:1;min-width:0;">'
       +'<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.2rem;">'
       +'<span style="font-size:0.62rem;font-weight:700;padding:0.1rem 0.45rem;border-radius:3px;background:'+s.bg+';color:'+s.col+';white-space:nowrap;">'+s.lbl+'</span>'
@@ -5798,6 +5798,14 @@ function dashToggleStep(jobId, idx, done) {
   job.nextstep_items[idx].done = done;
   saveJobs(); renderDashboard(); renderPrioritySteps();
 }
+
+// Delegated listener for priority step checkboxes (avoids inline handler escaping issues)
+document.addEventListener('change', function(e) {
+  const cb = e.target;
+  if (cb.type === 'checkbox' && cb.dataset.jobId && cb.closest('#dash-priority-steps')) {
+    dashToggleStep(cb.dataset.jobId, parseInt(cb.dataset.stepIdx, 10), cb.checked);
+  }
+});
 
 async function generateDashFocus() {
   var cards = document.getElementById('dash-focus-cards');
