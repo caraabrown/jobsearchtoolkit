@@ -5853,10 +5853,12 @@ function renderFocusCards() {
   if (focusActions.length) html += '<div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:0.75rem;" id="focus-actions-list">'
     +'<div style="padding:0.5rem 1rem;background:var(--bgoff);border-bottom:1px solid var(--border);font-family:\'Raleway\',sans-serif;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:var(--mid);">Top Actions</div>'
     +focusActions.map(function(a,i){
-      return '<div style="display:flex;align-items:flex-start;gap:0.65rem;padding:0.6rem 1rem;'+(i>0?'border-top:1px solid var(--border);':'')+a.done?';opacity:0.45;':''+(a.generating?';background:#f7f9ff;':'')+'">'
-        +'<input type="checkbox" data-focus-idx="'+i+'" '+(a.done?'checked':'')+(a.generating?' disabled':'')+' style="margin-top:0.25rem;flex-shrink:0;width:15px;height:15px;accent-color:var(--black);cursor:pointer;">'
-        +'<span style="font-size:0.86rem;line-height:1.55;'+(a.done?'text-decoration:line-through;color:var(--mid);':'')+'">'
-        +escHtml(a.text)+(a.generating?' <em style="font-size:0.75rem;color:var(--mid);">generating next…</em>':'')+'</span></div>';
+      var rowStyle='display:flex;align-items:flex-start;gap:0.65rem;padding:0.6rem 1rem;'+(i>0?'border-top:1px solid var(--border);':'')+(a.done?'opacity:0.45;':'')+(a.generating?'background:#f7f9ff;':'');
+      var textStyle='font-size:0.86rem;line-height:1.55;'+(a.done?'text-decoration:line-through;color:var(--mid);':'');
+      return '<div style="'+rowStyle+'">'
+        +'<input type="checkbox" data-focus-idx="'+i+'" '+(a.done?'checked ':'')+(a.generating?'disabled ':'')+'style="margin-top:0.25rem;flex-shrink:0;width:15px;height:15px;accent-color:var(--black);cursor:pointer;">'
+        +'<span style="'+textStyle+'">'+escHtml(a.text)+(a.generating?' <em style="font-size:0.75rem;color:var(--mid);">generating next…</em>':'')+'</span>'
+        +'</div>';
     }).join('')+'</div>';
   if (focusWatchout) html += '<div style="display:flex;align-items:flex-start;gap:0.6rem;padding:0.65rem 0.9rem;border:1px solid #f0d49a;border-radius:6px;background:#fdf6ec;">'
     +'<span style="font-size:0.85rem;flex-shrink:0;">⚠</span>'
