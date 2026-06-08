@@ -5826,30 +5826,75 @@ async function generateDashFocus() {
   try {
     var full='';
     await callClaude(sys,msg,function(t){full=t;});
-    // Parse structured output into dashboard cards
     var priority=full.match(/PRIORITY:\s*(.+)/i);
     var actions=[...full.matchAll(/^-\s+(.+)/gm)].map(function(m){return m[1].trim();});
     var watchout=full.match(/WATCH OUT:\s*(.+)/i);
-    if(cards){
-      var html='';
-      if(priority)html+='<div style="background:#f7f6f4;border-left:4px solid var(--black);border-radius:0 6px 6px 0;padding:0.85rem 1.1rem;margin-bottom:0.75rem;">'
-        +'<div style="font-family:\'Raleway\',sans-serif;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:var(--mid);margin-bottom:0.3rem;">This Week\'s Focus</div>'
-        +'<div style="font-size:0.92rem;font-weight:700;color:var(--black);line-height:1.5;">'+escHtml(priority[1].trim())+'</div></div>';
-      if(actions.length)html+='<div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:0.75rem;">'
-        +'<div style="padding:0.5rem 1rem;background:var(--bgoff);border-bottom:1px solid var(--border);font-family:\'Raleway\',sans-serif;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:var(--mid);">Top Actions</div>'
-        +actions.map(function(a,i){return '<div style="display:flex;align-items:flex-start;gap:0.6rem;padding:0.55rem 1rem;'+(i>0?'border-top:1px solid var(--border);':'')+'">'
-          +'<span style="font-family:\'Raleway\',sans-serif;font-size:0.7rem;font-weight:800;color:var(--black);flex-shrink:0;margin-top:0.05rem;">'+(i+1)+'.</span>'
-          +'<span style="font-size:0.86rem;line-height:1.55;">'+escHtml(a)+'</span></div>';}).join('')+'</div>';
-      if(watchout)html+='<div style="display:flex;align-items:flex-start;gap:0.6rem;padding:0.65rem 0.9rem;border:1px solid #f0d49a;border-radius:6px;background:#fdf6ec;">'
-        +'<span style="font-size:0.85rem;flex-shrink:0;">⚠</span>'
-        +'<div><div style="font-family:\'Raleway\',sans-serif;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:#8b5000;margin-bottom:0.15rem;">Watch Out</div>'
-        +'<div style="font-size:0.86rem;line-height:1.5;color:var(--black);">'+escHtml(watchout[1].trim())+'</div></div></div>';
-      if(!priority&&!actions.length)html='<div style="font-size:0.85rem;line-height:1.7;white-space:pre-wrap;">'+escHtml(full)+'</div>';
-      cards.innerHTML=html;
-    }
+    focusActions = actions.map(function(a){return {text:a,done:false};});
+    focusPriority = priority ? priority[1].trim() : '';
+    focusWatchout = watchout ? watchout[1].trim() : '';
+    focusSysPrompt = sys + '\n\nContext: ' + msg;
+    renderFocusCards();
   } catch(e) { if(cards) cards.textContent='Error: '+e.message; }
   finally { if(loading) loading.style.display='none'; if(btn) btn.disabled=false; }
 }
+
+var focusActions = [];
+var focusPriority = '';
+var focusWatchout = '';
+var focusSysPrompt = '';
+
+function renderFocusCards() {
+  var cards = document.getElementById('dash-focus-cards');
+  if (!cards) return;
+  var html = '';
+  if (focusPriority) html += '<div style="background:#f7f6f4;border-left:4px solid var(--black);border-radius:0 6px 6px 0;padding:0.85rem 1.1rem;margin-bottom:0.75rem;">'
+    +'<div style="font-family:\'Raleway\',sans-serif;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:var(--mid);margin-bottom:0.3rem;">This Week\'s Focus</div>'
+    +'<div style="font-size:0.92rem;font-weight:700;color:var(--black);line-height:1.5;">'+escHtml(focusPriority)+'</div></div>';
+  if (focusActions.length) html += '<div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:0.75rem;" id="focus-actions-list">'
+    +'<div style="padding:0.5rem 1rem;background:var(--bgoff);border-bottom:1px solid var(--border);font-family:\'Raleway\',sans-serif;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:var(--mid);">Top Actions</div>'
+    +focusActions.map(function(a,i){
+      return '<div style="display:flex;align-items:flex-start;gap:0.65rem;padding:0.6rem 1rem;'+(i>0?'border-top:1px solid var(--border);':'')+a.done?';opacity:0.45;':''+(a.generating?';background:#f7f9ff;':'')+'">'
+        +'<input type="checkbox" data-focus-idx="'+i+'" '+(a.done?'checked':'')+(a.generating?' disabled':'')+' style="margin-top:0.25rem;flex-shrink:0;width:15px;height:15px;accent-color:var(--black);cursor:pointer;">'
+        +'<span style="font-size:0.86rem;line-height:1.55;'+(a.done?'text-decoration:line-through;color:var(--mid);':'')+'">'
+        +escHtml(a.text)+(a.generating?' <em style="font-size:0.75rem;color:var(--mid);">generating next…</em>':'')+'</span></div>';
+    }).join('')+'</div>';
+  if (focusWatchout) html += '<div style="display:flex;align-items:flex-start;gap:0.6rem;padding:0.65rem 0.9rem;border:1px solid #f0d49a;border-radius:6px;background:#fdf6ec;">'
+    +'<span style="font-size:0.85rem;flex-shrink:0;">⚠</span>'
+    +'<div><div style="font-family:\'Raleway\',sans-serif;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:#8b5000;margin-bottom:0.15rem;">Watch Out</div>'
+    +'<div style="font-size:0.86rem;line-height:1.5;color:var(--black);">'+escHtml(focusWatchout)+'</div></div></div>';
+  if (!focusPriority && !focusActions.length) html = '<div style="font-size:0.83rem;color:var(--mid);">Click Generate to get this week\'s focus.</div>';
+  cards.innerHTML = html;
+}
+
+async function completeFocusAction(idx) {
+  if (!focusActions[idx]) return;
+  focusActions[idx].done = true;
+  focusActions[idx].generating = true;
+  renderFocusCards();
+  var completed = focusActions.filter(function(a){return a.done;}).map(function(a){return a.text;});
+  var remaining = focusActions.filter(function(a){return !a.done;});
+  var nextSys = 'You are a job search strategist. The candidate just completed a task. Return ONLY a single string: the next highest-impact action to replace it. No preamble, no quotes, no numbering.';
+  var nextMsg = 'Completed: '+completed.join('; ')+'. Remaining: '+remaining.map(function(a){return a.text;}).join('; ')+'. Context: '+focusSysPrompt+'. What is the single next highest-impact action?';
+  try {
+    var newTask = '';
+    await callClaude(nextSys, nextMsg, function(t){ newTask = t.trim(); });
+    focusActions[idx].generating = false;
+    focusActions.push({text: newTask.replace(/^["'\-\d.]+\s*/,''), done: false});
+  } catch(e) {
+    focusActions[idx].generating = false;
+  }
+  renderFocusCards();
+}
+
+// Delegated listener for focus action checkboxes
+document.addEventListener('change', function(e) {
+  var cb = e.target;
+  if (cb.type === 'checkbox' && cb.dataset.focusIdx !== undefined && cb.closest('#focus-actions-list')) {
+    var idx = parseInt(cb.dataset.focusIdx, 10);
+    if (cb.checked && !focusActions[idx].done) completeFocusAction(idx);
+    else if (!cb.checked) { focusActions[idx].done = false; renderFocusCards(); }
+  }
+});
 
 // ─── GENERATE RESUME FROM SELECTED EDITS ──────────────────────────────────────
 
