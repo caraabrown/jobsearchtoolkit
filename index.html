@@ -4872,8 +4872,18 @@ document.getElementById('new-application-btn').addEventListener('click', () => {
   // ── Intel dropdowns ────────────────────────────────────────────────────────
   setTimeout(populateIntelDropdowns, 50);
 
+  // ── Clear all result boxes ─────────────────────────────────────────────────
+  ['ats-result','le-result','recheck-result','cl-result','why-result','qa-result',
+   'research-result','interview-result','li-result','salary-result','recruiter-result'
+  ].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('visible'); });
+  const leGenSec = document.getElementById('le-gen-resume-section'); if (leGenSec) leGenSec.style.display = 'none';
+  const leIndicator = document.getElementById('le-edit-indicator'); if (leIndicator) leIndicator.style.display = 'none';
+  const grResult = document.getElementById('gr-result'); if (grResult) grResult.style.display = 'none';
+
   // ── Navigate to JD panel ───────────────────────────────────────────────────
   document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(l => l.classList.remove('nav-done'));
+  localStorage.removeItem('cara_nav_done');
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   const jdLink = document.querySelector('nav a[data-panel="job-input"]');
   if (jdLink) jdLink.classList.add('active');
