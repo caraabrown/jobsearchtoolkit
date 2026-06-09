@@ -3413,13 +3413,50 @@ async function sendLeChat(){
     var replyText='';
     await callClaudeChat(leSysPrompt,leHistory,function(t){replyText=t;var el=document.getElementById(replyId);if(el)el.textContent=t;thread.scrollTop=thread.scrollHeight;});
     leHistory.push({role:'assistant',content:replyText});
-    // Parse structured chat edits and merge into unified state
+    // Strip raw CHAT_EDIT blocks from displayed reply
+    var displayReply = replyText.replace(/CHAT_EDIT_START[\s\S]*?CHAT_EDIT_END/g, '').trim();
+    var replyEl = document.getElementById(replyId);
+    if (replyEl) replyEl.textContent = displayReply;
+
+    // Parse structured chat edits, inject as checked cards into #le-output, merge into state
     var parsed = parseChatConfirmation(replyText);
     if (parsed.length > 0) {
-      parsed.forEach(function(newEdit) {
+      var leOutput = document.getElementById('le-output');
+      var existingBlocks = leOutput ? leOutput.querySelectorAll('.edit-block').length : 0;
+      parsed.forEach(function(newEdit, pi) {
+        // Dedupe state
         var existingIdx = leChatEdits.findIndex(function(e) { return e.before && e.before === newEdit.before; });
         if (existingIdx >= 0) { leChatEdits[existingIdx] = newEdit; }
         else { leChatEdits.push(newEdit); }
+
+        // Inject visual card into #le-output
+        if (leOutput) {
+          var blockIdx = existingBlocks + pi;
+          var blockId = 'edit-block-' + blockIdx;
+          // Remove prior card for same BEFORE if present
+          if (newEdit.before) {
+            leOutput.querySelectorAll('.edit-block').forEach(function(b) {
+              if (b.dataset.source === 'chat' && b.dataset.before === newEdit.before) b.remove();
+            });
+          }
+          var safeB = newEdit.before.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+          var safeA = newEdit.after.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+          var safeS = (newEdit.section||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+          var card = '<div class="edit-block" id="'+blockId+'" data-impact="0" data-checked="true" data-before="'+safeB+'" data-after="'+safeA+'" data-isinsert="'+newEdit.isInsert+'" data-source="chat" style="border-left:3px solid #1e6b35;">' +
+            '<div class="edit-block-header"><div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">' +
+            '<label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;margin:0;">' +
+            '<input type="checkbox" checked style="width:15px;height:15px;cursor:pointer;accent-color:#1e6b35;" onchange="updateLeScoreTracker(this,'+blockIdx+')">' +
+            '<strong>Chat Edit</strong></label>' +
+            (safeS ? '<span style="display:inline-block;padding:0.15rem 0.55rem;background:#1a1a1a;border-radius:3px;font-size:0.68rem;font-weight:600;color:#fff;letter-spacing:0.02em;">'+safeS+'</span>' : '') +
+            '<span style="display:inline-block;padding:0.15rem 0.55rem;background:#e8f4ee;border:1px solid #a8d8b8;border-radius:3px;font-size:0.68rem;font-weight:700;color:#1e6b35;">From Chat</span>' +
+            '</div></div>' +
+            (newEdit.isInsert
+              ? '<div class="edit-row-before" style="background:#fff8ee;border-color:#f0c080;"><span class="edit-label" style="color:#a05000;">Insert new</span>'+safeA+'</div>'
+              : '<div class="edit-row-before"><span class="edit-label">Remove</span>'+safeB+'</div>' +
+                '<div class="edit-row-after"><span class="edit-label">Replace with</span><span class="after-text">'+safeA+'</span></div>'
+            ) + '</div>';
+          leOutput.insertAdjacentHTML('beforeend', card);
+        }
       });
       updateLeEditIndicator();
     }
