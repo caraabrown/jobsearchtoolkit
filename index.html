@@ -1462,6 +1462,7 @@
               <div style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.3rem;">Next Step</div>
               <strong style="font-size:1rem;font-family:'Open Sans',sans-serif;color:var(--black);">Generate Full Resume with Selected Edits</strong>
               <div style="font-size:0.8rem;color:var(--mid);margin-top:0.3rem;">Check the edits above, then click Generate. The AI applies only your selected edits to produce the complete updated resume.</div>
+              <div id="le-edit-indicator" style="display:none;margin-top:0.5rem;align-items:center;gap:0.4rem;background:#e8f4ee;border:1px solid #a8d8b8;border-radius:4px;padding:0.3rem 0.7rem;font-size:0.76rem;font-weight:600;color:#1e6b35;font-family:'Raleway',sans-serif;letter-spacing:0.03em;"></div>
             </div>
             <button class="btn" id="gen-resume-btn" onclick="generateResumeFromEdits(this)">Generate Resume</button>
           </div>
@@ -3146,6 +3147,8 @@ const um2 = `You are given a resume, a job description, and a set of recommendat
       try {
         await callClaude(sp2, um2, (text) => { fullLe = text; leOutput.textContent = text; });
         renderEditBlocks(fullLe, leOutput);
+        initLeScoreTracker(fullLe);
+        saveEditsForOptimizers(fullLe, selectedLeResume);
         markNavDone('line-edits');
       } catch(e) {
         leOutput.textContent = 'Error: ' + e.message;
@@ -3335,6 +3338,7 @@ async function callClaudeChat(systemPrompt,messages,onChunk){
 var whyHistory=[];
 var qaHistory=[];
 var leHistory=[];
+var leChatEdits=[];
 var whySysPrompt='';
 var qaSysPrompt='';
 var leSysPrompt='';
@@ -3359,6 +3363,40 @@ async function sendVariantChat(prefix,history,sysPrompt){
   finally{loading.style.display='none';}
 }
 
+function parseChatConfirmation(text) {
+  var results = [];
+  var blockRe = /CHAT_EDIT_START([\s\S]*?)CHAT_EDIT_END/g;
+  var match;
+  while ((match = blockRe.exec(text)) !== null) {
+    var block = match[1];
+    var get = function(field) {
+      var m = block.match(new RegExp(field + ':\\s*([^\\n]+)'));
+      return m ? m[1].trim() : '';
+    };
+    var section = get('SECTION');
+    var before = get('BEFORE');
+    var after = get('AFTER');
+    var type = get('TYPE');
+    if (!after || /\[|placeholder/i.test(after)) continue;
+    var isInsert = (before.toUpperCase() === 'INSERT' || /insert/i.test(type));
+    if (isInsert) before = '';
+    results.push({ section: section, before: before, after: after, isInsert: isInsert, source: 'chat' });
+  }
+  return results;
+}
+
+function updateLeEditIndicator() {
+  var uiCount = 0;
+  document.querySelectorAll('#le-output .edit-block input[type="checkbox"]').forEach(function(cb){ if (cb.checked) uiCount++; });
+  var chatCount = leChatEdits.length;
+  var el = document.getElementById('le-edit-indicator');
+  if (!el) return;
+  var total = uiCount + chatCount;
+  if (total === 0) { el.style.display = 'none'; return; }
+  el.style.display = 'inline-flex';
+  el.textContent = total + ' edit' + (total !== 1 ? 's' : '') + ' queued' + (chatCount > 0 ? ' (' + chatCount + ' from chat)' : '');
+}
+
 async function sendLeChat(){
   var input=document.getElementById('le-chat-input');
   var thread=document.getElementById('le-chat-thread');
@@ -3375,7 +3413,16 @@ async function sendLeChat(){
     var replyText='';
     await callClaudeChat(leSysPrompt,leHistory,function(t){replyText=t;var el=document.getElementById(replyId);if(el)el.textContent=t;thread.scrollTop=thread.scrollHeight;});
     leHistory.push({role:'assistant',content:replyText});
-    // Green check on user bubble
+    // Parse structured chat edits and merge into unified state
+    var parsed = parseChatConfirmation(replyText);
+    if (parsed.length > 0) {
+      parsed.forEach(function(newEdit) {
+        var existingIdx = leChatEdits.findIndex(function(e) { return e.before && e.before === newEdit.before; });
+        if (existingIdx >= 0) { leChatEdits[existingIdx] = newEdit; }
+        else { leChatEdits.push(newEdit); }
+      });
+      updateLeEditIndicator();
+    }
     var ub=document.getElementById(msgId);
     if(ub){var bc=ub.querySelector('.le-bubble');if(bc)bc.insertAdjacentHTML('beforeend',' <span style="color:#1e6b35;font-size:0.76rem;font-weight:700;font-family:\'Raleway\',sans-serif;letter-spacing:0.04em;">✓ incorporated</span>');}
   }catch(e){var el=document.getElementById(replyId);if(el)el.textContent='Error: '+e.message;}
@@ -4737,7 +4784,7 @@ document.getElementById('new-application-btn').addEventListener('click', () => {
   const leOut = document.getElementById('le-output'); if (leOut) leOut.innerHTML = '';
   const leChatEl = document.getElementById('le-chat'); if (leChatEl) leChatEl.style.display = 'none';
   const leChatThread = document.getElementById('le-chat-thread'); if (leChatThread) leChatThread.innerHTML = '';
-  leHistory = []; leSysPrompt = '';
+  leHistory = []; leSysPrompt = ''; leChatEdits = [];
   const leResult = document.getElementById('le-result'); if (leResult) leResult.classList.remove('visible');
   const leTracker = document.getElementById('le-score-tracker'); if (leTracker) leTracker.style.display = 'none';
   const selBtns = document.getElementById('le-sel-btns'); if (selBtns) selBtns.style.display = 'none';
@@ -4901,7 +4948,8 @@ Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.$
     saveEditsForOptimizers(fullText, selectedLeResume);
     // Show chat + init history
     leHistory = [{role:'user',content:userMsg},{role:'assistant',content:fullText}];
-    leSysPrompt = 'You are a resume coach reviewing line-by-line edits with the candidate. When they provide additional context, corrections, or answers to questions, briefly confirm (2-3 sentences) how their note will change the final resume. Be specific about which sections or bullets are affected. Notes are incorporated when they click Generate Resume.';
+    leChatEdits = [];
+    leSysPrompt = 'You are a resume coach reviewing line-by-line edits with the candidate. When they provide additional context, corrections, or answers to questions, confirm the change in 2-3 sentences, then output one or more structured edit blocks using EXACTLY this format:\n\nCHAT_EDIT_START\nSECTION: [section name]\nBEFORE: [exact original text, or the word INSERT if adding new content]\nAFTER: [complete replacement or new text, ready to paste]\nTYPE: [Replace | Insert]\nCHAT_EDIT_END\n\nAlways output a block for every discrete change (title, date, bullet, section). Never use placeholder text in AFTER. If the user asks a question with no change to make, skip the block.';
     const leChatEl = document.getElementById('le-chat');
     if (leChatEl) leChatEl.style.display = 'block';
 
@@ -5119,6 +5167,7 @@ function updateLeScoreTracker(checkbox, idx) {
   document.getElementById('le-checked-count').textContent = checked;
   const projected = leBaseScore ? Math.min(leBaseScore + totalImpact, 100) + '%' : (totalImpact ? '+' + totalImpact + ' pts' : '—');
   document.getElementById('le-projected-score').textContent = projected;
+  updateLeEditIndicator();
 }
 
 // ─── RECHECK OUTPUT TABS ──────────────────────────────────────────────────────
@@ -5904,20 +5953,30 @@ async function generateResumeFromEdits(btn) {
   const baseResume = RESUMES[selectedLeResume]?.text || '';
   if (!baseResume) { alert('No base resume is selected. Select one in the Line-by-Line Edits tab.'); return; }
 
+  // Collect UI-checked edits
   const blocks = document.querySelectorAll('#le-output .edit-block');
-  const checkedEdits = [];
+  const uiEdits = [];
   blocks.forEach(b => {
     const cb = b.querySelector('input[type="checkbox"]');
     if (cb && cb.checked) {
-      checkedEdits.push({
+      uiEdits.push({
         before: b.dataset.before || '',
         after: b.dataset.after || '',
-        isInsert: b.dataset.isinsert === 'true'
+        isInsert: b.dataset.isinsert === 'true',
+        source: 'ui'
       });
     }
   });
 
-  if (checkedEdits.length === 0) { alert('Check at least one edit to apply, then click Generate.'); return; }
+  // Merge: start with UI edits, then apply chat edits — chat wins on same BEFORE
+  const merged = uiEdits.slice();
+  leChatEdits.forEach(function(chatEdit) {
+    var existingIdx = merged.findIndex(function(e) { return !e.isInsert && e.before === chatEdit.before; });
+    if (existingIdx >= 0) { merged[existingIdx] = chatEdit; }
+    else { merged.push(chatEdit); }
+  });
+
+  if (merged.length === 0) { alert('Check at least one edit to apply, or send a note in the chat thread, then click Generate.'); return; }
 
   if (btn) btn.disabled = true;
   document.getElementById('gr-loading').style.display = 'flex';
@@ -5925,7 +5984,7 @@ async function generateResumeFromEdits(btn) {
   const errEl = document.getElementById('gr-error');
   if (errEl) { errEl.textContent = ''; errEl.classList.remove('visible'); }
 
-  const editsText = checkedEdits.map((e, i) => {
+  const editsText = merged.map((e, i) => {
     if (e.isInsert) return `INSERT ${i+1}: Add this new line/bullet:\n${e.after}`;
     return `REPLACE ${i+1}:\nOriginal: ${e.before}\nNew version: ${e.after}`;
   }).join('\n\n');
@@ -5938,8 +5997,7 @@ Rules:
 - Never add, remove, or change anything not in the edit list
 - Output only the complete updated resume text — no preamble, no commentary`;
 
-  const chatNotes = leHistory.filter(function(m){return m.role==='user';}).slice(2).map(function(m,i){return 'Note '+(i+1)+': '+m.content;}).join('\n');
-  const userMsg = `Here is the base resume:\n\n${baseResume}\n\n---\n\nApply these ${checkedEdits.length} edit(s):\n\n${editsText}${chatNotes ? '\n\n---\n\nADDITIONAL NOTES FROM CANDIDATE (incorporate into the resume where relevant):\n'+chatNotes : ''}\n\nReturn the complete updated resume.`;
+  const userMsg = `Here is the base resume:\n\n${baseResume}\n\n---\n\nApply these ${merged.length} edit(s) (${uiEdits.filter(e=>merged.includes(e)).length} from line-by-line UI, ${leChatEdits.length} from chat):\n\n${editsText}\n\nReturn the complete updated resume.`;
 
   try {
     let text = '';
