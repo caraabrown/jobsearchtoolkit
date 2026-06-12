@@ -1342,9 +1342,13 @@
         </div>
         <div id="add-resume-msg" style="display:none;margin-top:0.8rem;font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.1em;"></div>
       </div>
-    </div>
+      <div style="margin-top:2rem;border-top:1px solid var(--border);padding-top:1.5rem;" id="quick-links-section">
+        <div style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;color:var(--black);margin-bottom:0.25rem;">Quick Copy Links</div>
+        <div style="font-size:0.78rem;color:var(--mid);margin-bottom:1rem;">Save links you paste frequently into applications — portfolio, LinkedIn, etc. Label each one and copy with one click.</div>
+        <div id="quick-links-list" style="display:flex;flex-direction:column;gap:0.6rem;"></div>
+      </div>
 
-    <div class="panel" id="panel-job-input">
+    </div>
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
         <div>
           <div class="panel-title">Job <em>Description</em></div>
@@ -3162,6 +3166,12 @@ Be specific and direct.`;
     gapsOut.innerHTML = renderRecheckTab(gaps || '', 'gaps');
     readyOut.innerHTML= renderRecheckTab(ready|| '', 'ready');
 
+    // Inject full context into recheck chat so Claude can actually answer questions
+    const _recheckResume = document.getElementById('updated-resume-text')?.value?.trim() || updatedResume || '';
+    const _recheckJD = savedJD || document.getElementById('jd-text')?.value?.trim() || '';
+    recheckChatSysPrompt = `You are a resume coach reviewing a revised resume ATS check with the candidate. You have full context — answer questions specifically. Be direct and concrete.\n\nATS ANALYSIS RESULTS:\n${fullText}\n\nREVISED RESUME:\n${_recheckResume}\n\nJOB DESCRIPTION:\n${_recheckJD}\n\nAnswer questions about scores, gaps, improvements, or specific edits in 2-4 sentences. Always reference specific lines, sections, or scores from the context above. Never say you can't see the content — you have all of it above.`;
+    recheckChatHistory = [];
+
     // Wire up static tabs
     document.querySelectorAll('#recheck-tabs .tab').forEach(tab => {
       tab.addEventListener('click', () => {
@@ -3201,11 +3211,12 @@ Be specific and direct.`;
       const label = ordinals[roundNum] || (roundNum + 'th');
       r2.innerHTML = `🔄 <strong>Round ${label}:</strong> Generating edits based on your Revised Resume Check recommendations.`;
       r2.style.display = 'block';
-      // Run the edits
+      // Use latest generated resume for round 2+ — falls back to updated-resume-text textarea
       const jd2 = savedJD || document.getElementById('jd-text').value.trim();
-      if (!jd2 || !updatedResume) return;
+      const latestResume = window._grResumeText || updatedResume;
+      if (!jd2 || !latestResume) return;
       const sp2 = `You are a senior resume editor. PERSPECTIVE: You are advising from the point of view of a hiring manager. What problems does this role solve at a company like this? How do I empower Cara to position herself as that solution?\n\nYou produce precise, surgical edits — exact original text, exact replacement, and one-line reason. Never invent experience not in the resume.`;
-const um2 = `You are given a resume, a job description, and a set of recommendations from an ATS analysis. Your job is to translate each recommendation into a precise, surgical edit block.\n\nFor each recommendation:\n1. Find the EXACT line in the resume it refers to\n2. Rewrite only what needs changing\n3. Output in the structured format below\n\nRESUME:\n${updatedResume}\n\nJOB DESCRIPTION:\n${jd2}\n\nRECOMMENDATIONS TO TRANSLATE:\n${fullText}\n\nFirst output this exact summary line:\nEDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+\n\nThen for each recommendation output a block in this EXACT format:\n\nSECTION: [section name — for Professional History include company name e.g. "Professional History — Kroger"]\nCONTEXT: [copy the 1-2 lines immediately surrounding the BEFORE line in the resume]\nBEFORE: [copy the exact original line from the resume verbatim — do not paraphrase]\nAFTER: [your rewritten version, ready to paste — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nSCORE_IMPACT: [estimated ATS point gain for this single edit, whole number]\nWHY: [one sentence explaining the specific improvement]\n\nRULES:\n- BEFORE must be copied verbatim from the resume — never invented\n- AFTER must be complete and ready to paste with no placeholders\n- Only make changes that are honest wordsmithing of existing experience\n- Never invent titles, companies, credentials or skills not in the resume\n- ABSOLUTE BAN — never insert spaces between individual letters in any AFTER text. "A R E A S O F E X P E R T I S E" is forbidden. Write unspaced words only.`;      const leOutput = document.getElementById('le-output');
+const um2 = `You are given a resume, a job description, and a set of recommendations from an ATS analysis. Your job is to translate each recommendation into a precise, surgical edit block.\n\nFor each recommendation:\n1. Find the EXACT line in the resume it refers to\n2. Rewrite only what needs changing\n3. Output in the structured format below\n\nRESUME:\n${latestResume}\n\nJOB DESCRIPTION:\n${jd2}\n\nRECOMMENDATIONS TO TRANSLATE:\n${fullText}\n\nFirst output this exact summary line:\nEDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+\n\nThen for each recommendation output a block in this EXACT format:\n\nSECTION: [section name — for Professional History include company name e.g. "Professional History — Kroger"]\nCONTEXT: [copy the 1-2 lines immediately surrounding the BEFORE line in the resume]\nBEFORE: [copy the exact original line from the resume verbatim — do not paraphrase]\nAFTER: [your rewritten version, ready to paste — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nSCORE_IMPACT: [estimated ATS point gain for this single edit, whole number]\nWHY: [one sentence explaining the specific improvement]\n\nRULES:\n- BEFORE must be copied verbatim from the resume — never invented\n- AFTER must be complete and ready to paste with no placeholders\n- Only make changes that are honest wordsmithing of existing experience\n- Never invent titles, companies, credentials or skills not in the resume\n- ABSOLUTE BAN — never insert spaces between individual letters in any AFTER text. "A R E A S O F E X P E R T I S E" is forbidden. Write unspaced words only.`;      const leOutput = document.getElementById('le-output');
       leOutput.textContent = '';
       showLoading('le-loading');
       document.getElementById('le-result').classList.add('visible');
@@ -3404,7 +3415,7 @@ var qaHistory=[];
 var leHistory=[];
 var whySysPrompt='';
 var qaSysPrompt='';
-var leSysPrompt='';
+var leSysPrompt='You are a resume editor. Generate Line-by-Line Edits first — your full ATS results, resume, and job description will be loaded into context automatically so you can answer questions and revise specific edits.';
 async function sendVariantChat(prefix,history,sysPrompt){
   var input=document.getElementById(prefix+'-chat-input');
   var thread=document.getElementById(prefix+'-chat-thread');
@@ -4887,6 +4898,10 @@ document.getElementById('new-application-btn').addEventListener('click', () => {
   // ── Intel dropdowns ────────────────────────────────────────────────────────
   setTimeout(populateIntelDropdowns, 50);
 
+  // ── Nav done dots ──────────────────────────────────────────────────────────
+  document.querySelectorAll('nav a.nav-done').forEach(l => l.classList.remove('nav-done'));
+  localStorage.removeItem('cara_nav_done');
+
   // ── Navigate to JD panel ───────────────────────────────────────────────────
   document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -5000,7 +5015,11 @@ Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.$
     saveEditsForOptimizers(fullText, selectedLeResume);
     // Show chat + init history
     leHistory = [{role:'user',content:userMsg},{role:'assistant',content:fullText}];
-    leSysPrompt = `You are a resume editor reviewing line-by-line edits with the candidate. You have two modes:\n\nMODE 1 — EDIT REVISION: If the candidate references a specific edit number (e.g. "Edit 3", "#7", "edit 14") or asks to change a specific BEFORE/AFTER pair, respond with a revised block in this EXACT format and nothing else before it:\n\nREVISED_EDIT: [edit number]\nAFTER: [complete revised text, ready to paste]\nWHY: [one sentence on what changed and why]\n\nMODE 2 — GENERAL CONTEXT: If they provide general context, corrections, or answer a question, respond in 2-3 sentences confirming how it will affect the resume when they click Generate Resume. Be specific about which sections or bullets are affected.\n\nCurrent edit list:\n${fullText}`;
+    const _leJD = savedJD || document.getElementById('jd-text')?.value?.trim() || '';
+    const _leAtsScores = savedAtsKeywords || localStorage.getItem('cara_sess_ats_kw') || '';
+    const _leAtsPath = savedAtsPath || localStorage.getItem('cara_sess_ats_path') || '';
+    const _leResume = (window._grResumeText) || (window.RESUMES && window.RESUMES[selectedLeResume]) || '';
+    leSysPrompt = `You are a resume editor reviewing line-by-line edits with the candidate. You have two modes:\n\nMODE 1 — EDIT REVISION: If the candidate references a specific edit number (e.g. "Edit 3", "#7", "edit 14") or asks to change a specific BEFORE/AFTER pair, respond with a revised block in this EXACT format and nothing else before it:\n\nREVISED_EDIT: [edit number]\nAFTER: [complete revised text, ready to paste]\nWHY: [one sentence on what changed and why]\n\nMODE 2 — GENERAL CONTEXT: If they provide general context, corrections, or answer a question, respond in 2-3 sentences confirming how it will affect the resume when they click Generate Resume. Be specific about which sections or bullets are affected.\n\nJOB DESCRIPTION:\n${_leJD}\n\nATS MISSING KEYWORDS:\n${_leAtsScores}\n\nFASTEST PATH TO 95%+:\n${_leAtsPath}\n\nRESUME BEING EDITED:\n${_leResume}\n\nCurrent edit list:\n${fullText}`;
     const leChatEl = document.getElementById('le-chat');
     if (leChatEl) leChatEl.style.display = 'block';
 
@@ -5016,7 +5035,7 @@ document.getElementById('le-chat-send').addEventListener('click', function(){ se
 document.getElementById('le-chat-input').addEventListener('keydown', function(e){ if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)) sendLeChat(); });
 
 var recheckChatHistory = [];
-var recheckChatSysPrompt = 'You are a resume coach reviewing a revised resume ATS check with the candidate. Answer questions about scores, gaps, or changes in 2-3 sentences. Be specific and direct.';
+var recheckChatSysPrompt = 'You are a resume coach reviewing a revised resume ATS check with the candidate. Run the Revised Resume Check first — your full ATS results, resume, and job description will be loaded into context automatically so you can answer questions specifically.';
 
 async function sendRecheckChat() {
   var input = document.getElementById('recheck-chat-input');
@@ -6688,6 +6707,62 @@ document.addEventListener('click', function(e){
     setTimeout(function(){ if(!document.getElementById('gd-card-1')) gdRenderSignals(); }, 50);
   }
 });
+/* ─── QUICK COPY LINKS ─── */
+(function(){
+  const LS_KEY = 'cara_quick_links';
+  const DEFAULTS = [
+    { label:'Portfolio', value:'' },
+    { label:'LinkedIn', value:'' },
+    { label:'', value:'' }
+  ];
+
+  function load(){ try { return JSON.parse(localStorage.getItem(LS_KEY)) || DEFAULTS; } catch(e){ return DEFAULTS; } }
+  function save(links){ localStorage.setItem(LS_KEY, JSON.stringify(links)); }
+
+  function render(){
+    const container = document.getElementById('quick-links-list');
+    if(!container) return;
+    const links = load();
+    container.innerHTML = links.map((l,i)=>`
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        <input type="text" value="${escHtml(l.label)}" placeholder="Label" data-qi="${i}" data-qf="label"
+          style="width:110px;flex-shrink:0;font-size:0.82rem;padding:0.45rem 0.6rem;border:1px solid var(--border);border-radius:4px;font-family:inherit;color:var(--black);background:#fff;"
+          oninput="qlUpdate(${i},'label',this.value)">
+        <input type="text" value="${escHtml(l.value)}" placeholder="Paste URL or text…" data-qi="${i}" data-qf="value"
+          style="flex:1;font-size:0.82rem;padding:0.45rem 0.6rem;border:1px solid var(--border);border-radius:4px;font-family:inherit;color:var(--black);background:#fff;"
+          oninput="qlUpdate(${i},'value',this.value)">
+        <button onclick="qlCopy(${i})" style="font-size:0.7rem;font-family:'Raleway',sans-serif;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:0.45rem 0.9rem;background:var(--black);color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Copy</button>
+      </div>
+    `).join('');
+  }
+
+  window.qlUpdate = function(i, field, val){
+    const links = load();
+    links[i][field] = val;
+    save(links);
+  };
+
+  window.qlCopy = function(i){
+    const links = load();
+    const val = links[i].value;
+    if(!val) return;
+    navigator.clipboard.writeText(val).then(()=>{
+      const btn = document.querySelectorAll('#quick-links-list button')[i];
+      if(btn){ const orig=btn.textContent; btn.textContent='Copied!'; setTimeout(()=>btn.textContent=orig,1500); }
+    });
+  };
+
+  // Init on panel activation
+  document.addEventListener('click', function(e){
+    const link = e.target.closest('[data-panel]');
+    if(link && link.dataset.panel==='my-resumes') setTimeout(render, 50);
+  });
+  // Also init on load if panel is already active
+  if(document.querySelector('#panel-my-resumes.active')) render();
+  document.addEventListener('DOMContentLoaded', function(){
+    if(document.querySelector('#panel-my-resumes.active')) render();
+  });
+})();
 
 </script>
 </body>
