@@ -4981,7 +4981,7 @@ INTEGRITY RULES (non-negotiable):
 - NEVER add industries, sectors, titles, tools, credentials, or skills not evidenced in the resume
 - NEVER suggest changing a title (e.g. do not suggest VP, Director, or any level Cara has not held)
 - NEVER invent client names, company names, or domains (e.g. fintech, healthcare, federal) not in the resume
-- If a JD keyword requires experience Cara does not have, flag it as a gap — do not fabricate a match
+- If a JD keyword requires experience Cara does not have, do NOT create a SECTION/BEFORE/AFTER block for it — instead append it after all edit blocks in the ---EDITOR_NOTES--- section so it appears in chat, not in the edit list
 - The goal is the highest score achievable through honest wordsmithing only
 
 EDITING RULES:
@@ -5162,6 +5162,8 @@ function renderEditBlocks(rawText, container) {
     blocks.push(currentBlock.join('\n'));
   }
 
+  const chatNotes = [];
+
   blocks.forEach((block, i) => {
     // Parse each field using indexOf-based extraction
     function extractField(text, fieldName, nextFields) {
@@ -5187,6 +5189,16 @@ function renderEditBlocks(rawText, container) {
     const fromChat    = /SOURCE:\s*CHAT/i.test(block);
 
     if (!before && !after) return;
+
+    // Gap flags and no-edit notes → chat thread, not edit cards
+    const isGapFlag = /GAP\s*FLAG|NO\s*EDIT\s*POSSIBLE|NOT\s*EDITABLE|no\s*direct\s*experience|cannot\s*be\s*wordsmith/i.test(after) ||
+                      /GAP\s*FLAG|NO\s*EDIT\s*POSSIBLE|NOT\s*EDITABLE/i.test(before) ||
+                      /GAP\s*FLAG|NO\s*EDIT\s*POSSIBLE|NOT\s*EDITABLE/i.test(type);
+    if (isGapFlag) {
+      const noteText = (section ? '[' + section + '] ' : '') + (after || before) + (why ? '\n' + why : '');
+      chatNotes.push(noteText);
+      return;
+    }
 
     const impact = parseInt(scoreImpact) || 0;
     const editId = 'edit-block-' + i;
@@ -5217,6 +5229,23 @@ function renderEditBlocks(rawText, container) {
   }
 
   container.innerHTML = html || `<div style="white-space:pre-wrap;font-size:0.85rem;">${escHtml(rawText)}</div>`;
+
+  // Route any gap flags / no-edit notes to the chat thread
+  if (chatNotes.length > 0) {
+    const thread = document.getElementById('le-chat-thread');
+    if (thread) {
+      const noteHtml = chatNotes.map(n => escHtml(n)).join('\n\n');
+      thread.insertAdjacentHTML('beforeend',
+        '<div style="margin-bottom:0.5rem;padding:0.5rem 0.75rem;border-left:3px solid var(--amber,#c97316);font-size:0.83rem;background:#fffbf5;border-radius:0 4px 4px 0;">' +
+        '<div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:0.25rem;">Claude — Editor\'s Notes</div>' +
+        '<div style="white-space:pre-wrap;line-height:1.5;">' + noteHtml + '</div>' +
+        '<div style="margin-top:0.4rem;font-size:0.7rem;color:var(--mid);font-family:\'Raleway\',sans-serif;">These gaps cannot be addressed in the resume — address them in your cover letter.</div>' +
+        '</div>'
+      );
+      thread.scrollTop = thread.scrollHeight;
+      leHistory.push({ role: 'assistant', content: 'Editor\'s Notes:\n' + chatNotes.join('\n\n') });
+    }
+  }
 }
 
 
