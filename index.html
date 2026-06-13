@@ -6244,8 +6244,8 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#7a7975;-webkit-fo
 - .resume-footer — "Cara A. Brown, MBA" · "Page X of ${pageCount}" · "caraabrown.com" — MANDATORY on every page, last child of every .page`;
 
   const pageInstructions = is2page
-    ? `TARGET: exactly 2 pages. Page 1: Header · hbar · Synopsis · Areas of Expertise · Tools · Professional Experience (flows until page full) · Footer. Page 2: Professional Experience continued · Additional Experience · Education & Certifications · Leadership & Affiliations · Footer. Be concise — 1–2 most impactful bullets per role if needed to fit.`
-    : `TARGET: exactly 3 pages. Page 1: Header · hbar · Synopsis · Areas of Expertise · Tools · Professional Experience (flows until page full) · Footer. Page 2: Professional Experience continued (flows until full) · Footer. Page 3: Additional Experience · Education & Certifications · Leadership & Affiliations · Footer. Include all bullets for major roles. Never leave a page mostly empty.`;
+    ? `TARGET: exactly 2 pages. Page 1: Header · hbar · Synopsis · Areas of Expertise · Tools · Alanne International · Professional Experience (flows until page full) · Footer. Page 2: Professional Experience continued · Additional Experience · Education & Certifications · Leadership & Affiliations · Footer. NEVER trim bullet count to hit page limit — compress bullet length or spacing instead. Fill every page naturally — no white space gaps.`
+    : `TARGET: exactly 3 pages. Page 1: Header · hbar · Synopsis · Areas of Expertise · Tools · Alanne International · Professional Experience (flows until page full) · Footer. Page 2: Professional Experience continued (flows until full) · Footer. Page 3: Additional Experience · Education & Certifications · Leadership & Affiliations · Footer. Include all bullets for all roles. NEVER trim bullet count — compress bullet length or spacing if needed. Fill every page naturally — no white space gaps.`;
 
   const sysPrompt = `You are a precise resume HTML formatter. Convert the plain-text resume into a complete, print-ready HTML file using the provided CSS and class structure. Source of truth: Cara A. Brown Resume Style Guide v2.
 Rules:
@@ -6256,7 +6256,7 @@ Rules:
 - Page padding is already set in CSS — do NOT add inline padding or margin on any .page div
 - Output ONLY the complete HTML document starting with <!DOCTYPE html> — no markdown, no explanation
 - SYNOPSIS: EXACTLY 1 paragraph. 100–150 words. Tone: direct, factual, credential-forward — NOT narrative, NOT storytelling. No numeric year counts — never "X years" or "X+ years" — use "proven" instead. BANNED: "The work is rarely what it appears" / "what looks like a technology gap is usually a diagnostic failure" / "I start there" / any rhetorical "what looks like X is really Y" construction. End with: MBA, Design Strategy — California College of the Arts, ranked #2 graduate design program globally.
-- TITLE LINE: max 3 items · separated by · · role titles/functions ONLY (no skills/keywords) · must fit on 1 line · reduce font-size or letter-spacing if it wraps
+- TITLE LINE: max 3 items · separated by · · role titles/functions ONLY (no skills/keywords) · must fit on 1 line · reduce font-size or letter-spacing if it wraps · "Systems Thinker" BANNED from title line (use in synopsis/AoE only) · optional 3rd item: "AI Adoption & Operations Strategist"
 - AREAS OF EXPERTISE: display:block single column ONLY — never CSS grid, never 2-column
 - TOOLS: dot-separated list only (Figma · Miro · FigJam) — no sentences, no descriptions
 - BULLETS: em-dash via CSS ::before ONLY. Never •, ▪, →. Every bullet 2 printed lines or less — split longer bullets into two. Each bullet leads with action or outcome, not context.
@@ -6264,10 +6264,15 @@ Rules:
 - FOOTER IS MANDATORY on every single .page div — last child element, no exceptions
 - ABSOLUTE BAN — never insert spaces between individual letters. "A R E A S O F E X P E R T I S E" is forbidden. Section label text must be unspaced words: "AREAS OF EXPERTISE" not "A R E A S O F E X P E R T I S E"
 - Every .page MUST have display:flex; flex-direction:column — required for footer to pin to bottom
-- Content flows naturally page to page — BANNED: locking any content to a specific page, leaving a page mostly empty, overflowing any page
-- Alanne International: in Professional Experience, dated 01/2026–Present
+- Content flows naturally page to page — BANNED: locking any content to a specific page, leaving a page mostly empty, overflowing any page, white space gaps on any page
+- NEVER trim bullet count to fit pages — compress bullet length or spacing instead. Maximum 3 pages total.
+- Alanne International: ALWAYS in Professional Experience first position, dated 01/2026–Present — NEVER in Additional Experience
 - GardaWorld: in Additional Experience, no dates
 - No graduation years in Education
+- Job order by start date descending: Kroger 03/2022 · RealReal 03/2019 · Foster Brand 07/2016 · EOYDC 02/2015 · Lamont Bishop 05/2010
+- Lamont Bishop Gallery dates: 05/2010–03/2019
+- TRAILING SPACES: none allowed anywhere — before/after punctuation, at line ends, inside any element
+- SPELLING AND PUNCTUATION must be perfect — proofread every word, no double periods, every bullet ends cleanly
 - Characters NEVER allowed in body text: → (use "to"), typed — as bullet character (CSS only), #CloseTheGap (use CloseTheGap)
 ${STRUCTURE}`;
 
