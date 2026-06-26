@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2859,6 +2859,7 @@ document.querySelector('nav').addEventListener('click', function(e) {
   if (panelId === 'next-steps') setTimeout(populateNsJobSelect, 50);
   if (panelId === 'ghost-detector') setTimeout(function(){ if(!document.getElementById('gd-card-1')) gdRenderSignals(); }, 50);
   if (panelId === 'my-resumes') setTimeout(function(){ if(typeof render==='function') render(); }, 50);
+  if (panelId === 'line-edits') setTimeout(function(){ refreshLeChatContext(); }, 50);
   if (['company-research','interview-prep','linkedin-outreach','salary-intel'].includes(panelId)) {
     setTimeout(populateIntelDropdowns, 50);
     if (panelId === 'company-research') restoreIntelOutput('company-research', 'research-tab-snapshot');
@@ -3512,6 +3513,46 @@ var leHistory=[];
 var whySysPrompt='';
 var qaSysPrompt='';
 var leSysPrompt='You are a resume editor. Generate Line-by-Line Edits first — your full ATS results, resume, and job description will be loaded into context automatically so you can answer questions and revise specific edits.';
+
+function refreshLeChatContext() {
+  const _leJD = savedJD || document.getElementById('jd-text')?.value?.trim() || '';
+  const _leResume = window._grResumeText || (atsHighestResume && RESUMES[atsHighestResume]?.text) || RESUMES[selectedLeResume]?.text || '';
+  const _leResumeLabel = (atsHighestResume && RESUMES[atsHighestResume]?.label) || RESUMES[selectedLeResume]?.label || '';
+  const _leAtsScores = (window._sessionCtx?.atsKeywords) || savedAtsKeywords || '';
+  const _leAtsPath = (window._sessionCtx?.atsPath) || savedAtsPath || '';
+  const _leRole = savedRoleName || savedRoleTitle || '';
+  const _leCompany = savedCompany || '';
+  if (!_leJD && !_leResume) return; // nothing to update yet
+  leSysPrompt = `You are a resume editor helping Cara Brown refine her resume for a specific job. You have full context loaded below — never ask her to paste anything.
+
+CRITICAL RULES:
+- Always refer to edits by their UI label: Edit 1, Edit 2 — never "Flag 1" or "INSERT 28"
+- NEVER output before/after text in chat — that belongs in the edit cards
+- Confirmations: "✓ Edit [N] — incorporated." only
+- Questions: 1-2 sentences max
+- Edit revisions respond ONLY with:
+REVISED_EDIT: [number]
+AFTER: [complete text]
+WHY: [one sentence]
+
+CURRENT JOB:
+${_leRole ? 'Role: ' + _leRole : ''}${_leCompany ? '\nCompany: ' + _leCompany : ''}
+
+JOB DESCRIPTION:
+${_leJD || '(not yet saved — ask Cara to save one in Step 01)'}
+
+RESUME BEING EDITED (${_leResumeLabel}):
+${_leResume || '(not yet selected)'}
+
+ATS MISSING KEYWORDS:
+${_leAtsScores || '(run ATS Check first)'}
+
+FASTEST PATH TO 95%+:
+${_leAtsPath || '(run ATS Check first)'}
+
+SESSION CONTEXT:
+${typeof buildSessionContextBlock === 'function' ? buildSessionContextBlock() : ''}`;
+}
 async function sendVariantChat(prefix,history,sysPrompt){
   var input=document.getElementById(prefix+'-chat-input');
   var thread=document.getElementById(prefix+'-chat-thread');
@@ -3538,6 +3579,26 @@ async function sendLeChat(){
   var thread=document.getElementById('le-chat-thread');
   var loading=document.getElementById('le-chat-loading');
   var msg=input.value.trim();if(!msg)return;
+
+  // Collect any selected clarify answers before sending
+  if (window._pendingClarifyQuestions && window._pendingClarifyQuestions.length) {
+    const ctx = window._sessionCtx;
+    window._pendingClarifyQuestions.forEach((item, qi) => {
+      const selectedBtn = document.querySelector(`#clarify-opts-${qi} button[style*="e8f0fe"]`);
+      const otherInput = document.getElementById(`clarify-other-${qi}`);
+      let ans = '';
+      if (selectedBtn) ans = selectedBtn.dataset.opt || '';
+      if (ans.startsWith('Other') && otherInput && otherInput.value.trim()) ans = otherInput.value.trim();
+      if (ans && !ans.startsWith('Other') && !ctx.leAnswers.find(a => a.question === item.q)) {
+        ctx.leAnswers.push({ question: item.q, answer: ans });
+      }
+    });
+    window._pendingClarifyQuestions = null;
+    // Remove the clarify block from chat
+    const cb = document.getElementById('clarify-chat-block');
+    if (cb) cb.remove();
+  }
+
   leHistory.push({role:'user',content:msg});
   var msgId='le-um-'+Date.now();
   thread.insertAdjacentHTML('beforeend','<div id="'+msgId+'" data-role="user" style="margin-bottom:0.5rem;padding:0.4rem 0.7rem;background:var(--bgoff);border-radius:4px;font-size:0.83rem;"><div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:0.15rem;">You</div><div class="le-bubble">'+escHtml(msg)+'</div></div>');
@@ -5052,7 +5113,7 @@ document.getElementById('new-application-btn').addEventListener('click', () => {
   const leOut = document.getElementById('le-output'); if (leOut) leOut.innerHTML = '';
   const leChatEl = document.getElementById('le-chat'); if (leChatEl) leChatEl.style.display = 'none';
   const leChatThread = document.getElementById('le-chat-thread'); if (leChatThread) leChatThread.innerHTML = '';
-  leHistory = []; leSysPrompt = '';
+  leHistory = []; leSysPrompt = 'You are a resume editor. Add a job description and run ATS Check first — context loads automatically.';
   const leResult = document.getElementById('le-result'); if (leResult) leResult.classList.remove('visible');
   const leTracker = document.getElementById('le-score-tracker'); if (leTracker) leTracker.style.display = 'none';
   const selBtns = document.getElementById('le-sel-btns'); if (selBtns) selBtns.style.display = 'none';
@@ -5157,6 +5218,8 @@ function autoSelectBestResume(resumeKey, resumeLabel) {
   const confirm = document.getElementById('le-resume-confirm');
   const confirmName = document.getElementById('le-resume-confirm-name');
   if (confirm && confirmName) { confirmName.textContent = resumeLabel; confirm.style.display = 'block'; }
+  // Keep chat context current
+  if (typeof refreshLeChatContext === 'function') refreshLeChatContext();
 }
 
 // ─── EDIT CATEGORIES ──────────────────────────────────────────────────────────
@@ -5284,33 +5347,33 @@ function renderEditInsightsDashboard() {
 document.getElementById('gen-edits-btn').addEventListener('click', async () => {
   const jd = savedJD || document.getElementById('jd-text').value.trim();
   if (!jd) { showError('le-error', 'Please save a job description in Step 01 first.'); return; }
-
   const resume = RESUMES[selectedLeResume];
   if (!resume || !resume.text) { showError('le-error', 'Please select a resume above.'); return; }
-
   const additionalExp = (document.getElementById('le-additional-exp').value || '').trim();
-
-  // ── STEP 1: Ask clarifying questions if we haven't yet (or if new round) ──
-  const thread = document.getElementById('le-chat-thread');
-  const leChatEl = document.getElementById('le-chat');
   const ctx = window._sessionCtx;
   const round = ctx.currentRound + 1;
+  // Generate edits immediately — no question gate
+  await _generateLineEdits(resume, jd, additionalExp, round);
+});
 
-  // Show chat panel so questions appear
-  if (leChatEl) leChatEl.style.display = 'block';
+async function submitClarifyAnswers(qId, questions) {
+  // No longer used as a gate — kept for any legacy calls
+}
 
-  // Ask clarifying questions before generating (every round)
-  const clarifyPrompt = `You are a resume strategist preparing to generate line-by-line ATS edits for a senior design professional (Cara Brown, MBA — Principal Service Designer / Design Strategist). Before generating edits, ask 2–3 highly specific clarifying questions to sharpen the edits. Base questions on genuine unknowns: role priority (which function to lead with), experience gaps relative to the JD, or specific achievements to emphasize. Do NOT ask generic questions. Keep each question under 20 words. Output ONLY the questions as a JSON array of strings, nothing else. Example: ["Which role function should lead — service design or strategy?","Any recent projects directly relevant to [X from JD]?"]
+async function _askClarifyingQuestions(jd, resumeLabel, round) {
+  // Only ask once per session (round 1 only), skip if already answered
+  const ctx = window._sessionCtx;
+  if (ctx.leAnswers.length > 0) return;
 
-JOB DESCRIPTION (first 800 chars): ${jd.substring(0,800)}
-RESUME LABEL: ${resume.label}
-ROUND: ${round}
-${ctx.leAnswers.length ? `PRIOR ANSWERS (skip repeating these topics):\n${ctx.leAnswers.map(a=>`Q: ${a.question}\nA: ${a.answer}`).join('\n')}` : ''}`;
+  const thread = document.getElementById('le-chat-thread');
+  if (!thread) return;
 
-  showLoading('le-loading');
-  hideError('le-error');
+  const clarifyPrompt = `You are a resume strategist. Generate exactly 2 multiple-choice clarifying questions to sharpen line-by-line ATS edits for Cara Brown, MBA (Principal Service Designer / Design Strategist). Questions must be specific to this JD. Each question must have 3-4 short answer options plus "Other (type below)". Output ONLY valid JSON in this format, nothing else:
+[{"q":"Question text?","opts":["Option A","Option B","Option C","Other (type below)"]},{"q":"Question text?","opts":["Option A","Option B","Option C","Other (type below)"]}]
 
-  let clarifyQuestions = [];
+JOB DESCRIPTION (first 600 chars): ${jd.substring(0,600)}
+RESUME: ${resumeLabel}`;
+
   try {
     const apiKey = localStorage.getItem('cara_api_key') || '';
     const cRes = await fetch('https://api.anthropic.com/v1/messages', {
@@ -5318,51 +5381,45 @@ ${ctx.leAnswers.length ? `PRIOR ANSWERS (skip repeating these topics):\n${ctx.le
       body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:400, messages:[{role:'user',content:clarifyPrompt}] })
     });
     const cData = await cRes.json();
-    const raw = (cData.content||[]).map(b=>b.text||'').join('').trim();
-    const clean = raw.replace(/```json|```/g,'').trim();
-    clarifyQuestions = JSON.parse(clean);
-    if (!Array.isArray(clarifyQuestions)) clarifyQuestions = [];
-  } catch(e) { clarifyQuestions = []; }
+    const raw = (cData.content||[]).map(b=>b.text||'').join('').trim().replace(/```json|```/g,'').trim();
+    const questions = JSON.parse(raw);
+    if (!Array.isArray(questions) || !questions.length) return;
 
-  hideLoading('le-loading');
+    // Render as plain chat message with inline option buttons
+    const qHtml = questions.map((item, qi) => {
+      const optsHtml = item.opts.map(opt =>
+        `<button onclick="leClarifySelectOpt(this, ${qi})" data-qi="${qi}" data-opt="${escHtml(opt)}" style="display:block;width:100%;text-align:left;background:var(--bgoff);border:1px solid var(--border);border-radius:3px;padding:0.3rem 0.6rem;font-size:0.78rem;font-family:inherit;cursor:pointer;margin-bottom:0.25rem;">${escHtml(opt)}</button>`
+      ).join('');
+      return `<div style="margin-bottom:0.75rem;">
+        <div style="font-size:0.8rem;font-weight:600;color:var(--black);margin-bottom:0.4rem;">Q${qi+1}: ${escHtml(item.q)}</div>
+        <div id="clarify-opts-${qi}">${optsHtml}</div>
+        <input type="text" id="clarify-other-${qi}" placeholder="Or type your answer…" style="display:none;width:100%;border:1px solid var(--border);border-radius:3px;padding:0.3rem 0.6rem;font-size:0.78rem;font-family:inherit;margin-top:0.25rem;">
+      </div>`;
+    }).join('');
 
-  if (clarifyQuestions.length > 0) {
-    // Render questions as interactive inputs in chat
-    const qId = 'clarify-block-' + Date.now();
-    const qHtml = `<div id="${qId}" style="padding:0.5rem 0;border-bottom:1px solid var(--border);padding-bottom:0.75rem;margin-bottom:0.5rem;">
-      <div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Claude — Round ${round} Questions</div>
-      ${clarifyQuestions.map((q,i) => `
-        <div class="clarify-question">
-          <div class="clarify-question-text"><strong>Q${i+1}:</strong> ${escHtml(q)}</div>
-          <textarea class="clarify-answer-input" id="clarify-ans-${qId}-${i}" rows="2" placeholder="Your answer…"></textarea>
-        </div>`).join('')}
-      <button class="btn" style="margin-top:0.5rem;width:100%;" onclick="submitClarifyAnswers('${qId}', ${JSON.stringify(clarifyQuestions).replace(/'/g,"&#39;")})">Submit &amp; Generate Edits</button>
-    </div>`;
-    thread.insertAdjacentHTML('beforeend', qHtml);
+    thread.insertAdjacentHTML('beforeend',
+      `<div id="clarify-chat-block" style="padding:0.5rem 0.75rem;border-left:3px solid var(--amber);background:#fffbf5;border-radius:0 4px 4px 0;margin-bottom:0.5rem;">
+        <div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Claude — Optional: sharpen your edits</div>
+        ${qHtml}
+        <div style="font-size:0.72rem;color:var(--mid);margin-top:0.5rem;">Answer above then type anything in the chat box and hit Send — or ignore and your edits are already generated below.</div>
+      </div>`
+    );
+    // Store questions for when user sends answers
+    window._pendingClarifyQuestions = questions;
     thread.scrollTop = thread.scrollHeight;
-    return; // Wait for answers before generating
-  }
-
-  // No questions or already answered — go straight to generation
-  await _generateLineEdits(resume, jd, additionalExp, round);
-});
-
-async function submitClarifyAnswers(qId, questions) {
-  const ctx = window._sessionCtx;
-  questions.forEach((q, i) => {
-    const ans = (document.getElementById(`clarify-ans-${qId}-${i}`)?.value || '').trim();
-    if (ans) ctx.leAnswers.push({ question: q, answer: ans });
-  });
-  // Replace Q block with confirmation
-  const block = document.getElementById(qId);
-  if (block) {
-    block.innerHTML = `<div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--green);margin-bottom:0.25rem;">✓ Answers received — generating edits…</div>`;
-  }
-  const jd = savedJD || document.getElementById('jd-text').value.trim();
-  const resume = RESUMES[selectedLeResume];
-  const additionalExp = (document.getElementById('le-additional-exp').value || '').trim();
-  await _generateLineEdits(resume, jd, additionalExp, ctx.currentRound + 1);
+  } catch(e) { /* silent — questions are optional */ }
 }
+
+function leClarifySelectOpt(btn, qi) {
+  // Highlight selection, show other input if needed
+  const container = document.getElementById(`clarify-opts-${qi}`);
+  if (container) container.querySelectorAll('button').forEach(b => { b.style.background = 'var(--bgoff)'; b.style.borderColor = 'var(--border)'; b.style.fontWeight = '400'; });
+  btn.style.background = '#e8f0fe'; btn.style.borderColor = '#2a4db5'; btn.style.fontWeight = '600';
+  const otherInput = document.getElementById(`clarify-other-${qi}`);
+  if (otherInput) otherInput.style.display = btn.dataset.opt.startsWith('Other') ? 'block' : 'none';
+}
+
+
 
 async function _generateLineEdits(resume, jd, additionalExp, round) {
   const ctx = window._sessionCtx;
@@ -5455,17 +5512,18 @@ Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.$
     }).join('\n');
 
     leHistory = [{role:'user',content:userMsg},{role:'assistant',content:fullText}];
-    leSysPrompt = `You are a resume editor reviewing line-by-line edits with the candidate. Be concise.
+    leSysPrompt = `You are a resume editor reviewing line-by-line edits with the candidate. Be concise. You have full context — the JD, resume, and ATS analysis are already loaded below. Never ask the candidate to paste anything.
 
 CRITICAL RULES FOR CHAT RESPONSES:
 - Always refer to edits by their UI label exactly: Edit 1, Edit 2, Edit 3 — never "Flag 1", "INSERT 28", or any other label
 - NEVER output before/after text in chat — that belongs in the edit cards only
-- When the candidate confirms or approves a change, respond with a single checkbox confirmation line only: "✓ Edit [N] — incorporated." 
+- When the candidate confirms or approves a change, respond with a single checkbox confirmation line only: "✓ Edit [N] — incorporated."
 - When the candidate asks a question, answer in 1-2 sentences maximum
 - When the candidate asks to revise an edit, respond ONLY with this exact format and nothing else:
 REVISED_EDIT: [edit number]
 AFTER: [complete revised text, ready to paste]
 WHY: [one sentence]
+- If the candidate answers the optional clarifying questions shown in chat, acknowledge with "✓ Noted — will apply to next round of edits." only
 
 EDIT REFERENCE INDEX (use these labels exactly):
 ${editIndex}
@@ -5486,6 +5544,9 @@ SESSION CONTEXT:
 ${buildSessionContextBlock()}`;
 
     leHistory = [{role:'user',content:userMsg},{role:'assistant',content:fullText}];
+
+    // Ask optional clarifying questions in chat after edits load (round 1 only, non-blocking)
+    setTimeout(() => _askClarifyingQuestions(_leJD, resume.label, round), 300);
 
   } catch (err) {
     showError('le-error', 'Something went wrong: ' + err.message);
