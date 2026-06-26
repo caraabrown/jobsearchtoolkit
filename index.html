@@ -1549,6 +1549,7 @@
                         <input type="radio" name="gr-pages" value="3" checked style="accent-color:var(--black);margin:0;"> 3-page
                       </label>
                     </div>
+                    <button class="btn btn-ghost" onclick="downloadGrAsDocx(this)">Download Word Doc</button>
                     <button class="btn" onclick="downloadGrAsHTML(this)">Download Styled HTML</button>
                   </div>
                 </div>
@@ -6553,7 +6554,8 @@ document.addEventListener('change', function(e) {
 // ─── GENERATE RESUME FROM SELECTED EDITS ──────────────────────────────────────
 
 async function generateResumeFromEdits(btn) {
-  const baseResume = RESUMES[selectedLeResume]?.text || '';
+  // Use the most recently generated version if available — not the original base resume
+  const baseResume = window._grResumeText || RESUMES[selectedLeResume]?.text || '';
   if (!baseResume) { alert('No base resume is selected. Select one in the Line-by-Line Edits tab.'); return; }
 
   const blocks = document.querySelectorAll('#le-output .edit-block');
@@ -6588,10 +6590,11 @@ Rules:
 - Apply every INSERT by adding the new content in the appropriate section
 - Preserve ALL other resume content exactly — every line, section, header, bullet, and spacing
 - Never add, remove, or change anything not in the edit list
-- ABSOLUTE BAN — never insert spaces between individual letters in any text node. Section headers must be unspaced words: "AREAS OF EXPERTISE" not "A R E A S O F E X P E R T I S E". Spaced characters break every ATS parser.
-- Output the complete updated resume text first
-- If you have editor's notes, questions, or flags for the candidate, append them after the resume separated by this exact line: ---EDITOR_NOTES---
-- Keep editor's notes concise and actionable — specific questions or flags only, no general commentary`;
+- ABSOLUTE BAN — never insert spaces between individual letters in any text node
+- CRITICAL OUTPUT RULE: Output the complete updated resume text FIRST — no preamble, no commentary before the resume, no "I need to flag" statements before the resume
+- If a REPLACE target is not found verbatim, do your best to locate it by context and apply it anyway — never stop to explain before outputting the resume
+- ONLY after the complete resume, if you have editor's notes, append them separated by this exact line on its own: ---EDITOR_NOTES---
+- Editor's notes must come AFTER the full resume, never before or inline`;
 
   const chatNotes = leHistory.filter(function(m){return m.role==='user';}).slice(2).map(function(m,i){return 'Note '+(i+1)+': '+m.content;}).join('\n');
   const userMsg = `Here is the base resume:\n\n${baseResume}\n\n---\n\nApply these ${checkedEdits.length} edit(s):\n\n${editsText}${chatNotes ? '\n\n---\n\nADDITIONAL NOTES FROM CANDIDATE (incorporate into the resume where relevant):\n'+chatNotes : ''}\n\nReturn the complete updated resume.`;
@@ -6600,13 +6603,19 @@ Rules:
     let text = '';
     await callClaude(systemPrompt, userMsg, (t) => { text = t; });
 
-    // Split resume from editor's notes
+    // Split resume from editor's notes — handle multiple separator patterns
     const notesSplit = text.split(/---EDITOR_NOTES---/i);
     let resumeText = notesSplit[0].trim();
     const editorNotes = notesSplit[1] ? notesSplit[1].trim() : '';
 
-    // Also strip any legacy editor notes pattern just in case
-    resumeText = resumeText.replace(/[-—]{2,}\s*EDITOR['']?S?\s*NOTES?[\s\S]*$/i, '').trim();
+    // Strip any notes that leaked before the separator (Claude sometimes puts them inline)
+    resumeText = resumeText
+      .replace(/\*{0,2}Action needed[:\*]{0,2}[\s\S]*$/im, '')
+      .replace(/\*{0,2}Editor'?s? Notes?[:\*]{0,2}[\s\S]*$/im, '')
+      .replace(/[-—]{2,}\s*NOTES?[\s\S]*$/i, '')
+      .replace(/\bnone of the (three|2|3|four|4|five|5) REPLACE targets\b[\s\S]*$/i, '')
+      .replace(/\bI need to flag\b[\s\S]*$/i, '')
+      .trim();
 
     document.getElementById('gr-output').textContent = resumeText;
     document.getElementById('gr-result').style.display = 'block';
@@ -6655,6 +6664,59 @@ function copyGrOutput(btn) {
   });
 }
 
+async function downloadGrAsDocx(btn) {
+  const text = window._grResumeText || document.getElementById('gr-output')?.textContent || '';
+  if (!text.trim()) { alert('Generate a resume first.'); return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
+  if (!window.docx) {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+  const { Document, Packer, Paragraph, TextRun, BorderStyle, AlignmentType } = window.docx;
+  const ACCENT = '2a4080'; const MID = '888680'; const INK = '1e1e1c'; const BLACK = '0d0d0b'; const RULE = 'dddad3';
+  const lines = text.split('\n');
+  const children = [];
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i]; const line = raw.trim();
+    if (!line) { children.push(new Paragraph({ children: [], spacing: { after: 40 } })); continue; }
+    if (i === 0 || (i < 4 && line.match(/^[A-Z][a-z]+ [A-Z]\. [A-Z][a-z]+/))) {
+      const parts = line.split(/,\s*/);
+      children.push(new Paragraph({ children: [new TextRun({ text: parts[0], bold: true, size: 50, font: 'Arial', color: BLACK }), ...(parts[1] ? [new TextRun({ text: ', ' + parts[1], size: 50, font: 'Arial', color: BLACK })] : [])], spacing: { after: 20 } })); continue;
+    }
+    if (i < 6 && !line.startsWith('—') && line.includes('·') && !line.includes('@')) {
+      children.push(new Paragraph({ children: [new TextRun({ text: line, size: 14, font: 'Arial', color: ACCENT, bold: true, allCaps: true })], spacing: { after: 20 } })); continue;
+    }
+    if (line.includes('@') || (line.includes('·') && (line.includes('linkedin') || line.includes('caraabrown')))) {
+      children.push(new Paragraph({ children: [new TextRun({ text: line, size: 15, font: 'Arial', color: MID })], spacing: { after: 60 } }));
+      children.push(new Paragraph({ children: [], border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: RULE, space: 1 } }, spacing: { before: 40, after: 0 } })); continue;
+    }
+    if (line === line.toUpperCase() && line.length < 60 && !line.startsWith('—') && line.length > 2 && !line.includes('·')) {
+      children.push(new Paragraph({ children: [new TextRun({ text: line, size: 12, font: 'Arial', color: ACCENT, bold: true, allCaps: true })], border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: RULE, space: 2 } }, spacing: { before: 100, after: 40 } })); continue;
+    }
+    if (line.startsWith('—') || line.startsWith('\u2014')) {
+      const bulletText = line.replace(/^[\u2014\-]+\s*/, '');
+      children.push(new Paragraph({ children: [new TextRun({ text: '\u2014  ', color: ACCENT, bold: true, size: 15, font: 'Arial' }), new TextRun({ text: bulletText.replace(/<\/?strong>/g, ''), size: 15, font: 'Arial', color: INK })], indent: { left: 220, hanging: 220 }, spacing: { after: 30 } })); continue;
+    }
+    if (line.match(/Designer|Strategist|Director|Manager|VP|Chief|Lead|Principal|Analyst|Officer|Consultant|Founder/) && line.length < 80 && !line.startsWith('—')) {
+      children.push(new Paragraph({ children: [new TextRun({ text: line, size: 16, font: 'Arial', color: ACCENT, bold: true })], spacing: { after: 40 } })); continue;
+    }
+    children.push(new Paragraph({ children: [new TextRun({ text: line, size: 15, font: 'Arial', color: INK })], spacing: { after: 40 } }));
+  }
+  const label = RESUMES[window._grResumeKey || selectedLeResume]?.label || 'Resume';
+  const safeLabel = label.replace(/[^a-zA-Z0-9]/g, '_');
+  const doc = new Document({ sections: [{ properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 864, right: 792, bottom: 864, left: 792 } } }, children }] });
+  try {
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `CaraBrown_${safeLabel}.docx`; a.click(); URL.revokeObjectURL(url);
+    if (btn) { btn.textContent = 'Downloaded!'; setTimeout(() => { btn.textContent = 'Download Word Doc'; btn.disabled = false; }, 2500); }
+  } catch(e) { alert('Download failed: ' + e.message); if (btn) { btn.textContent = 'Download Word Doc'; btn.disabled = false; } }
+}
+
 async function downloadGrAsHTML(btn) {
   const text = window._grResumeText || document.getElementById('gr-output')?.textContent || '';
   if (!text.trim()) { alert('Generate a resume first.'); return; }
@@ -6678,7 +6740,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#7a7975;-webkit-fo
 .print-bar p strong{color:#f6f5f1;font-weight:600;}
 .btn-print{background:#f6f5f1;color:var(--black);font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:8px 22px;border:none;cursor:pointer;}
 .doc{padding:56px 0 48px;display:flex;flex-direction:column;align-items:center;gap:0;}
-.page{width:8.5in;height:11in;background:#ffffff;margin:24px auto;padding:${pagePadding};box-shadow:0 2px 8px rgba(0,0,0,0.1);overflow:hidden;display:flex;flex-direction:column;}
+.page{width:8.5in;min-height:11in;background:#ffffff;margin:24px auto;padding:${pagePadding};box-shadow:0 2px 8px rgba(0,0,0,0.1);display:flex;flex-direction:column;}
 .resume-name{font-size:25pt;font-weight:700;letter-spacing:-0.02em;color:#0d0d0b;line-height:1;margin-bottom:1px;}
 .resume-name span{font-weight:300;}
 .resume-title{font-size:7pt;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#2a4080;margin-top:3px;line-height:1.3;}
