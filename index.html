@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2306,7 +2306,7 @@ PROFESSIONAL HISTORY
 KROGER | Senior Service Designer, Transportation & Logistics | Cincinnati, OH (Remote) 03/2022 – 09/2025
 • Served as Principal Design Strategist on a CEO-identified, enterprise-critical initiative addressing driver experience across 30+ distribution centers, operating as a strategic partner to EVP- and C-suite leaders.
 • Led end-to-end enterprise service design across a complex, multi-system ecosystem spanning people, process, policy, and technology; produced executive-ready service blueprints, journey maps, and systems diagnostics.
-• Designed and launched an enterprise-wide service health measurement and feedback program driving driver satisfaction from 36% → 74%, NPS from –36 → +49, amenity satisfaction 37% → 78%, unload-time satisfaction 36% → 78%.
+• Designed and launched an enterprise-wide service health measurement and feedback program driving driver satisfaction from 36% to 74%, NPS from –36 to +49, amenity satisfaction 37% to 78%, unload-time satisfaction 36% to 78%.
 • Institutionalized Net Promoter Score (NPS) as a permanent distribution center performance metric; work recognized via Chief HR Officer-led presentation at the Qualtrics Conference.
 • Revived a previously stalled enterprise trailer-tracking initiative by quantifying ~$15M/week in loss exposure at a single DC; extrapolated to ~$270M/week enterprise-wide and drove implementation of an enterprise tracking solution.
 • Selected to support enterprise-wide TMS/WMS replacement, defining service vision, adoption strategy, and governance; increased system adoption by 20%.
@@ -2315,7 +2315,7 @@ KROGER | Senior Service Designer, Transportation & Logistics | Cincinnati, OH (R
 
 THE REALREAL | E-Commerce Center Coordinator - Fine Jewelry & Watches | Brisbane, CA 03/2019 – 03/2021
 • Led service and systems redesign across five U.S. e-commerce authentication centers.
-• Reduced customer inquiry backlog by 80% (230 → 40), increased inventory control accuracy by 15%, reduced operational shrink by 10%, recovered $50K in high-value inventory.
+• Reduced customer inquiry backlog by 80% (230 to 40), increased inventory control accuracy by 15%, reduced operational shrink by 10%, recovered $50K in high-value inventory.
 • Designed a future-state internal authentication service model in response to COVID-19 disruption.
 
 FOSTER BRAND | Principal Design Strategist | Brooklyn, NY 07/2016 - 03/2019
@@ -2356,7 +2356,7 @@ Design Strategy | Service Design | Enterprise Experience Strategy | Systems Thin
 
 KROGER | Senior Service Designer | 03/2022 – 09/2025
 • Served as Principal Design Strategist on CEO-identified initiative improving driver experience across 30+ distribution centers.
-• Drove satisfaction 36%→74%, NPS –36→+49; institutionalized NPS as permanent enterprise metric recognized at Qualtrics Conference.
+• Drove satisfaction 36% to 74%, NPS –36 to +49; institutionalized NPS as permanent enterprise metric recognized at Qualtrics Conference.
 • Quantified ~$15M/week in trailer losses at single DC, ~$270M/week enterprise-wide; drove implementation of tracking solution.
 • Increased system adoption by 20% on TMS/WMS replacement; co-authored 2024–2027 Transportation Strategy.
 • Selected for Kroger–Albertsons merger integration team (one of five).
@@ -2397,7 +2397,7 @@ PROFESSIONAL HISTORY
 KROGER | Senior Service Designer, Transportation & Logistics | 03/2022 – 09/2025
 • Led CEO-identified, enterprise-critical service design initiative addressing driver experience across 20+ distribution centers.
 • Designed and deployed enterprise-wide, gamified service feedback and measurement program—journey maps, service blueprints, experience principles.
-• Delivered: driver satisfaction 36%→74%, NPS –36→+49; institutionalized NPS as permanent metric, presented at Qualtrics Conference.
+• Delivered: driver satisfaction 36% to 74%, NPS –36 to +49; institutionalized NPS as permanent metric, presented at Qualtrics Conference.
 • Conducted service design research: user interviews, contextual inquiry, on-site observation with drivers, frontline staff, leadership.
 • Facilitated co-design workshops and design sprints with executives, delivery teams, frontline users.
 • Revived stalled trailer-tracking initiative: quantified $15M/week losses, integrated into Agile backlogs, user stories, acceptance criteria.
@@ -2434,7 +2434,7 @@ PROFESSIONAL HISTORY
 KROGER | Sr. Service Designer (Lead Product Designer, Platform & Systems) | 03/2022 – 09/2025
 • Led end-to-end product and service design for CEO-identified, enterprise-critical digital initiative spanning 30+ distribution centers.
 • Partnered with Product, Engineering, Operations, Finance, HR, Legal to define product strategy, user journeys, MVP scope, and phased rollout.
-• Designed and launched new digital service and measurement platform; increased driver satisfaction 36%→74%, NPS –36→+49.
+• Designed and launched new digital service and measurement platform; increased driver satisfaction 36% to 74%, NPS –36 to +49.
 • Defined success metrics and dashboards; institutionalized NPS as permanent enterprise KPI adopted by EVP of Supply Chain.
 • Revived stalled digital tracking product; quantified $15M/week loss at single site; scaled across 34 sites to inform enterprise investment.
 • Delivered high-fidelity prototypes, service blueprints, and experience principles used by engineering teams.
@@ -2542,6 +2542,52 @@ function loadSavedResumes() {
   if (validCustomKeys.length !== customKeys.length) {
     localStorage.setItem('cara_custom_resume_keys', JSON.stringify(validCustomKeys));
   }
+}
+
+function collectResumePayload() {
+  const out = {};
+  RESUME_KEYS.forEach(({ key }) => {
+    out[key] = {
+      text:   localStorage.getItem(LS_PREFIX + key)            || null,
+      label:  localStorage.getItem(LS_PREFIX + key + '_label') || null,
+      hidden: localStorage.getItem(LS_PREFIX + key + '_hidden')|| null
+    };
+  });
+  const customKeys = JSON.parse(localStorage.getItem('cara_custom_resume_keys') || '[]');
+  out.__customKeys = customKeys;
+  out.__customCounter = parseInt(localStorage.getItem('cara_custom_counter') || '0');
+  return out;
+}
+
+function applyResumePayload(resumeData) {
+  if (!resumeData || typeof resumeData !== 'object') return;
+  const customKeys = Array.isArray(resumeData.__customKeys) ? resumeData.__customKeys : [];
+  if (resumeData.__customCounter) localStorage.setItem('cara_custom_counter', resumeData.__customCounter);
+  localStorage.setItem('cara_custom_resume_keys', JSON.stringify(customKeys));
+  const allKeys = [...RESUME_KEYS.map(r => r.key), ...customKeys.map(c => c.key)];
+  allKeys.forEach(key => {
+    const d = resumeData[key];
+    if (!d) return;
+    if (d.text) {
+      localStorage.setItem(LS_PREFIX + key, d.text);
+      // Update in-memory RESUMES immediately — don't wait for loadSavedResumes
+      if (RESUMES[key]) { RESUMES[key].text = d.text; RESUMES[key].custom = true; }
+    } else { localStorage.removeItem(LS_PREFIX + key); }
+    if (d.label) {
+      localStorage.setItem(LS_PREFIX + key + '_label', d.label);
+      if (RESUMES[key]) RESUMES[key].label = d.label;
+    } else { localStorage.removeItem(LS_PREFIX + key + '_label'); }
+    if (d.hidden) {
+      localStorage.setItem(LS_PREFIX + key + '_hidden', d.hidden);
+      if (RESUMES[key]) RESUMES[key].hidden = true;
+    } else {
+      localStorage.removeItem(LS_PREFIX + key + '_hidden');
+      if (RESUMES[key]) RESUMES[key].hidden = false;
+    }
+  });
+  loadSavedResumes();
+  if (typeof renderSlots === 'function') renderSlots();
+  if (typeof refreshLeChatContext === 'function') refreshLeChatContext();
 }
 
 function saveResume(key, text) {
@@ -2939,32 +2985,40 @@ async function callClaude(systemPrompt, userMessage, onChunk) {
   const atsContext = (savedAtsKeywords || savedAtsFlags || savedAtsPath) ? `ATS INSIGHTS FROM PRIOR ANALYSIS (use these to strengthen your response):\n${savedAtsKeywords ? 'MISSING KEYWORDS:\n' + savedAtsKeywords + '\n\n' : ''}${savedAtsFlags ? 'RED FLAGS & WINS:\n' + savedAtsFlags + '\n\n' : ''}${savedAtsPath ? 'FASTEST PATH TO 95%+:\n' + savedAtsPath + '\n\n' : ''}` : '';
   systemPrompt = hiringManagerLens + atsContext + systemPrompt;
   const apiKey = localStorage.getItem('cara_api_key') || '';
-  if (!apiKey) {
-    throw new Error('No API key saved. Click ⚙ API Key in the header to add your key.');
-  }
+  if (!apiKey) { throw new Error('No API key saved. Click ⚙ API Key in the header to add your key.'); }
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
+    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 8192, system: systemPrompt, messages: [{ role: 'user', content: userMessage }] })
+  });
+  if (!response.ok) { const errBody = await response.text(); throw new Error('API error ' + response.status + ': ' + errBody); }
+  const data = await response.json();
+  const text = data.content[0].text;
+  onChunk(text);
+  return text;
+}
+
+// Prefill variant — forces Claude's first token, preventing any preamble before the resume
+async function callClaudeWithPrefill(systemPrompt, userMessage, prefill, onChunk) {
+  const apiKey = localStorage.getItem('cara_api_key') || '';
+  if (!apiKey) { throw new Error('No API key saved. Click ⚙ API Key in the header to add your key.'); }
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: 8192,
       system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }]
+      messages: [
+        { role: 'user', content: userMessage },
+        { role: 'assistant', content: prefill }
+      ]
     })
   });
-
-  if (!response.ok) {
-    const errBody = await response.text();
-    throw new Error('API error ' + response.status + ': ' + errBody);
-  }
-
+  if (!response.ok) { const errBody = await response.text(); throw new Error('API error ' + response.status + ': ' + errBody); }
   const data = await response.json();
-  const text = data.content[0].text;
+  // Prepend the prefill to the response so output is complete
+  const text = prefill + (data.content[0].text || '');
   onChunk(text);
   return text;
 }
@@ -3516,7 +3570,7 @@ var leSysPrompt='You are a resume editor. Generate Line-by-Line Edits first — 
 
 function refreshLeChatContext() {
   const _leJD = savedJD || document.getElementById('jd-text')?.value?.trim() || '';
-  const _leResume = window._grResumeText || (atsHighestResume && RESUMES[atsHighestResume]?.text) || RESUMES[selectedLeResume]?.text || '';
+  const _leResume = RESUMES[selectedLeResume]?.text || (atsHighestResume && RESUMES[atsHighestResume]?.text) || window._grResumeText || '';
   const _leResumeLabel = (atsHighestResume && RESUMES[atsHighestResume]?.label) || RESUMES[selectedLeResume]?.label || '';
   const _leAtsScores = (window._sessionCtx?.atsKeywords) || savedAtsKeywords || '';
   const _leAtsPath = (window._sessionCtx?.atsPath) || savedAtsPath || '';
@@ -5501,7 +5555,7 @@ Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.$
     const _leJD = savedJD || document.getElementById('jd-text')?.value?.trim() || '';
     const _leAtsScores = ctx.atsKeywords || savedAtsKeywords || '';
     const _leAtsPath = ctx.atsPath || savedAtsPath || '';
-    const _leResume = (window._grResumeText) || (window.RESUMES && window.RESUMES[selectedLeResume]?.text) || '';
+    const _leResume = RESUMES[selectedLeResume]?.text || window._grResumeText || '';
 
     // Build numbered edit list for chat reference
     const editBlocks = output.querySelectorAll('.edit-block');
@@ -6615,8 +6669,10 @@ document.addEventListener('change', function(e) {
 // ─── GENERATE RESUME FROM SELECTED EDITS ──────────────────────────────────────
 
 async function generateResumeFromEdits(btn) {
-  // Use the most recently generated version if available — not the original base resume
-  const baseResume = window._grResumeText || RESUMES[selectedLeResume]?.text || '';
+  // Always use the currently saved resume text as the base — never let a prior
+  // generated version override an updated saved resume
+  const savedResumeText = RESUMES[selectedLeResume]?.text || '';
+  const baseResume = savedResumeText || window._grResumeText || '';
   if (!baseResume) { alert('No base resume is selected. Select one in the Line-by-Line Edits tab.'); return; }
 
   const blocks = document.querySelectorAll('#le-output .edit-block');
@@ -6662,21 +6718,16 @@ Rules:
 
   try {
     let text = '';
-    await callClaude(systemPrompt, userMsg, (t) => { text = t; });
+    // Extract the first line of the base resume to use as prefill
+    // This forces Claude's first token to be the resume name line — no preamble possible
+    const firstLine = baseResume.split('\n').find(l => l.trim()) || 'Cara A. Brown, MBA';
+    await callClaudeWithPrefill(systemPrompt, userMsg, firstLine + '\n', (t) => { text = t; });
 
-    // Split resume from editor's notes — handle multiple separator patterns
-    const notesSplit = text.split(/---EDITOR_NOTES---/i);
-    let resumeText = notesSplit[0].trim();
-    const editorNotes = notesSplit[1] ? notesSplit[1].trim() : '';
-
-    // Strip any notes that leaked before the separator (Claude sometimes puts them inline)
-    resumeText = resumeText
-      .replace(/\*{0,2}Action needed[:\*]{0,2}[\s\S]*$/im, '')
-      .replace(/\*{0,2}Editor'?s? Notes?[:\*]{0,2}[\s\S]*$/im, '')
-      .replace(/[-—]{2,}\s*NOTES?[\s\S]*$/i, '')
-      .replace(/\bnone of the (three|2|3|four|4|five|5) REPLACE targets\b[\s\S]*$/i, '')
-      .replace(/\bI need to flag\b[\s\S]*$/i, '')
-      .trim();
+    // Notes splitting is now simple: prefill guarantees resume starts first.
+    // Only need to split on the separator for editor notes.
+    const sepIdx = text.search(/---EDITOR_NOTES---/i);
+    let resumeText = (sepIdx > -1 ? text.substring(0, sepIdx) : text).trim();
+    const editorNotes = (sepIdx > -1 ? text.substring(sepIdx + 20).trim() : '');
 
     document.getElementById('gr-output').textContent = resumeText;
     document.getElementById('gr-result').style.display = 'block';
@@ -7018,7 +7069,7 @@ const WORK_SAMPLES_CATALOG = [
     key: 'c05',
     title: 'Carrier Experience Survey',
     cat: 'Service Design · Change Management · Enterprise',
-    tldr: 'Built a driver sentiment measurement framework from scratch — no precedent, no owner, no baseline — then the research methodology and change management playbook that turned it into a funded, permanent enterprise function. NPS: −36 → +49.',
+    tldr: 'Built a driver sentiment measurement framework from scratch — no precedent, no owner, no baseline — then the research methodology and change management playbook that turned it into a funded, permanent enterprise function. NPS: −36 to +49.',
     tags: ['Enterprise Service Design','Systems Diagnosis','KPI Design','Executive Advisory','Change Enablement','Cross-functional Alignment','Influence Without Authority','Gamification Design','Field Research'],
     url: 'https://caraabrown.com/kroger-driver-experience'
   },
