@@ -938,34 +938,6 @@
     letter-spacing: 0.1em;
   }
 
-  /* ── Version selector ── */
-  .version-bar { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap; }
-  .version-bar-label { font-family:'Raleway',sans-serif; font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--mid); flex-shrink:0; }
-  .version-pill { font-family:'Raleway',sans-serif; font-size:0.65rem; font-weight:700; letter-spacing:0.04em; padding:0.2rem 0.65rem; border:1px solid var(--border); border-radius:20px; background:transparent; color:var(--mid); cursor:pointer; transition:all 0.15s; white-space:nowrap; }
-  .version-pill.active { background:var(--black); color:#fff; border-color:var(--black); }
-  .version-pill.current { border-color:var(--green); color:var(--green); }
-
-  /* ── Edit category pill ── */
-  .edit-cat-pill { display:inline-block; padding:0.12rem 0.5rem; border-radius:20px; font-family:'Raleway',sans-serif; font-size:0.6rem; font-weight:700; letter-spacing:0.04em; white-space:nowrap; }
-  .edit-cat-keyword   { background:#e8f0fe; color:#1a3a8f; border:1px solid #c5d4f5; }
-  .edit-cat-role      { background:#fce8ff; color:#6b1a8f; border:1px solid #e5c5f5; }
-  .edit-cat-impact    { background:#e8f5ec; color:#1a4a2e; border:1px solid #b2dfc0; }
-  .edit-cat-emphasis  { background:#fff3e0; color:#a05000; border:1px solid #f0c080; }
-  .edit-cat-gap       { background:#fde8e8; color:#7a1a1a; border:1px solid #f0c0c0; }
-  .edit-cat-synopsis  { background:#e8f0f7; color:#1a3a5f; border:1px solid #b2c8e0; }
-  .edit-cat-skills    { background:#f0e8ff; color:#4a1a8f; border:1px solid #d0b8f5; }
-  .edit-cat-bullet    { background:#f7f0e8; color:#5f3a00; border:1px solid #e0c890; }
-  .edit-cat-scope     { background:#e8fff0; color:#004a2e; border:1px solid #90dfc0; }
-  .edit-cat-industry  { background:#fff0f0; color:#8f001a; border:1px solid #f5b8c0; }
-  .edit-cat-round     { background:#1a1a1a; color:#fff; border:1px solid #1a1a1a; }
-
-  /* ── Chat clarify question UI ── */
-  .clarify-question { border:1px solid var(--border); border-radius:6px; padding:0.65rem 0.9rem; background:#fff; margin-bottom:0.5rem; }
-  .clarify-question-text { font-size:0.8rem; color:var(--black); margin-bottom:0.5rem; line-height:1.4; }
-  .clarify-answer-input { width:100%; border:1px solid var(--border); border-radius:3px; padding:0.4rem 0.6rem; font-family:inherit; font-size:0.8rem; resize:none; }
-  .chat-confirm-row { display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.75rem; border-radius:4px; background:#f0f7f2; border-left:3px solid var(--green); font-size:0.8rem; color:var(--black); margin-bottom:0.35rem; }
-  .chat-confirm-cb { width:15px; height:15px; accent-color:var(--green); cursor:pointer; flex-shrink:0; }
-
   .score-improved { display: block; }
   .score-improved-inline { display: block; }
   .prep-dropdown-wrap { position: relative; display: inline-block; }
@@ -1107,8 +1079,6 @@
       <button class="btn" id="save-resume-links-btn">Save Resume Links</button>
     </div>
     <div id="resume-links-saved-msg" style="display:none;margin-top:0.8rem;color:var(--success);font-family:'Raleway',sans-serif;font-size:0.65rem;letter-spacing:0.1em;">✓ LINKS SAVED</div>
-    <hr style="border:none;border-top:1px solid var(--border);margin:1.8rem 0;">
-    <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);text-align:right;">ApplyKit Job Search Toolkit &nbsp;·&nbsp; <span id="settings-version-label"></span></div>
   </div>
 </div>
 
@@ -1198,14 +1168,6 @@
           <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);">Search Analytics</div>
         </div>
         <div id="dash-analytics" style="padding:1rem;"></div>
-      </div>
-
-      <!-- ── EDIT CATEGORY INSIGHTS ── -->
-      <div id="dash-edit-insights-wrap" style="border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:1.5rem;display:none;">
-        <div style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);">
-          <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);">Resume Edit Insights — Across All Applications</div>
-        </div>
-        <div id="dash-edit-insights" style="padding:1rem;"></div>
       </div>
 
       <div style="border:1px solid var(--border);border-radius:6px;padding:1rem;">
@@ -1498,12 +1460,6 @@
           <div class="loading" id="le-loading"><div class="spinner"></div>Analyzing and rewriting for maximum ATS score…</div>
           <div class="error-msg" id="le-error"></div>
 
-          <!-- Version bar -->
-          <div class="version-bar" id="le-version-bar" style="display:none;">
-            <span class="version-bar-label">Version</span>
-            <div id="le-version-pills" style="display:flex;gap:0.4rem;flex-wrap:wrap;"></div>
-          </div>
-
           <div class="result-box" id="le-result">
             <div style="margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
               <div style="display:flex;align-items:center;gap:0.75rem;">
@@ -1549,7 +1505,6 @@
                         <input type="radio" name="gr-pages" value="3" checked style="accent-color:var(--black);margin:0;"> 3-page
                       </label>
                     </div>
-                    <button class="btn btn-ghost" onclick="downloadGrAsDocx(this)">Download Word Doc</button>
                     <button class="btn" onclick="downloadGrAsHTML(this)">Download Styled HTML</button>
                   </div>
                 </div>
@@ -1593,9 +1548,6 @@
         <!-- RIGHT: Controls + Results -->
         <div style="flex:1;min-width:0;">
           <label>Updated Resume Text *</label>
-          <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.4rem;">
-            <button class="btn btn-ghost" style="font-size:0.72rem;padding:0.3rem 0.75rem;" onclick="(function(){const leText=document.getElementById('le-output');if(!leText||!leText.innerText.trim()){alert('No updated resume found on the Line-by-Line Edits page.');return;}const ta=document.getElementById('updated-resume-text');if(ta){ta.value=window._grResumeText||leText.innerText.trim();}})()">← Load from Line Edits</button>
-          </div>
           <textarea id="updated-resume-text" placeholder="Paste your updated resume text here…" rows="14"></textarea>
 
           <div class="btn-row">
@@ -1604,12 +1556,6 @@
 
           <div class="loading" id="recheck-loading"><div class="spinner"></div>Analyzing revised resume…</div>
           <div class="error-msg" id="recheck-error"></div>
-
-          <!-- Version bar -->
-          <div class="version-bar" id="rrc-version-bar" style="display:none;">
-            <span class="version-bar-label">Operating on</span>
-            <div id="rrc-version-pills" style="display:flex;gap:0.4rem;flex-wrap:wrap;"></div>
-          </div>
 
           <div class="score-cards" id="recheck-score-card" style="display:none; margin-bottom:1rem;"></div>
           <div class="result-box" id="recheck-result">
@@ -2306,7 +2252,7 @@ PROFESSIONAL HISTORY
 KROGER | Senior Service Designer, Transportation & Logistics | Cincinnati, OH (Remote) 03/2022 – 09/2025
 • Served as Principal Design Strategist on a CEO-identified, enterprise-critical initiative addressing driver experience across 30+ distribution centers, operating as a strategic partner to EVP- and C-suite leaders.
 • Led end-to-end enterprise service design across a complex, multi-system ecosystem spanning people, process, policy, and technology; produced executive-ready service blueprints, journey maps, and systems diagnostics.
-• Designed and launched an enterprise-wide service health measurement and feedback program driving driver satisfaction from 36% to 74%, NPS from –36 to +49, amenity satisfaction 37% to 78%, unload-time satisfaction 36% to 78%.
+• Designed and launched an enterprise-wide service health measurement and feedback program driving driver satisfaction from 36% → 74%, NPS from –36 → +49, amenity satisfaction 37% → 78%, unload-time satisfaction 36% → 78%.
 • Institutionalized Net Promoter Score (NPS) as a permanent distribution center performance metric; work recognized via Chief HR Officer-led presentation at the Qualtrics Conference.
 • Revived a previously stalled enterprise trailer-tracking initiative by quantifying ~$15M/week in loss exposure at a single DC; extrapolated to ~$270M/week enterprise-wide and drove implementation of an enterprise tracking solution.
 • Selected to support enterprise-wide TMS/WMS replacement, defining service vision, adoption strategy, and governance; increased system adoption by 20%.
@@ -2315,7 +2261,7 @@ KROGER | Senior Service Designer, Transportation & Logistics | Cincinnati, OH (R
 
 THE REALREAL | E-Commerce Center Coordinator - Fine Jewelry & Watches | Brisbane, CA 03/2019 – 03/2021
 • Led service and systems redesign across five U.S. e-commerce authentication centers.
-• Reduced customer inquiry backlog by 80% (230 to 40), increased inventory control accuracy by 15%, reduced operational shrink by 10%, recovered $50K in high-value inventory.
+• Reduced customer inquiry backlog by 80% (230 → 40), increased inventory control accuracy by 15%, reduced operational shrink by 10%, recovered $50K in high-value inventory.
 • Designed a future-state internal authentication service model in response to COVID-19 disruption.
 
 FOSTER BRAND | Principal Design Strategist | Brooklyn, NY 07/2016 - 03/2019
@@ -2356,7 +2302,7 @@ Design Strategy | Service Design | Enterprise Experience Strategy | Systems Thin
 
 KROGER | Senior Service Designer | 03/2022 – 09/2025
 • Served as Principal Design Strategist on CEO-identified initiative improving driver experience across 30+ distribution centers.
-• Drove satisfaction 36% to 74%, NPS –36 to +49; institutionalized NPS as permanent enterprise metric recognized at Qualtrics Conference.
+• Drove satisfaction 36%→74%, NPS –36→+49; institutionalized NPS as permanent enterprise metric recognized at Qualtrics Conference.
 • Quantified ~$15M/week in trailer losses at single DC, ~$270M/week enterprise-wide; drove implementation of tracking solution.
 • Increased system adoption by 20% on TMS/WMS replacement; co-authored 2024–2027 Transportation Strategy.
 • Selected for Kroger–Albertsons merger integration team (one of five).
@@ -2397,7 +2343,7 @@ PROFESSIONAL HISTORY
 KROGER | Senior Service Designer, Transportation & Logistics | 03/2022 – 09/2025
 • Led CEO-identified, enterprise-critical service design initiative addressing driver experience across 20+ distribution centers.
 • Designed and deployed enterprise-wide, gamified service feedback and measurement program—journey maps, service blueprints, experience principles.
-• Delivered: driver satisfaction 36% to 74%, NPS –36 to +49; institutionalized NPS as permanent metric, presented at Qualtrics Conference.
+• Delivered: driver satisfaction 36%→74%, NPS –36→+49; institutionalized NPS as permanent metric, presented at Qualtrics Conference.
 • Conducted service design research: user interviews, contextual inquiry, on-site observation with drivers, frontline staff, leadership.
 • Facilitated co-design workshops and design sprints with executives, delivery teams, frontline users.
 • Revived stalled trailer-tracking initiative: quantified $15M/week losses, integrated into Agile backlogs, user stories, acceptance criteria.
@@ -2434,7 +2380,7 @@ PROFESSIONAL HISTORY
 KROGER | Sr. Service Designer (Lead Product Designer, Platform & Systems) | 03/2022 – 09/2025
 • Led end-to-end product and service design for CEO-identified, enterprise-critical digital initiative spanning 30+ distribution centers.
 • Partnered with Product, Engineering, Operations, Finance, HR, Legal to define product strategy, user journeys, MVP scope, and phased rollout.
-• Designed and launched new digital service and measurement platform; increased driver satisfaction 36% to 74%, NPS –36 to +49.
+• Designed and launched new digital service and measurement platform; increased driver satisfaction 36%→74%, NPS –36→+49.
 • Defined success metrics and dashboards; institutionalized NPS as permanent enterprise KPI adopted by EVP of Supply Chain.
 • Revived stalled digital tracking product; quantified $15M/week loss at single site; scaled across 34 sites to inform enterprise investment.
 • Delivered high-fidelity prototypes, service blueprints, and experience principles used by engineering teams.
@@ -2542,52 +2488,6 @@ function loadSavedResumes() {
   if (validCustomKeys.length !== customKeys.length) {
     localStorage.setItem('cara_custom_resume_keys', JSON.stringify(validCustomKeys));
   }
-}
-
-function collectResumePayload() {
-  const out = {};
-  RESUME_KEYS.forEach(({ key }) => {
-    out[key] = {
-      text:   localStorage.getItem(LS_PREFIX + key)            || null,
-      label:  localStorage.getItem(LS_PREFIX + key + '_label') || null,
-      hidden: localStorage.getItem(LS_PREFIX + key + '_hidden')|| null
-    };
-  });
-  const customKeys = JSON.parse(localStorage.getItem('cara_custom_resume_keys') || '[]');
-  out.__customKeys = customKeys;
-  out.__customCounter = parseInt(localStorage.getItem('cara_custom_counter') || '0');
-  return out;
-}
-
-function applyResumePayload(resumeData) {
-  if (!resumeData || typeof resumeData !== 'object') return;
-  const customKeys = Array.isArray(resumeData.__customKeys) ? resumeData.__customKeys : [];
-  if (resumeData.__customCounter) localStorage.setItem('cara_custom_counter', resumeData.__customCounter);
-  localStorage.setItem('cara_custom_resume_keys', JSON.stringify(customKeys));
-  const allKeys = [...RESUME_KEYS.map(r => r.key), ...customKeys.map(c => c.key)];
-  allKeys.forEach(key => {
-    const d = resumeData[key];
-    if (!d) return;
-    if (d.text) {
-      localStorage.setItem(LS_PREFIX + key, d.text);
-      // Update in-memory RESUMES immediately — don't wait for loadSavedResumes
-      if (RESUMES[key]) { RESUMES[key].text = d.text; RESUMES[key].custom = true; }
-    } else { localStorage.removeItem(LS_PREFIX + key); }
-    if (d.label) {
-      localStorage.setItem(LS_PREFIX + key + '_label', d.label);
-      if (RESUMES[key]) RESUMES[key].label = d.label;
-    } else { localStorage.removeItem(LS_PREFIX + key + '_label'); }
-    if (d.hidden) {
-      localStorage.setItem(LS_PREFIX + key + '_hidden', d.hidden);
-      if (RESUMES[key]) RESUMES[key].hidden = true;
-    } else {
-      localStorage.removeItem(LS_PREFIX + key + '_hidden');
-      if (RESUMES[key]) RESUMES[key].hidden = false;
-    }
-  });
-  loadSavedResumes();
-  if (typeof renderSlots === 'function') renderSlots();
-  if (typeof refreshLeChatContext === 'function') refreshLeChatContext();
 }
 
 function saveResume(key, text) {
@@ -2885,34 +2785,27 @@ function toggleMobileNav() {
   overlay.classList.toggle('open', !isOpen);
 }
 
-document.querySelector('nav').addEventListener('click', function(e) {
-  const link = e.target.closest('a[data-panel]');
-  if (!link) return;
-  e.preventDefault();
-  const panelId = link.dataset.panel;
-  const target = document.getElementById('panel-' + panelId);
-  if (!target) return;
-  document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  link.classList.add('active');
-  target.classList.add('active');
-  // Scroll main content area to top on panel switch
-  const mainEl = document.querySelector('main');
-  if (mainEl) mainEl.scrollTop = 0;
-  document.querySelector('nav').classList.remove('open');
-  document.getElementById('nav-overlay').classList.remove('open');
-  if (panelId === 'dashboard') { renderDashboard(); maybeAutoFocus(); }
-  if (panelId === 'next-steps') setTimeout(populateNsJobSelect, 50);
-  if (panelId === 'ghost-detector') setTimeout(function(){ if(!document.getElementById('gd-card-1')) gdRenderSignals(); }, 50);
-  if (panelId === 'my-resumes') setTimeout(function(){ if(typeof render==='function') render(); }, 50);
-  if (panelId === 'line-edits') setTimeout(function(){ refreshLeChatContext(); }, 50);
-  if (['company-research','interview-prep','linkedin-outreach','salary-intel'].includes(panelId)) {
-    setTimeout(populateIntelDropdowns, 50);
-    if (panelId === 'company-research') restoreIntelOutput('company-research', 'research-tab-snapshot');
-    if (panelId === 'interview-prep') restoreIntelOutput('interview-prep', 'interview-output');
-    if (panelId === 'linkedin-outreach') restoreIntelOutput('linkedin-outreach', 'li-output');
-    if (panelId === 'salary-intel') setTimeout(restoreSalaryNumbers, 50);
-  }
+document.querySelectorAll('nav a[data-panel]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const panelId = link.dataset.panel;
+    document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    link.classList.add('active');
+    document.getElementById('panel-' + panelId).classList.add('active');
+    // Close mobile nav on selection
+    document.querySelector('nav').classList.remove('open');
+    document.getElementById('nav-overlay').classList.remove('open');
+    if (panelId === 'dashboard') { renderDashboard(); maybeAutoFocus(); }
+    if (panelId === 'next-steps') setTimeout(populateNsJobSelect, 50);
+    if (['company-research','interview-prep','linkedin-outreach','salary-intel'].includes(panelId)) {
+      setTimeout(populateIntelDropdowns, 50);
+      if (panelId === 'company-research') restoreIntelOutput('company-research', 'research-tab-snapshot');
+      if (panelId === 'interview-prep') restoreIntelOutput('interview-prep', 'interview-output');
+      if (panelId === 'linkedin-outreach') restoreIntelOutput('linkedin-outreach', 'li-output');
+      if (panelId === 'salary-intel') setTimeout(restoreSalaryNumbers, 50);
+    }
+  });
 });
 
 // ─── COVER LETTER TONE TABS ───────────────────────────────────────────────────
@@ -2985,40 +2878,32 @@ async function callClaude(systemPrompt, userMessage, onChunk) {
   const atsContext = (savedAtsKeywords || savedAtsFlags || savedAtsPath) ? `ATS INSIGHTS FROM PRIOR ANALYSIS (use these to strengthen your response):\n${savedAtsKeywords ? 'MISSING KEYWORDS:\n' + savedAtsKeywords + '\n\n' : ''}${savedAtsFlags ? 'RED FLAGS & WINS:\n' + savedAtsFlags + '\n\n' : ''}${savedAtsPath ? 'FASTEST PATH TO 95%+:\n' + savedAtsPath + '\n\n' : ''}` : '';
   systemPrompt = hiringManagerLens + atsContext + systemPrompt;
   const apiKey = localStorage.getItem('cara_api_key') || '';
-  if (!apiKey) { throw new Error('No API key saved. Click ⚙ API Key in the header to add your key.'); }
+  if (!apiKey) {
+    throw new Error('No API key saved. Click ⚙ API Key in the header to add your key.');
+  }
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-    body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 8192, system: systemPrompt, messages: [{ role: 'user', content: userMessage }] })
-  });
-  if (!response.ok) { const errBody = await response.text(); throw new Error('API error ' + response.status + ': ' + errBody); }
-  const data = await response.json();
-  const text = data.content[0].text;
-  onChunk(text);
-  return text;
-}
-
-// Prefill variant — forces Claude's first token, preventing any preamble before the resume
-async function callClaudeWithPrefill(systemPrompt, userMessage, prefill, onChunk) {
-  const apiKey = localStorage.getItem('cara_api_key') || '';
-  if (!apiKey) { throw new Error('No API key saved. Click ⚙ API Key in the header to add your key.'); }
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: 8192,
       system: systemPrompt,
-      messages: [
-        { role: 'user', content: userMessage },
-        { role: 'assistant', content: prefill }
-      ]
+      messages: [{ role: 'user', content: userMessage }]
     })
   });
-  if (!response.ok) { const errBody = await response.text(); throw new Error('API error ' + response.status + ': ' + errBody); }
+
+  if (!response.ok) {
+    const errBody = await response.text();
+    throw new Error('API error ' + response.status + ': ' + errBody);
+  }
+
   const data = await response.json();
-  // Prepend the prefill to the response so output is complete
-  const text = prefill + (data.content[0].text || '');
+  const text = data.content[0].text;
   onChunk(text);
   return text;
 }
@@ -3074,7 +2959,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
         if (highestKey) autoSelectBestResume(highestKey, highestLabel);
       }
       fullText = text;
-      document.getElementById('ats-best-output').innerHTML = fmtVariation(text);
+      document.getElementById('ats-best-output').textContent = text;
     });
     function atsSection(txt, startRe, endRe) {
       const sm = txt.search(startRe); if (sm < 0) return '';
@@ -3125,8 +3010,6 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     localStorage.setItem('cara_sess_ats_kw', kwTxt);
     localStorage.setItem('cara_sess_ats_flags', flagsTxt);
     localStorage.setItem('cara_sess_ats_path', pathTxt);
-    // Populate session context
-    if (window._sessionCtx) { window._sessionCtx.atsKeywords = kwTxt; window._sessionCtx.atsFlags = flagsTxt; window._sessionCtx.atsPath = pathTxt; }
     document.getElementById('ats-best-output').innerHTML = formatAtsContent(bestTxt || fullText);
     document.getElementById('ats-keywords-output').innerHTML = formatAtsContent(kwTxt);
     document.getElementById('ats-flags-output').innerHTML = formatAtsContent(flagsTxt);
@@ -3310,71 +3193,40 @@ Be specific and direct.`;
     const revisedText = document.getElementById('updated-resume-text')?.value?.trim();
     if (revisedText) autoSaveRevisedResumeToHub(revisedText);
     document.getElementById('recheck-to-le-btn').onclick = async () => {
+      // Navigate to line edits panel
       document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
       const leLink = document.querySelector('nav a[data-panel="line-edits"]');
       if (leLink) leLink.classList.add('active');
       document.getElementById('panel-line-edits').classList.add('active');
-
-      const jd2 = savedJD || document.getElementById('jd-text').value.trim();
-      const latestResume = window._grResumeText || document.getElementById('updated-resume-text')?.value?.trim() || updatedResume;
-      if (!jd2 || !latestResume) { alert('No resume or JD found. Generate a resume first.'); return; }
-
-      const ctx = window._sessionCtx || {};
-      const round = (ctx.currentRound || 0) + 1;
-      const sessionBlock = buildSessionContextBlock ? buildSessionContextBlock() : '';
-
-      // Delta = what the recheck table says still needs fixing + chat gaps
-      const recheckDelta = fullText; // fullText is the recheck analysis text in scope
-      const chatGaps = (ctx.recheckChatGaps || []).map(g => '- ' + g.text).join('\n');
-
+      // Set round N indicator
       let r2 = document.getElementById('le-round2-hint');
       if (!r2) {
-        r2 = document.createElement('div'); r2.id = 'le-round2-hint';
-        r2.className = 'step-hint'; r2.style.cssText = 'border-color:#1e6b35;background:#f0f7f2;margin-bottom:1rem;';
+        r2 = document.createElement('div');
+        r2.id = 'le-round2-hint';
+        r2.className = 'step-hint';
+        r2.style.cssText = 'border-color:#1e6b35;background:#f0f7f2;margin-bottom:1rem;';
         document.getElementById('le-result').before(r2);
       }
+      const roundNum = (parseInt(r2.dataset.round || '1')) + 1;
+      r2.dataset.round = roundNum;
       const ordinals = ['','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th'];
-      r2.innerHTML = `🔄 <strong>Round ${ordinals[round] || round + 'th'}:</strong> Generating edits from Revised Resume Check gaps + session context.`;
+      const label = ordinals[roundNum] || (roundNum + 'th');
+      r2.innerHTML = `🔄 <strong>Round ${label}:</strong> Generating edits based on your Revised Resume Check recommendations.`;
       r2.style.display = 'block';
-
-      const sp2 = `You are a senior resume editor. Generate precise, surgical edit blocks. Never invent experience not in the resume. Use the CATEGORY field on every block.`;
-      const um2 = `TASK: Generate line-by-line edit blocks to address the REMAINING GAPS identified below. Do NOT re-generate edits for things already fixed. Focus only on what the Revised Resume Check says still needs work.
-
-RESUME (current version):
-${latestResume}
-
-JOB DESCRIPTION:
-${jd2}
-
-REMAINING GAPS FROM REVISED RESUME CHECK:
-${recheckDelta}
-
-${chatGaps ? `ADDITIONAL GAPS FROM CHAT:\n${chatGaps}\n` : ''}
-${sessionBlock}
-
-Output format — EDIT_SUMMARY line first, then one block per gap:
-SECTION: [section name]
-CONTEXT: [1-2 surrounding lines]
-BEFORE: [exact original text verbatim]
-AFTER: [complete rewrite, ready to paste]
-TYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry | Insert]
-CATEGORY: [one of: Keyword & Language | Role Positioning | Impact & Quantification | Experience Emphasis | Gap & Timeline | Synopsis & Framing | Skills & Tools | Bullet Strength | Scope Signals | Industry Context]
-SCORE_IMPACT: [whole number]
-WHY: [one sentence]
-
-RULES: BEFORE must be verbatim. AFTER must be complete. Never invent experience. ABSOLUTE BAN on spaced letters.`;
-
-      const leOutput = document.getElementById('le-output');
+      // Use latest generated resume for round 2+ — falls back to updated-resume-text textarea
+      const jd2 = savedJD || document.getElementById('jd-text').value.trim();
+      const latestResume = window._grResumeText || updatedResume;
+      if (!jd2 || !latestResume) return;
+      const sp2 = `You are a senior resume editor. PERSPECTIVE: You are advising from the point of view of a hiring manager. What problems does this role solve at a company like this? How do I empower Cara to position herself as that solution?\n\nYou produce precise, surgical edits — exact original text, exact replacement, and one-line reason. Never invent experience not in the resume.`;
+const um2 = `You are given a resume, a job description, and a set of recommendations from an ATS analysis. Your job is to translate each recommendation into a precise, surgical edit block.\n\nFor each recommendation:\n1. Find the EXACT line in the resume it refers to\n2. Rewrite only what needs changing\n3. Output in the structured format below\n\nRESUME:\n${latestResume}\n\nJOB DESCRIPTION:\n${jd2}\n\nRECOMMENDATIONS TO TRANSLATE:\n${fullText}\n\nFirst output this exact summary line:\nEDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+\n\nThen for each recommendation output a block in this EXACT format:\n\nSECTION: [section name — for Professional History include company name e.g. "Professional History — Kroger"]\nCONTEXT: [copy the 1-2 lines immediately surrounding the BEFORE line in the resume]\nBEFORE: [copy the exact original line from the resume verbatim — do not paraphrase]\nAFTER: [your rewritten version, ready to paste — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nSCORE_IMPACT: [estimated ATS point gain for this single edit, whole number]\nWHY: [one sentence explaining the specific improvement]\n\nRULES:\n- BEFORE must be copied verbatim from the resume — never invented\n- AFTER must be complete and ready to paste with no placeholders\n- Only make changes that are honest wordsmithing of existing experience\n- Never invent titles, companies, credentials or skills not in the resume\n- ABSOLUTE BAN — never insert spaces between individual letters in any AFTER text. "A R E A S O F E X P E R T I S E" is forbidden. Write unspaced words only.`;      const leOutput = document.getElementById('le-output');
       leOutput.textContent = '';
       showLoading('le-loading');
       document.getElementById('le-result').classList.add('visible');
       let fullLe = '';
       try {
         await callClaude(sp2, um2, (text) => { fullLe = text; leOutput.textContent = text; });
-        if (window._sessionCtx) window._sessionCtx.currentRound = round;
         renderEditBlocks(fullLe, leOutput);
-        initLeScoreTracker(fullLe);
         markNavDone('line-edits');
       } catch(e) {
         leOutput.textContent = 'Error: ' + e.message;
@@ -3540,7 +3392,7 @@ function renderVariationTabs(prefix,text){
   var chatEl=document.getElementById(prefix+'-chat');
   if(!tabRow||!tabPanels)return;
   tabRow.innerHTML=versions.map(function(v,i){return '<div class="tab'+(i===0?' active':'')+'" onclick="switchVarTab(\'"+prefix+"\',"+(i)+")">'+escHtml(v.label)+'</div>';}).join('');
-  tabPanels.innerHTML=versions.map(function(v,i){return '<div id="'+prefix+'-panel-'+i+'" style="display:'+(i===0?'block':'none')+';font-size:0.88rem;line-height:1.8;color:var(--black);">'+fmtVariation(v.content)+'</div>';}).join('');
+  tabPanels.innerHTML=versions.map(function(v,i){return '<div id="'+prefix+'-panel-'+i+'" style="display:'+(i===0?'block':'none')+';white-space:pre-wrap;font-size:0.88rem;line-height:1.8;color:var(--black);">'+escHtml(v.content)+'</div>';}).join('');
   if(notes&&notesContent){notesContent.textContent=notes;if(notesBox)notesBox.style.display='block';}
   if(stream)stream.style.display='none';
   if(tabsWrap)tabsWrap.style.display='block';
@@ -3567,46 +3419,6 @@ var leHistory=[];
 var whySysPrompt='';
 var qaSysPrompt='';
 var leSysPrompt='You are a resume editor. Generate Line-by-Line Edits first — your full ATS results, resume, and job description will be loaded into context automatically so you can answer questions and revise specific edits.';
-
-function refreshLeChatContext() {
-  const _leJD = savedJD || document.getElementById('jd-text')?.value?.trim() || '';
-  const _leResume = RESUMES[selectedLeResume]?.text || (atsHighestResume && RESUMES[atsHighestResume]?.text) || window._grResumeText || '';
-  const _leResumeLabel = (atsHighestResume && RESUMES[atsHighestResume]?.label) || RESUMES[selectedLeResume]?.label || '';
-  const _leAtsScores = (window._sessionCtx?.atsKeywords) || savedAtsKeywords || '';
-  const _leAtsPath = (window._sessionCtx?.atsPath) || savedAtsPath || '';
-  const _leRole = savedRoleName || savedRoleTitle || '';
-  const _leCompany = savedCompany || '';
-  if (!_leJD && !_leResume) return; // nothing to update yet
-  leSysPrompt = `You are a resume editor helping Cara Brown refine her resume for a specific job. You have full context loaded below — never ask her to paste anything.
-
-CRITICAL RULES:
-- Always refer to edits by their UI label: Edit 1, Edit 2 — never "Flag 1" or "INSERT 28"
-- NEVER output before/after text in chat — that belongs in the edit cards
-- Confirmations: "✓ Edit [N] — incorporated." only
-- Questions: 1-2 sentences max
-- Edit revisions respond ONLY with:
-REVISED_EDIT: [number]
-AFTER: [complete text]
-WHY: [one sentence]
-
-CURRENT JOB:
-${_leRole ? 'Role: ' + _leRole : ''}${_leCompany ? '\nCompany: ' + _leCompany : ''}
-
-JOB DESCRIPTION:
-${_leJD || '(not yet saved — ask Cara to save one in Step 01)'}
-
-RESUME BEING EDITED (${_leResumeLabel}):
-${_leResume || '(not yet selected)'}
-
-ATS MISSING KEYWORDS:
-${_leAtsScores || '(run ATS Check first)'}
-
-FASTEST PATH TO 95%+:
-${_leAtsPath || '(run ATS Check first)'}
-
-SESSION CONTEXT:
-${typeof buildSessionContextBlock === 'function' ? buildSessionContextBlock() : ''}`;
-}
 async function sendVariantChat(prefix,history,sysPrompt){
   var input=document.getElementById(prefix+'-chat-input');
   var thread=document.getElementById(prefix+'-chat-thread');
@@ -3633,26 +3445,6 @@ async function sendLeChat(){
   var thread=document.getElementById('le-chat-thread');
   var loading=document.getElementById('le-chat-loading');
   var msg=input.value.trim();if(!msg)return;
-
-  // Collect any selected clarify answers before sending
-  if (window._pendingClarifyQuestions && window._pendingClarifyQuestions.length) {
-    const ctx = window._sessionCtx;
-    window._pendingClarifyQuestions.forEach((item, qi) => {
-      const selectedBtn = document.querySelector(`#clarify-opts-${qi} button[style*="e8f0fe"]`);
-      const otherInput = document.getElementById(`clarify-other-${qi}`);
-      let ans = '';
-      if (selectedBtn) ans = selectedBtn.dataset.opt || '';
-      if (ans.startsWith('Other') && otherInput && otherInput.value.trim()) ans = otherInput.value.trim();
-      if (ans && !ans.startsWith('Other') && !ctx.leAnswers.find(a => a.question === item.q)) {
-        ctx.leAnswers.push({ question: item.q, answer: ans });
-      }
-    });
-    window._pendingClarifyQuestions = null;
-    // Remove the clarify block from chat
-    const cb = document.getElementById('clarify-chat-block');
-    if (cb) cb.remove();
-  }
-
   leHistory.push({role:'user',content:msg});
   var msgId='le-um-'+Date.now();
   thread.insertAdjacentHTML('beforeend','<div id="'+msgId+'" data-role="user" style="margin-bottom:0.5rem;padding:0.4rem 0.7rem;background:var(--bgoff);border-radius:4px;font-size:0.83rem;"><div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:0.15rem;">You</div><div class="le-bubble">'+escHtml(msg)+'</div></div>');
@@ -4013,11 +3805,6 @@ loadResumeLinks();
 // Clearing browser storage loses only the credential, never the data.
 
 const GIST_FILENAME = 'applykit_tracker.json';
-const TOOLKIT_VERSION = 'v8.5';
-document.addEventListener('DOMContentLoaded', () => {
-  const vl = document.getElementById('settings-version-label');
-  if (vl) vl.textContent = TOOLKIT_VERSION;
-});
 let ghToken = localStorage.getItem('cara_gh_token') || '';
 let ghGistId = 'a6d92ba7e84e3bc462000db1c4a02e92'; // hardcoded — survives any browser/cache/storage clear
 localStorage.setItem('cara_gh_gist_id', ghGistId);
@@ -4605,7 +4392,6 @@ document.getElementById('gen-li-btn').addEventListener('click', async () => {
     output.textContent = '';
     document.getElementById('li-result').classList.add('visible');
     await callClaude(systemPrompt, userMsg, text => { output.textContent = text; });
-    output.innerHTML = fmtVariation(output.textContent);
     markNavDone('linkedin-outreach');
     saveIntelOutput('linkedin-outreach', output.innerHTML);
   } catch (err) {
@@ -4794,7 +4580,6 @@ document.getElementById('gen-interview-btn').addEventListener('click', async () 
     document.getElementById('interview-result').classList.add('visible');
     let ipFull = '';
     await callClaude(systemPrompt, userMsg, text => { ipFull = text; output.textContent = text; });
-    output.innerHTML = fmtInterview(ipFull);
     markNavDone('interview-prep');
     saveIntelOutput('interview-prep', output.innerHTML);
   } catch (err) {
@@ -4817,108 +4602,6 @@ document.querySelectorAll('#salary-mode-tabs .tab').forEach(tab => {
     document.getElementById('recruiter-sub').style.display = salaryMode === 'recruiter' ? 'block' : 'none';
   });
 });
-
-function fmtVariation(raw) {
-  if (!raw) return '';
-  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function md(s){ return esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*([^*]+)\*/g,'<em>$1</em>'); }
-  const lines = raw.split('\n');
-  let html = '';
-  let inList = false;
-  lines.forEach(function(line){
-    const t = line.trim();
-    if (!t) { if(inList){html+='</div>';inList=false;} html += '<div style="height:0.5rem;"></div>'; return; }
-    if (/^#{1,3}\s/.test(t)) {
-      if(inList){html+='</div>';inList=false;}
-      const lvl = t.match(/^(#+)/)[1].length;
-      const text = t.replace(/^#+\s*/,'');
-      const sz = lvl===1?'0.75rem':lvl===2?'0.68rem':'0.62rem';
-      html += `<div style="font-family:'Raleway',sans-serif;font-size:${sz};font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);border-bottom:1px solid var(--border);padding-bottom:0.35rem;margin:1.1rem 0 0.55rem;">${md(text)}</div>`;
-    } else if (/^[-•*]\s/.test(t)) {
-      if(!inList){html+='<div style="display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.5rem;">';inList=true;}
-      html += `<div style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.86rem;line-height:1.7;"><span style="color:var(--mid);flex-shrink:0;padding-top:0.1rem;">—</span><span>${md(t.replace(/^[-•*]\s*/,''))}</span></div>`;
-    } else if (/^\d+\.\s/.test(t)) {
-      if(inList){html+='</div>';inList=false;}
-      html += `<div style="font-size:0.86rem;line-height:1.7;margin-bottom:0.3rem;padding-left:0.25rem;">${md(t)}</div>`;
-    } else {
-      if(inList){html+='</div>';inList=false;}
-      html += `<div style="font-size:0.86rem;line-height:1.8;margin-bottom:0.25rem;">${md(t)}</div>`;
-    }
-  });
-  if(inList) html += '</div>';
-  return html;
-}
-
-function fmtInterview(raw) {
-  if (!raw) return '';
-  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function md(s){ return esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>'); }
-
-  // Split into major sections on ## headings
-  const sections = raw.split(/\n(?=##\s)/);
-  let html = '';
-
-  sections.forEach(sec => {
-    const lines = sec.trim().split('\n');
-    const heading = lines[0].replace(/^#+\s*/,'').trim();
-    const body = lines.slice(1).join('\n').trim();
-
-    // Detect question sections (## Q1, ## PART 2, etc.)
-    const isQuestion = /^Q\d+[:\s]|^PART\s+\d+|^\d+\.\s/i.test(heading);
-    const isOpener = /60.SECOND|OPENER|PART\s*1/i.test(heading);
-    const isCara = /CARA'S NOTE|NOTE:/i.test(heading);
-
-    if (isOpener) {
-      html += `<div style="background:#1a2744;border-radius:8px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;">
-        <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,0.45);margin-bottom:0.6rem;">${esc(heading)}</div>
-        <div style="font-size:0.88rem;line-height:1.75;color:rgba(255,255,255,0.88);">${fmtInterviewBody(body, md)}</div>
-      </div>`;
-    } else if (isCara) {
-      html += `<div style="background:#fffbf0;border:1px solid #e8d9a0;border-radius:6px;padding:0.9rem 1.1rem;margin-bottom:1rem;">
-        <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:#8a6d00;margin-bottom:0.4rem;">${esc(heading)}</div>
-        <div style="font-size:0.85rem;line-height:1.7;color:#3a3000;">${fmtInterviewBody(body, md)}</div>
-      </div>`;
-    } else if (isQuestion) {
-      html += `<div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.1rem;">
-        <div style="background:var(--black);padding:0.65rem 1.1rem;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:#fff;">${esc(heading)}</div>
-        <div style="padding:1rem 1.25rem;font-size:0.86rem;line-height:1.75;">${fmtInterviewBody(body, md)}</div>
-      </div>`;
-    } else if (heading) {
-      html += `<div style="margin-bottom:1rem;">
-        <div style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:var(--black);border-bottom:1px solid var(--border);padding-bottom:0.4rem;margin-bottom:0.6rem;">${esc(heading)}</div>
-        <div style="font-size:0.86rem;line-height:1.75;">${fmtInterviewBody(body, md)}</div>
-      </div>`;
-    } else {
-      html += `<div style="font-size:0.86rem;line-height:1.75;margin-bottom:0.75rem;">${fmtInterviewBody(body, md)}</div>`;
-    }
-  });
-
-  return html || `<div style="font-size:0.86rem;line-height:1.75;white-space:pre-wrap;">${md(raw)}</div>`;
-}
-
-function fmtInterviewBody(body, md) {
-  if (!body) return '';
-  // Highlight STAR labels inline
-  const starColors = { SITUATION:'#1a2744', TASK:'#2a4080', ACTION:'#1e6b35', RESULT:'#7c3aed' };
-  return body.split('\n').map(line => {
-    const t = line.trim();
-    if (!t) return '';
-    // STAR label lines: **SITUATION:** or SITUATION:
-    const starMatch = t.match(/^\*?\*?(SITUATION|TASK|ACTION|RESULT)\*?\*?[:\s]/i);
-    if (starMatch) {
-      const label = starMatch[1].toUpperCase();
-      const color = starColors[label] || 'var(--black)';
-      const rest = t.replace(/^\*?\*?(SITUATION|TASK|ACTION|RESULT)\*?\*?[:\s]*/i,'');
-      return `<div style="display:flex;gap:0.6rem;align-items:flex-start;margin-bottom:0.5rem;padding:0.5rem 0.75rem;background:#f7f6f4;border-left:3px solid ${color};border-radius:0 4px 4px 0;">
-        <span style="font-family:'Raleway',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:${color};white-space:nowrap;padding-top:0.1rem;min-width:52px;">${label}</span>
-        <span style="line-height:1.65;">${md(rest)}</span>
-      </div>`;
-    }
-    if (/^[-•*]\s/.test(t)) return `<div style="display:flex;gap:0.5rem;margin-bottom:0.35rem;"><span style="color:var(--mid);flex-shrink:0;">—</span><span>${md(t.replace(/^[-•*]\s*/,''))}</span></div>`;
-    if (/^\d+\.\s/.test(t)) return `<div style="margin-bottom:0.4rem;padding-left:0.5rem;">${md(t)}</div>`;
-    return `<div style="margin-bottom:0.35rem;">${md(t)}</div>`;
-  }).join('');
-}
 
 function buildSalTab(name,raw){
   if(!raw||!raw.trim())return '<div style="color:var(--mid);font-size:0.85rem;padding:0.5rem 0;">No data for this section.</div>';
@@ -5167,30 +4850,11 @@ document.getElementById('new-application-btn').addEventListener('click', () => {
   const leOut = document.getElementById('le-output'); if (leOut) leOut.innerHTML = '';
   const leChatEl = document.getElementById('le-chat'); if (leChatEl) leChatEl.style.display = 'none';
   const leChatThread = document.getElementById('le-chat-thread'); if (leChatThread) leChatThread.innerHTML = '';
-  leHistory = []; leSysPrompt = 'You are a resume editor. Add a job description and run ATS Check first — context loads automatically.';
+  leHistory = []; leSysPrompt = '';
   const leResult = document.getElementById('le-result'); if (leResult) leResult.classList.remove('visible');
   const leTracker = document.getElementById('le-score-tracker'); if (leTracker) leTracker.style.display = 'none';
   const selBtns = document.getElementById('le-sel-btns'); if (selBtns) selBtns.style.display = 'none';
   const leHint = document.getElementById('le-auto-hint'); if (leHint) leHint.style.display = 'none';
-
-  // ── Generated Resume ───────────────────────────────────────────────────────
-  const grResultEl = document.getElementById('gr-result'); if (grResultEl) grResultEl.style.display = 'none';
-  const grOutputEl = document.getElementById('gr-output'); if (grOutputEl) grOutputEl.textContent = '';
-
-  // ── Save last version to tracker job, then clear version store ─────────────
-  if (window._resumeVersions && window._resumeVersions.length > 0 && savedCompany) {
-    const lastV = window._resumeVersions[window._resumeVersions.length - 1];
-    if (lastV && lastV.text) {
-      const matchJob = jobs.find(j => j.company && j.company.toLowerCase().includes(savedCompany.toLowerCase()));
-      if (matchJob) { matchJob.finalResumeText = lastV.text; matchJob.finalResumeVersion = lastV.label; saveJobs(); }
-    }
-  }
-  window._resumeVersions = []; window._currentVersionIdx = -1; window._grResumeText = ''; window._grResumeKey = '';
-  ['le-version-bar','rrc-version-bar'].forEach(function(id){ const el=document.getElementById(id); if(el) el.style.display='none'; });
-  ['le-version-pills','rrc-version-pills'].forEach(function(id){ const el=document.getElementById(id); if(el) el.innerHTML=''; });
-
-  // ── Session context reset ──────────────────────────────────────────────────
-  window._sessionCtx = { atsKeywords:'', atsFlags:'', atsPath:'', editorNotes:[], recheckChatGaps:[], leAnswers:[], currentRound:0 };
 
   // ── Cover Letter ───────────────────────────────────────────────────────────
   const clOut = document.getElementById('cl-output'); if (clOut) clOut.innerHTML = '';
@@ -5272,212 +4936,14 @@ function autoSelectBestResume(resumeKey, resumeLabel) {
   const confirm = document.getElementById('le-resume-confirm');
   const confirmName = document.getElementById('le-resume-confirm-name');
   if (confirm && confirmName) { confirmName.textContent = resumeLabel; confirm.style.display = 'block'; }
-  // Keep chat context current
-  if (typeof refreshLeChatContext === 'function') refreshLeChatContext();
-}
-
-// ─── EDIT CATEGORIES ──────────────────────────────────────────────────────────
-const EDIT_CATEGORIES = {
-  'Keyword & Language':    { key:'keyword',  cls:'edit-cat-keyword'  },
-  'Role Positioning':      { key:'role',     cls:'edit-cat-role'     },
-  'Impact & Quantification':{ key:'impact',  cls:'edit-cat-impact'   },
-  'Experience Emphasis':   { key:'emphasis', cls:'edit-cat-emphasis' },
-  'Gap & Timeline':        { key:'gap',      cls:'edit-cat-gap'      },
-  'Synopsis & Framing':    { key:'synopsis', cls:'edit-cat-synopsis' },
-  'Skills & Tools':        { key:'skills',   cls:'edit-cat-skills'   },
-  'Bullet Strength':       { key:'bullet',   cls:'edit-cat-bullet'   },
-  'Scope Signals':         { key:'scope',    cls:'edit-cat-scope'    },
-  'Industry Context':      { key:'industry', cls:'edit-cat-industry' },
-};
-const CATEGORY_KEYS = Object.keys(EDIT_CATEGORIES);
-
-function getCatCls(catName) {
-  const c = EDIT_CATEGORIES[catName];
-  return c ? c.cls : 'edit-cat-keyword';
-}
-
-// ─── SESSION CONTEXT (single source of truth for all Claude calls) ─────────────
-window._sessionCtx = {
-  atsKeywords: '',
-  atsFlags: '',
-  atsPath: '',
-  editorNotes: [],      // [{text, ts}]
-  recheckChatGaps: [],  // [{row, text}] — rows added via recheck chat
-  leAnswers: [],        // [{question, answer}] — clarifying Q&A
-  currentRound: 0,
-};
-
-function buildSessionContextBlock() {
-  const ctx = window._sessionCtx;
-  let out = '';
-  if (ctx.atsKeywords) out += `ATS MISSING KEYWORDS:\n${ctx.atsKeywords}\n\n`;
-  if (ctx.atsFlags)    out += `ATS RED FLAGS & WINS:\n${ctx.atsFlags}\n\n`;
-  if (ctx.atsPath)     out += `FASTEST PATH TO 95%+:\n${ctx.atsPath}\n\n`;
-  if (ctx.editorNotes.length) out += `EDITOR'S NOTES (from prior rounds):\n${ctx.editorNotes.map(n=>n.text).join('\n')}\n\n`;
-  if (ctx.recheckChatGaps.length) out += `REVISED RESUME CHECK — CHAT-IDENTIFIED GAPS:\n${ctx.recheckChatGaps.map(g=>g.text).join('\n')}\n\n`;
-  if (ctx.leAnswers.length) out += `CANDIDATE CLARIFYING ANSWERS:\n${ctx.leAnswers.map(a=>`Q: ${a.question}\nA: ${a.answer}`).join('\n')}\n\n`;
-  return out ? `SESSION CONTEXT (all prior analysis — incorporate fully):\n${out}` : '';
-}
-
-// ─── VERSION STORE ─────────────────────────────────────────────────────────────
-// Per-session (cleared on New Application). Last version saved to tracker on reset.
-window._resumeVersions = [];   // [{num, label, text, ts, round, resumeKey, scoreEstimate}]
-window._currentVersionIdx = -1;
-
-function storeResumeVersion(text, resumeKey, round, scoreEstimate) {
-  const num = window._resumeVersions.length + 1;
-  const label = `Version ${num}`;
-  window._resumeVersions.push({ num, label, text, ts: Date.now(), round, resumeKey, scoreEstimate: scoreEstimate || '' });
-  window._currentVersionIdx = window._resumeVersions.length - 1;
-  renderVersionBars();
-  return num;
-}
-
-function renderVersionBars() {
-  const vers = window._resumeVersions;
-  if (!vers.length) return;
-  const html = vers.map((v, i) => {
-    const isCurrent = i === window._currentVersionIdx;
-    return `<button class="version-pill ${isCurrent ? 'active' : ''}" onclick="loadVersion(${i})" title="Round ${v.round}${v.scoreEstimate ? ' · ' + v.scoreEstimate : ''}">${v.label}</button>`;
-  }).join('');
-  ['le-version-pills','rrc-version-pills'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.innerHTML = html;
-  });
-  document.getElementById('le-version-bar').style.display = vers.length > 0 ? 'flex' : 'none';
-  document.getElementById('rrc-version-bar').style.display = vers.length > 0 ? 'flex' : 'none';
-}
-
-function loadVersion(idx) {
-  const v = window._resumeVersions[idx]; if (!v) return;
-  window._currentVersionIdx = idx;
-  window._grResumeText = v.text;
-  window._grResumeKey = v.resumeKey;
-  // Populate gr-output and updated-resume-text
-  const grOut = document.getElementById('gr-output');
-  if (grOut) { grOut.textContent = v.text; document.getElementById('gr-result').style.display = 'block'; }
-  const rcTa = document.getElementById('updated-resume-text');
-  if (rcTa) rcTa.value = v.text;
-  renderVersionBars();
-}
-
-// ─── EDIT CATEGORY STATS (persisted across sessions) ─────────────────────────
-function getCategoryStats() {
-  try { return JSON.parse(localStorage.getItem('cara_edit_cat_stats') || '{}'); } catch(e) { return {}; }
-}
-function saveCategoryStats(stats) {
-  try { localStorage.setItem('cara_edit_cat_stats', JSON.stringify(stats)); } catch(e) {}
-}
-function recordCategoryUsage(catName, scoreImpact) {
-  const stats = getCategoryStats();
-  if (!stats[catName]) stats[catName] = { count: 0, totalImpact: 0 };
-  stats[catName].count++;
-  stats[catName].totalImpact += (parseInt(scoreImpact) || 0);
-  saveCategoryStats(stats);
-}
-function renderEditInsightsDashboard() {
-  const stats = getCategoryStats();
-  const wrap = document.getElementById('dash-edit-insights-wrap');
-  const el = document.getElementById('dash-edit-insights');
-  if (!el) return;
-  const entries = Object.entries(stats).sort((a,b) => b[1].count - a[1].count);
-  if (!entries.length) { if (wrap) wrap.style.display = 'none'; return; }
-  if (wrap) wrap.style.display = 'block';
-  const maxCount = Math.max(1, ...entries.map(e => e[1].count));
-  el.innerHTML = entries.map(([cat, d]) => {
-    const cls = getCatCls(cat);
-    const pct = Math.round((d.count / maxCount) * 100);
-    const avgImpact = d.count ? Math.round(d.totalImpact / d.count) : 0;
-    return `<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">
-      <span class="edit-cat-pill ${cls}" style="width:160px;text-align:center;flex-shrink:0;">${cat}</span>
-      <div style="flex:1;height:7px;background:var(--bgoff);border-radius:4px;overflow:hidden;">
-        <div style="height:100%;width:${pct}%;background:var(--black);border-radius:4px;"></div>
-      </div>
-      <span style="font-size:0.72rem;font-weight:700;width:28px;text-align:right;">${d.count}</span>
-      <span style="font-size:0.7rem;color:var(--mid);width:52px;text-align:right;">~+${avgImpact}pt avg</span>
-    </div>`;
-  }).join('');
 }
 
 document.getElementById('gen-edits-btn').addEventListener('click', async () => {
   const jd = savedJD || document.getElementById('jd-text').value.trim();
   if (!jd) { showError('le-error', 'Please save a job description in Step 01 first.'); return; }
+
   const resume = RESUMES[selectedLeResume];
-  if (!resume || !resume.text) { showError('le-error', 'Please select a resume above.'); return; }
   const additionalExp = (document.getElementById('le-additional-exp').value || '').trim();
-  const ctx = window._sessionCtx;
-  const round = ctx.currentRound + 1;
-  // Generate edits immediately — no question gate
-  await _generateLineEdits(resume, jd, additionalExp, round);
-});
-
-async function submitClarifyAnswers(qId, questions) {
-  // No longer used as a gate — kept for any legacy calls
-}
-
-async function _askClarifyingQuestions(jd, resumeLabel, round) {
-  // Only ask once per session (round 1 only), skip if already answered
-  const ctx = window._sessionCtx;
-  if (ctx.leAnswers.length > 0) return;
-
-  const thread = document.getElementById('le-chat-thread');
-  if (!thread) return;
-
-  const clarifyPrompt = `You are a resume strategist. Generate exactly 2 multiple-choice clarifying questions to sharpen line-by-line ATS edits for Cara Brown, MBA (Principal Service Designer / Design Strategist). Questions must be specific to this JD. Each question must have 3-4 short answer options plus "Other (type below)". Output ONLY valid JSON in this format, nothing else:
-[{"q":"Question text?","opts":["Option A","Option B","Option C","Other (type below)"]},{"q":"Question text?","opts":["Option A","Option B","Option C","Other (type below)"]}]
-
-JOB DESCRIPTION (first 600 chars): ${jd.substring(0,600)}
-RESUME: ${resumeLabel}`;
-
-  try {
-    const apiKey = localStorage.getItem('cara_api_key') || '';
-    const cRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:400, messages:[{role:'user',content:clarifyPrompt}] })
-    });
-    const cData = await cRes.json();
-    const raw = (cData.content||[]).map(b=>b.text||'').join('').trim().replace(/```json|```/g,'').trim();
-    const questions = JSON.parse(raw);
-    if (!Array.isArray(questions) || !questions.length) return;
-
-    // Render as plain chat message with inline option buttons
-    const qHtml = questions.map((item, qi) => {
-      const optsHtml = item.opts.map(opt =>
-        `<button onclick="leClarifySelectOpt(this, ${qi})" data-qi="${qi}" data-opt="${escHtml(opt)}" style="display:block;width:100%;text-align:left;background:var(--bgoff);border:1px solid var(--border);border-radius:3px;padding:0.3rem 0.6rem;font-size:0.78rem;font-family:inherit;cursor:pointer;margin-bottom:0.25rem;">${escHtml(opt)}</button>`
-      ).join('');
-      return `<div style="margin-bottom:0.75rem;">
-        <div style="font-size:0.8rem;font-weight:600;color:var(--black);margin-bottom:0.4rem;">Q${qi+1}: ${escHtml(item.q)}</div>
-        <div id="clarify-opts-${qi}">${optsHtml}</div>
-        <input type="text" id="clarify-other-${qi}" placeholder="Or type your answer…" style="display:none;width:100%;border:1px solid var(--border);border-radius:3px;padding:0.3rem 0.6rem;font-size:0.78rem;font-family:inherit;margin-top:0.25rem;">
-      </div>`;
-    }).join('');
-
-    thread.insertAdjacentHTML('beforeend',
-      `<div id="clarify-chat-block" style="padding:0.5rem 0.75rem;border-left:3px solid var(--amber);background:#fffbf5;border-radius:0 4px 4px 0;margin-bottom:0.5rem;">
-        <div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:0.5rem;">Claude — Optional: sharpen your edits</div>
-        ${qHtml}
-        <div style="font-size:0.72rem;color:var(--mid);margin-top:0.5rem;">Answer above then type anything in the chat box and hit Send — or ignore and your edits are already generated below.</div>
-      </div>`
-    );
-    // Store questions for when user sends answers
-    window._pendingClarifyQuestions = questions;
-    thread.scrollTop = thread.scrollHeight;
-  } catch(e) { /* silent — questions are optional */ }
-}
-
-function leClarifySelectOpt(btn, qi) {
-  // Highlight selection, show other input if needed
-  const container = document.getElementById(`clarify-opts-${qi}`);
-  if (container) container.querySelectorAll('button').forEach(b => { b.style.background = 'var(--bgoff)'; b.style.borderColor = 'var(--border)'; b.style.fontWeight = '400'; });
-  btn.style.background = '#e8f0fe'; btn.style.borderColor = '#2a4db5'; btn.style.fontWeight = '600';
-  const otherInput = document.getElementById(`clarify-other-${qi}`);
-  if (otherInput) otherInput.style.display = btn.dataset.opt.startsWith('Other') ? 'block' : 'none';
-}
-
-
-
-async function _generateLineEdits(resume, jd, additionalExp, round) {
-  const ctx = window._sessionCtx;
-  const sessionBlock = buildSessionContextBlock();
   const focusMap = {
     full: 'every section of the resume — synopsis, core competencies, and all experience bullets',
     summary: 'only the Synopsis / professional summary section at the top',
@@ -5489,9 +4955,9 @@ async function _generateLineEdits(resume, jd, additionalExp, round) {
   hideError('le-error');
   document.getElementById('le-result').classList.remove('visible');
 
-  const systemPrompt = `You are a senior resume editor and ATS optimization specialist. You produce precise, surgical edits — showing the exact original text, the exact replacement text, and a clear one-line reason for each change. You never give vague advice. Every edit is a specific, copyable rewrite that directly improves ATS keyword matching and relevance scoring for the target job description. CRITICAL RULE: You never invent experience, industries, credentials, or titles the candidate has not demonstrated in their resume. Your job is to find the best language for what is already true — not to fabricate. If a gap cannot be bridged honestly, you say so in ---EDITOR_NOTES--- only.`;
+  const systemPrompt = `You are a senior resume editor and ATS optimization specialist. You produce precise, surgical edits — showing the exact original text, the exact replacement text, and a clear one-line reason for each change. You never give vague advice. Every edit is a specific, copyable rewrite that directly improves ATS keyword matching and relevance scoring for the target job description. CRITICAL RULE: You never invent experience, industries, credentials, or titles the candidate has not demonstrated in their resume. Your job is to find the best language for what is already true — not to fabricate. If a gap cannot be bridged honestly, you say so.`;
 
-  const userMsg = `Perform a line-by-line ATS edit of the following resume against this job description. Focus on: ${focusMap[selectedLeFocus] || 'every section'}.
+  const userMsg = `Perform a line-by-line ATS edit of the following resume against this job description. Focus on: ${focusMap[selectedLeFocus]}.
 
 JOB DESCRIPTION:
 ${jd}
@@ -5500,37 +4966,38 @@ ${savedRoleName ? `Role: ${savedRoleName}` : ''}
 RESUME TO EDIT (${resume.label}):
 ${resume.text}
 
-${sessionBlock}
-
 YOUR TASK:
 1. First, output a one-line SUMMARY like this (required, exact format):
 EDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+
 
 2. Then produce line-by-line edits. For EVERY line or bullet that needs changing, output a block in this EXACT format:
 
-SECTION: [Be specific — include company name for Professional History bullets]
-CONTEXT: [copy the 1-2 surrounding lines in the resume]
-BEFORE: [exact original text, verbatim]
-AFTER: [complete rewritten version, ready to paste]
-TYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry | Insert]
-CATEGORY: [one of: Keyword & Language | Role Positioning | Impact & Quantification | Experience Emphasis | Gap & Timeline | Synopsis & Framing | Skills & Tools | Bullet Strength | Scope Signals | Industry Context]
-SCORE_IMPACT: [estimated ATS point gain, whole number]
-WHY: [one sentence explaining the specific ATS improvement]
+SECTION: [Be specific. For Professional History bullets, include the company name: e.g., "Professional History — Kroger" or "Professional History — The RealReal". For other sections use the name: e.g., "Synopsis", "Core Competencies", "Education"]
+CONTEXT: [copy the 1-2 lines immediately surrounding the BEFORE line in the resume — the line before it and/or after it — so the edit can be located in context. If BEFORE is the first or last line of a section, just include the one adjacent line.]
+BEFORE: [exact original text, copied verbatim]
+AFTER: [your rewritten version — complete, ready to paste. IMPORTANT: If this edit is within a Highlights subsection (e.g. a line that starts with "END-TO-END SERVICE DESIGN & DELIVERY:" or similar), the AFTER field must contain ONLY the pipe-separated content that follows the subsection label — do NOT include the subsection label itself in the AFTER field. Match punctuation exactly to context: if this is a partial replacement, do not add a period unless the original fragment ends with one]
+TYPE: [one of: Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry | Insert]
+SCORE_IMPACT: [estimated ATS point gain for this single edit, as a whole number e.g. 3]
+WHY: [one sentence explaining the specific ATS improvement this makes]
 
-INTEGRITY RULES:
+INTEGRITY RULES (non-negotiable):
 - NEVER add industries, sectors, titles, tools, credentials, or skills not evidenced in the resume
-- NEVER suggest changing a title Cara has not held
-- NEVER invent client names, company names, or domains not in the resume
-- If a JD keyword requires experience Cara does not have, append it after all edit blocks in ---EDITOR_NOTES--- only — never in an edit card
-- ABSOLUTE BAN — never insert spaces between individual letters in any AFTER text
+- NEVER suggest changing a title (e.g. do not suggest VP, Director, or any level Cara has not held)
+- NEVER invent client names, company names, or domains (e.g. fintech, healthcare, federal) not in the resume
+- If a JD keyword requires experience Cara does not have, flag it as a gap — do not fabricate a match
+- The goal is the highest score achievable through honest wordsmithing only
 
 EDITING RULES:
-- Only output edits for lines that ACTUALLY need changing
+- Only output edits for lines that ACTUALLY need changing — do not include lines that are already strong
 - AFTER text must be complete and ready to paste — no [brackets], no placeholders
+- Each AFTER rewrite must naturally incorporate missing JD keywords without sounding forced
 - Preserve Cara's voice, first-person implied bullet style, and quantified metrics
+- Reframe existing accomplishments using JD language — never invent new ones
 - Prioritize: (1) missing hard keywords, (2) missing soft skills the JD emphasizes, (3) verb choice, (4) structure
+- If a bullet needs a keyword added, work it in naturally at the start or end
+- For competencies, add missing keyword clusters as new pipe-separated entries only if they reflect actual skills
 
-Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.${additionalExp ? `\n\nADDITIONAL EXPERIENCE TO INCORPORATE:\n${additionalExp}` : ''}`;
+Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.${additionalExp ? `\n\nADDITIONAL EXPERIENCE TO INCORPORATE:\nThe candidate has provided additional experience not currently in the resume. For each item below, generate an INSERT block showing exactly where and how to add it. Use this format:\n\nSECTION: [best section to insert into]\nCONTEXT: [the line it should appear near]\nBEFORE: INSERT\nAFTER: [the new line or bullet, complete and ready to paste]\nTYPE: [Insert]\nWHY: [one sentence on why this addition improves ATS match]\n\nAdditional experience:\n${additionalExp}` : ''}${(()=>{const cn=leHistory.filter(m=>m.role==='user').map(m=>m.content).join('\n').trim();return cn?`\n\nCANDIDATE CHAT NOTES (incorporate into your edits — for any edit directly informed by these notes, add SOURCE: CHAT on a new line after WHY):\n${cn}`:'';})()} `;
 
   try {
     const output = document.getElementById('le-output');
@@ -5540,67 +5007,24 @@ Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.$
     let fullText = '';
     await callClaude(systemPrompt, userMsg, (text) => {
       fullText = text;
+      // Show raw text while streaming, render structured view only when done
       output.textContent = text;
     });
-
-    ctx.currentRound = round;
+    // Now render the full structured diff view
     renderEditBlocks(fullText, output);
+    // Initialize score tracker
     initLeScoreTracker(fullText);
+    // Save impactful edits to resume optimizer store
     saveEditsForOptimizers(fullText, selectedLeResume);
-
-    // Show chat
+    // Show chat + init history
+    leHistory = [{role:'user',content:userMsg},{role:'assistant',content:fullText}];
+    const _leJD = savedJD || document.getElementById('jd-text')?.value?.trim() || '';
+    const _leAtsScores = savedAtsKeywords || localStorage.getItem('cara_sess_ats_kw') || '';
+    const _leAtsPath = savedAtsPath || localStorage.getItem('cara_sess_ats_path') || '';
+    const _leResume = (window._grResumeText) || (window.RESUMES && window.RESUMES[selectedLeResume]) || '';
+    leSysPrompt = `You are a resume editor reviewing line-by-line edits with the candidate. You have two modes:\n\nMODE 1 — EDIT REVISION: If the candidate references a specific edit number (e.g. "Edit 3", "#7", "edit 14") or asks to change a specific BEFORE/AFTER pair, respond with a revised block in this EXACT format and nothing else before it:\n\nREVISED_EDIT: [edit number]\nAFTER: [complete revised text, ready to paste]\nWHY: [one sentence on what changed and why]\n\nMODE 2 — GENERAL CONTEXT: If they provide general context, corrections, or answer a question, respond in 2-3 sentences confirming how it will affect the resume when they click Generate Resume. Be specific about which sections or bullets are affected.\n\nJOB DESCRIPTION:\n${_leJD}\n\nATS MISSING KEYWORDS:\n${_leAtsScores}\n\nFASTEST PATH TO 95%+:\n${_leAtsPath}\n\nRESUME BEING EDITED:\n${_leResume}\n\nCurrent edit list:\n${fullText}`;
     const leChatEl = document.getElementById('le-chat');
     if (leChatEl) leChatEl.style.display = 'block';
-
-    const _leJD = savedJD || document.getElementById('jd-text')?.value?.trim() || '';
-    const _leAtsScores = ctx.atsKeywords || savedAtsKeywords || '';
-    const _leAtsPath = ctx.atsPath || savedAtsPath || '';
-    const _leResume = RESUMES[selectedLeResume]?.text || window._grResumeText || '';
-
-    // Build numbered edit list for chat reference
-    const editBlocks = output.querySelectorAll('.edit-block');
-    const editIndex = Array.from(editBlocks).map((b, i) => {
-      const section = b.querySelector('[data-section]')?.dataset?.section || '';
-      const before = (b.dataset.before || '').substring(0, 60);
-      return `Edit ${i+1}${section ? ' [' + section + ']' : ''}: "${before}…"`;
-    }).join('\n');
-
-    leHistory = [{role:'user',content:userMsg},{role:'assistant',content:fullText}];
-    leSysPrompt = `You are a resume editor reviewing line-by-line edits with the candidate. Be concise. You have full context — the JD, resume, and ATS analysis are already loaded below. Never ask the candidate to paste anything.
-
-CRITICAL RULES FOR CHAT RESPONSES:
-- Always refer to edits by their UI label exactly: Edit 1, Edit 2, Edit 3 — never "Flag 1", "INSERT 28", or any other label
-- NEVER output before/after text in chat — that belongs in the edit cards only
-- When the candidate confirms or approves a change, respond with a single checkbox confirmation line only: "✓ Edit [N] — incorporated."
-- When the candidate asks a question, answer in 1-2 sentences maximum
-- When the candidate asks to revise an edit, respond ONLY with this exact format and nothing else:
-REVISED_EDIT: [edit number]
-AFTER: [complete revised text, ready to paste]
-WHY: [one sentence]
-- If the candidate answers the optional clarifying questions shown in chat, acknowledge with "✓ Noted — will apply to next round of edits." only
-
-EDIT REFERENCE INDEX (use these labels exactly):
-${editIndex}
-
-JOB DESCRIPTION:
-${_leJD}
-
-ATS MISSING KEYWORDS:
-${_leAtsScores}
-
-FASTEST PATH TO 95%+:
-${_leAtsPath}
-
-RESUME BEING EDITED:
-${_leResume}
-
-SESSION CONTEXT:
-${buildSessionContextBlock()}`;
-
-    leHistory = [{role:'user',content:userMsg},{role:'assistant',content:fullText}];
-
-    // Ask optional clarifying questions in chat after edits load (round 1 only, non-blocking)
-    setTimeout(() => _askClarifyingQuestions(_leJD, resume.label, round), 300);
 
   } catch (err) {
     showError('le-error', 'Something went wrong: ' + err.message);
@@ -5608,13 +5032,13 @@ ${buildSessionContextBlock()}`;
   } finally {
     hideLoading('le-loading');
   }
-}
+});
 
 document.getElementById('le-chat-send').addEventListener('click', function(){ sendLeChat(); });
 document.getElementById('le-chat-input').addEventListener('keydown', function(e){ if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)) sendLeChat(); });
 
 var recheckChatHistory = [];
-var recheckChatSysPrompt = 'You are a resume ATS analyst. Your ONLY job is to answer questions about the Score Improvement table above and identify fixable gaps. Rules: (1) Never output before/after resume text. (2) If the user identifies a gap or asks to add something to the table, respond ONLY with: GAP_ROW: [short description of the gap or fix needed]. (3) For all other questions, answer in 1-2 sentences only, referencing specific table rows or scores. (4) Never give general resume advice.';
+var recheckChatSysPrompt = 'You are a resume coach reviewing a revised resume ATS check with the candidate. Run the Revised Resume Check first — your full ATS results, resume, and job description will be loaded into context automatically so you can answer questions specifically.';
 
 async function sendRecheckChat() {
   var input = document.getElementById('recheck-chat-input');
@@ -5631,14 +5055,6 @@ async function sendRecheckChat() {
     var replyText = '';
     await callClaudeChat(recheckChatSysPrompt, recheckChatHistory, function(t){ replyText=t; var el=document.getElementById(replyId); if(el) el.textContent=t; thread.scrollTop=thread.scrollHeight; });
     recheckChatHistory.push({role:'assistant', content:replyText});
-    // Parse GAP_ROW responses — add to session context and render as table row in chat
-    const gapMatch = replyText.match(/GAP_ROW:\s*(.+)/i);
-    if (gapMatch) {
-      const gapText = gapMatch[1].trim();
-      if (window._sessionCtx) window._sessionCtx.recheckChatGaps.push({ text: gapText, ts: Date.now() });
-      const el = document.getElementById(replyId);
-      if (el) el.innerHTML = `<div class="chat-confirm-row"><input type="checkbox" class="chat-confirm-cb" checked> <span>Gap added to session: <strong>${escHtml(gapText)}</strong> — will be included when you click "Turn Recommendations into Line Edits"</span></div>`;
-    }
   } catch(e) { var el=document.getElementById(replyId); if(el) el.textContent='Error: '+e.message; }
   finally { loading.style.display='none'; }
 }
@@ -5749,8 +5165,6 @@ function renderEditBlocks(rawText, container) {
     blocks.push(currentBlock.join('\n'));
   }
 
-  const chatNotes = [];
-
   blocks.forEach((block, i) => {
     // Parse each field using indexOf-based extraction
     function extractField(text, fieldName, nextFields) {
@@ -5766,35 +5180,21 @@ function renderEditBlocks(rawText, container) {
       return text.substring(start + marker.length, end).trim().replace(/^`+|`+$/g, '').trim();
     }
 
-    const section     = extractField(block, 'SECTION',      ['CONTEXT','BEFORE','AFTER','TYPE','CATEGORY','SCORE_IMPACT','WHY','SOURCE']);
-    const context     = extractField(block, 'CONTEXT',      ['BEFORE','AFTER','TYPE','CATEGORY','SCORE_IMPACT','WHY','SECTION','SOURCE']);
-    const before      = extractField(block, 'BEFORE',       ['AFTER','TYPE','CATEGORY','SCORE_IMPACT','WHY','SECTION','CONTEXT','SOURCE']);
-    const after       = extractField(block, 'AFTER',        ['TYPE','CATEGORY','SCORE_IMPACT','WHY','SECTION','BEFORE','CONTEXT','SOURCE']);
-    const type        = extractField(block, 'TYPE',         ['CATEGORY','SCORE_IMPACT','WHY','SECTION','BEFORE','AFTER','CONTEXT','SOURCE']);
-    const category    = extractField(block, 'CATEGORY',     ['SCORE_IMPACT','WHY','SECTION','BEFORE','AFTER','TYPE','CONTEXT','SOURCE']);
-    const scoreImpact = extractField(block, 'SCORE_IMPACT', ['WHY','SECTION','BEFORE','AFTER','TYPE','CATEGORY','CONTEXT','SOURCE']);
-    const why         = extractField(block, 'WHY',          ['SECTION','BEFORE','AFTER','TYPE','CATEGORY','SCORE_IMPACT','CONTEXT','SOURCE']);
+    const section     = extractField(block, 'SECTION',      ['CONTEXT','BEFORE','AFTER','TYPE','SCORE_IMPACT','WHY','SOURCE']);
+    const context     = extractField(block, 'CONTEXT',      ['BEFORE','AFTER','TYPE','SCORE_IMPACT','WHY','SECTION','SOURCE']);
+    const before      = extractField(block, 'BEFORE',       ['AFTER','TYPE','SCORE_IMPACT','WHY','SECTION','CONTEXT','SOURCE']);
+    const after       = extractField(block, 'AFTER',        ['TYPE','SCORE_IMPACT','WHY','SECTION','BEFORE','CONTEXT','SOURCE']);
+    const type        = extractField(block, 'TYPE',         ['SCORE_IMPACT','WHY','SECTION','BEFORE','AFTER','CONTEXT','SOURCE']);
+    const scoreImpact = extractField(block, 'SCORE_IMPACT', ['WHY','SECTION','BEFORE','AFTER','TYPE','CONTEXT','SOURCE']);
+    const why         = extractField(block, 'WHY',          ['SECTION','BEFORE','AFTER','TYPE','SCORE_IMPACT','CONTEXT','SOURCE']);
     const fromChat    = /SOURCE:\s*CHAT/i.test(block);
-    if (category) recordCategoryUsage(category, scoreImpact);
 
     if (!before && !after) return;
-
-    // Gap flags and no-edit notes → chat thread, not edit cards
-    const isGapFlag = /GAP\s*FLAG|NO\s*EDIT\s*POSSIBLE|NOT\s*EDITABLE|no\s*direct\s*experience|cannot\s*be\s*wordsmith/i.test(after) ||
-                      /GAP\s*FLAG|NO\s*EDIT\s*POSSIBLE|NOT\s*EDITABLE/i.test(before) ||
-                      /GAP\s*FLAG|NO\s*EDIT\s*POSSIBLE|NOT\s*EDITABLE/i.test(type);
-    if (isGapFlag) {
-      const noteText = (section ? '[' + section + '] ' : '') + (after || before) + (why ? '\n' + why : '');
-      chatNotes.push(noteText);
-      return;
-    }
 
     const impact = parseInt(scoreImpact) || 0;
     const editId = 'edit-block-' + i;
     const isInsert = before === 'INSERT' || (type || '').toLowerCase() === 'insert';
-    const catCls = category ? getCatCls(category) : '';
-    const roundNum = window._sessionCtx ? window._sessionCtx.currentRound + 1 : 1;
-    html += `<div class="edit-block" id="${editId}" data-impact="${impact}" data-checked="false" data-before="${escHtml(before)}" data-after="${escHtml(after)}" data-isinsert="${isInsert}" data-section="${escHtml(section)}" style="${fromChat ? 'border-left:3px solid #7c3aed;background:#faf5ff;' : ''}">
+    html += `<div class="edit-block" id="${editId}" data-impact="${impact}" data-checked="false" data-before="${escHtml(before)}" data-after="${escHtml(after)}" data-isinsert="${isInsert}" style="${fromChat ? 'border-left:3px solid #7c3aed;background:#faf5ff;' : ''}">
    <div class="edit-block-header">
         <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
           <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;margin:0;">
@@ -5802,8 +5202,6 @@ function renderEditBlocks(rawText, container) {
             <strong>Edit ${i + 1}</strong>
           </label>
           ${fromChat ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#7c3aed;border-radius:3px;font-size:0.68rem;font-weight:600;color:#fff;letter-spacing:0.02em;">From Chat</span>` : ''}
-          <span class="edit-cat-pill edit-cat-round">Rnd ${roundNum}</span>
-          ${category ? `<span class="edit-cat-pill ${catCls}">${escHtml(category)}</span>` : ''}
           ${section ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#1a1a1a;border-radius:3px;font-size:0.68rem;font-weight:600;color:#fff;letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}
           ${type ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:${isInsert ? '#fff3e0' : '#e8f0fe'};border:1px solid ${isInsert ? '#f0c080' : '#c5d4f5'};border-radius:3px;font-size:0.68rem;font-weight:600;color:${isInsert ? '#a05000' : '#2a4db5'};letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}
           ${impact > 0 ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#eaf7ee;border:1px solid #b2dfc0;border-radius:3px;font-size:0.68rem;font-weight:700;color:#1e6b35;">+${impact} pts</span>` : ''}
@@ -5822,23 +5220,6 @@ function renderEditBlocks(rawText, container) {
   }
 
   container.innerHTML = html || `<div style="white-space:pre-wrap;font-size:0.85rem;">${escHtml(rawText)}</div>`;
-
-  // Route any gap flags / no-edit notes to the chat thread
-  if (chatNotes.length > 0) {
-    const thread = document.getElementById('le-chat-thread');
-    if (thread) {
-      const noteHtml = chatNotes.map(n => escHtml(n)).join('\n\n');
-      thread.insertAdjacentHTML('beforeend',
-        '<div style="margin-bottom:0.5rem;padding:0.5rem 0.75rem;border-left:3px solid var(--amber,#c97316);font-size:0.83rem;background:#fffbf5;border-radius:0 4px 4px 0;">' +
-        '<div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:0.25rem;">Claude — Editor\'s Notes</div>' +
-        '<div style="white-space:pre-wrap;line-height:1.5;">' + noteHtml + '</div>' +
-        '<div style="margin-top:0.4rem;font-size:0.7rem;color:var(--mid);font-family:\'Raleway\',sans-serif;">These gaps cannot be addressed in the resume — address them in your cover letter.</div>' +
-        '</div>'
-      );
-      thread.scrollTop = thread.scrollHeight;
-      leHistory.push({ role: 'assistant', content: 'Editor\'s Notes:\n' + chatNotes.join('\n\n') });
-    }
-  }
 }
 
 
@@ -6341,7 +5722,7 @@ function wordDiff(before, after) {
     else{ops.unshift({t:'del',v:bWords[i-1]});i--;}
   }
   return ops.map(o =>
-    o.t==='add' ? `<ins style="color:#1a4a2e;font-weight:700;text-decoration:none;">${escHtml(o.v)}</ins>` :
+    o.t==='add' ? `<ins style="background:#e8f5ec;color:#1a4a2e;text-decoration:none;border-radius:2px;padding:0 1px;">${escHtml(o.v)}</ins>` :
     o.t==='del' ? `<del style="background:#fce8e8;color:#791f1f;border-radius:2px;padding:0 1px;">${escHtml(o.v)}</del>` :
     escHtml(o.v)
   ).join('');
@@ -6551,7 +5932,6 @@ var trackTips=['How Applied (every job)','Resume used per app','Recruiter name +
   }
 
   renderPrioritySteps();
-  renderEditInsightsDashboard();
 }
 
 function dashMarkStepDone(jobId) {
@@ -6669,10 +6049,7 @@ document.addEventListener('change', function(e) {
 // ─── GENERATE RESUME FROM SELECTED EDITS ──────────────────────────────────────
 
 async function generateResumeFromEdits(btn) {
-  // Always use the currently saved resume text as the base — never let a prior
-  // generated version override an updated saved resume
-  const savedResumeText = RESUMES[selectedLeResume]?.text || '';
-  const baseResume = savedResumeText || window._grResumeText || '';
+  const baseResume = RESUMES[selectedLeResume]?.text || '';
   if (!baseResume) { alert('No base resume is selected. Select one in the Line-by-Line Edits tab.'); return; }
 
   const blocks = document.querySelectorAll('#le-output .edit-block');
@@ -6707,40 +6084,30 @@ Rules:
 - Apply every INSERT by adding the new content in the appropriate section
 - Preserve ALL other resume content exactly — every line, section, header, bullet, and spacing
 - Never add, remove, or change anything not in the edit list
-- ABSOLUTE BAN — never insert spaces between individual letters in any text node
-- CRITICAL OUTPUT RULE: Output the complete updated resume text FIRST — no preamble, no commentary before the resume, no "I need to flag" statements before the resume
-- If a REPLACE target is not found verbatim, do your best to locate it by context and apply it anyway — never stop to explain before outputting the resume
-- ONLY after the complete resume, if you have editor's notes, append them separated by this exact line on its own: ---EDITOR_NOTES---
-- Editor's notes must come AFTER the full resume, never before or inline`;
+- ABSOLUTE BAN — never insert spaces between individual letters in any text node. Section headers must be unspaced words: "AREAS OF EXPERTISE" not "A R E A S O F E X P E R T I S E". Spaced characters break every ATS parser.
+- Output the complete updated resume text first
+- If you have editor's notes, questions, or flags for the candidate, append them after the resume separated by this exact line: ---EDITOR_NOTES---
+- Keep editor's notes concise and actionable — specific questions or flags only, no general commentary`;
 
   const chatNotes = leHistory.filter(function(m){return m.role==='user';}).slice(2).map(function(m,i){return 'Note '+(i+1)+': '+m.content;}).join('\n');
   const userMsg = `Here is the base resume:\n\n${baseResume}\n\n---\n\nApply these ${checkedEdits.length} edit(s):\n\n${editsText}${chatNotes ? '\n\n---\n\nADDITIONAL NOTES FROM CANDIDATE (incorporate into the resume where relevant):\n'+chatNotes : ''}\n\nReturn the complete updated resume.`;
 
   try {
     let text = '';
-    // Extract the first line of the base resume to use as prefill
-    // This forces Claude's first token to be the resume name line — no preamble possible
-    const firstLine = baseResume.split('\n').find(l => l.trim()) || 'Cara A. Brown, MBA';
-    await callClaudeWithPrefill(systemPrompt, userMsg, firstLine + '\n', (t) => { text = t; });
+    await callClaude(systemPrompt, userMsg, (t) => { text = t; });
 
-    // Notes splitting is now simple: prefill guarantees resume starts first.
-    // Only need to split on the separator for editor notes.
-    const sepIdx = text.search(/---EDITOR_NOTES---/i);
-    let resumeText = (sepIdx > -1 ? text.substring(0, sepIdx) : text).trim();
-    const editorNotes = (sepIdx > -1 ? text.substring(sepIdx + 20).trim() : '');
+    // Split resume from editor's notes
+    const notesSplit = text.split(/---EDITOR_NOTES---/i);
+    let resumeText = notesSplit[0].trim();
+    const editorNotes = notesSplit[1] ? notesSplit[1].trim() : '';
+
+    // Also strip any legacy editor notes pattern just in case
+    resumeText = resumeText.replace(/[-—]{2,}\s*EDITOR['']?S?\s*NOTES?[\s\S]*$/i, '').trim();
 
     document.getElementById('gr-output').textContent = resumeText;
     document.getElementById('gr-result').style.display = 'block';
     window._grResumeText = resumeText;
     window._grResumeKey = selectedLeResume;
-
-    // Store version
-    const ctx = window._sessionCtx;
-    storeResumeVersion(resumeText, selectedLeResume, ctx ? ctx.currentRound : 1, '');
-
-    // Auto-populate Revised Resume Check textarea
-    const rcTa = document.getElementById('updated-resume-text');
-    if (rcTa) rcTa.value = resumeText;
 
     // Route editor's notes to chat thread
     if (editorNotes) {
@@ -6755,8 +6122,6 @@ Rules:
         );
         thread.scrollTop = thread.scrollHeight;
         leHistory.push({ role: 'assistant', content: editorNotes });
-        // Store in session context so future generations include it
-        if (window._sessionCtx) window._sessionCtx.editorNotes.push({ text: editorNotes, ts: Date.now() });
         // Update leSysPrompt to include notes context
         leSysPrompt = leSysPrompt + '\n\nEDITOR\'S NOTES SENT TO CANDIDATE:\n' + editorNotes;
       }
@@ -6774,59 +6139,6 @@ function copyGrOutput(btn) {
   navigator.clipboard.writeText(text).then(() => {
     if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy Text', 2000); }
   });
-}
-
-async function downloadGrAsDocx(btn) {
-  const text = window._grResumeText || document.getElementById('gr-output')?.textContent || '';
-  if (!text.trim()) { alert('Generate a resume first.'); return; }
-  if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
-  if (!window.docx) {
-    await new Promise((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js';
-      s.onload = resolve; s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
-  const { Document, Packer, Paragraph, TextRun, BorderStyle, AlignmentType } = window.docx;
-  const ACCENT = '2a4080'; const MID = '888680'; const INK = '1e1e1c'; const BLACK = '0d0d0b'; const RULE = 'dddad3';
-  const lines = text.split('\n');
-  const children = [];
-  for (let i = 0; i < lines.length; i++) {
-    const raw = lines[i]; const line = raw.trim();
-    if (!line) { children.push(new Paragraph({ children: [], spacing: { after: 40 } })); continue; }
-    if (i === 0 || (i < 4 && line.match(/^[A-Z][a-z]+ [A-Z]\. [A-Z][a-z]+/))) {
-      const parts = line.split(/,\s*/);
-      children.push(new Paragraph({ children: [new TextRun({ text: parts[0], bold: true, size: 50, font: 'Arial', color: BLACK }), ...(parts[1] ? [new TextRun({ text: ', ' + parts[1], size: 50, font: 'Arial', color: BLACK })] : [])], spacing: { after: 20 } })); continue;
-    }
-    if (i < 6 && !line.startsWith('—') && line.includes('·') && !line.includes('@')) {
-      children.push(new Paragraph({ children: [new TextRun({ text: line, size: 14, font: 'Arial', color: ACCENT, bold: true, allCaps: true })], spacing: { after: 20 } })); continue;
-    }
-    if (line.includes('@') || (line.includes('·') && (line.includes('linkedin') || line.includes('caraabrown')))) {
-      children.push(new Paragraph({ children: [new TextRun({ text: line, size: 15, font: 'Arial', color: MID })], spacing: { after: 60 } }));
-      children.push(new Paragraph({ children: [], border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: RULE, space: 1 } }, spacing: { before: 40, after: 0 } })); continue;
-    }
-    if (line === line.toUpperCase() && line.length < 60 && !line.startsWith('—') && line.length > 2 && !line.includes('·')) {
-      children.push(new Paragraph({ children: [new TextRun({ text: line, size: 12, font: 'Arial', color: ACCENT, bold: true, allCaps: true })], border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: RULE, space: 2 } }, spacing: { before: 100, after: 40 } })); continue;
-    }
-    if (line.startsWith('—') || line.startsWith('\u2014')) {
-      const bulletText = line.replace(/^[\u2014\-]+\s*/, '');
-      children.push(new Paragraph({ children: [new TextRun({ text: '\u2014  ', color: ACCENT, bold: true, size: 15, font: 'Arial' }), new TextRun({ text: bulletText.replace(/<\/?strong>/g, ''), size: 15, font: 'Arial', color: INK })], indent: { left: 220, hanging: 220 }, spacing: { after: 30 } })); continue;
-    }
-    if (line.match(/Designer|Strategist|Director|Manager|VP|Chief|Lead|Principal|Analyst|Officer|Consultant|Founder/) && line.length < 80 && !line.startsWith('—')) {
-      children.push(new Paragraph({ children: [new TextRun({ text: line, size: 16, font: 'Arial', color: ACCENT, bold: true })], spacing: { after: 40 } })); continue;
-    }
-    children.push(new Paragraph({ children: [new TextRun({ text: line, size: 15, font: 'Arial', color: INK })], spacing: { after: 40 } }));
-  }
-  const label = RESUMES[window._grResumeKey || selectedLeResume]?.label || 'Resume';
-  const safeLabel = label.replace(/[^a-zA-Z0-9]/g, '_');
-  const doc = new Document({ sections: [{ properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 864, right: 792, bottom: 864, left: 792 } } }, children }] });
-  try {
-    const blob = await Packer.toBlob(doc);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `CaraBrown_${safeLabel}.docx`; a.click(); URL.revokeObjectURL(url);
-    if (btn) { btn.textContent = 'Downloaded!'; setTimeout(() => { btn.textContent = 'Download Word Doc'; btn.disabled = false; }, 2500); }
-  } catch(e) { alert('Download failed: ' + e.message); if (btn) { btn.textContent = 'Download Word Doc'; btn.disabled = false; } }
 }
 
 async function downloadGrAsHTML(btn) {
@@ -6852,7 +6164,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#7a7975;-webkit-fo
 .print-bar p strong{color:#f6f5f1;font-weight:600;}
 .btn-print{background:#f6f5f1;color:var(--black);font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:8px 22px;border:none;cursor:pointer;}
 .doc{padding:56px 0 48px;display:flex;flex-direction:column;align-items:center;gap:0;}
-.page{width:8.5in;min-height:11in;background:#ffffff;margin:24px auto;padding:${pagePadding};box-shadow:0 2px 8px rgba(0,0,0,0.1);display:flex;flex-direction:column;}
+.page{width:8.5in;height:11in;background:#ffffff;margin:24px auto;padding:${pagePadding};box-shadow:0 2px 8px rgba(0,0,0,0.1);overflow:hidden;display:flex;flex-direction:column;}
 .resume-name{font-size:25pt;font-weight:700;letter-spacing:-0.02em;color:#0d0d0b;line-height:1;margin-bottom:1px;}
 .resume-name span{font-weight:300;}
 .resume-title{font-size:7pt;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#2a4080;margin-top:3px;line-height:1.3;}
@@ -7069,7 +6381,7 @@ const WORK_SAMPLES_CATALOG = [
     key: 'c05',
     title: 'Carrier Experience Survey',
     cat: 'Service Design · Change Management · Enterprise',
-    tldr: 'Built a driver sentiment measurement framework from scratch — no precedent, no owner, no baseline — then the research methodology and change management playbook that turned it into a funded, permanent enterprise function. NPS: −36 to +49.',
+    tldr: 'Built a driver sentiment measurement framework from scratch — no precedent, no owner, no baseline — then the research methodology and change management playbook that turned it into a funded, permanent enterprise function. NPS: −36 → +49.',
     tags: ['Enterprise Service Design','Systems Diagnosis','KPI Design','Executive Advisory','Change Enablement','Cross-functional Alignment','Influence Without Authority','Gamification Design','Field Research'],
     url: 'https://caraabrown.com/kroger-driver-experience'
   },
@@ -7394,7 +6706,9 @@ function gdResetAll(){
 
 document.addEventListener('click', function(e){
   const link = e.target.closest('[data-panel]');
-  if(link && link.dataset.panel==='my-resumes') setTimeout(render, 50);
+  if(link && link.dataset.panel==='ghost-detector'){
+    setTimeout(function(){ if(!document.getElementById('gd-card-1')) gdRenderSignals(); }, 50);
+  }
 });
 /* ─── QUICK COPY LINKS ─── */
 (function(){
