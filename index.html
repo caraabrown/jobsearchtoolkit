@@ -1014,7 +1014,49 @@
     <span id="gh-sync-dot" style="width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0;display:inline-block;"></span>
     <span id="gh-sync-label">Synced</span>
   </div>
+
+  <!-- PIPELINE PROGRESS BAR -->
+  <div id="pipeline-bar" style="background:#0a0a0a;padding:10px 3rem 14px;display:none;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;position:relative;margin-bottom:8px;" id="pipeline-steps"></div>
+    <div style="height:3px;background:#1e1e1e;border-radius:2px;position:relative;margin:0 10px;">
+      <div id="pipeline-fill" style="height:100%;border-radius:2px;background:#3fa040;transition:width 0.4s ease;width:0%;"></div>
+      <div id="pipeline-glow" style="position:absolute;top:-4px;width:11px;height:11px;border-radius:50%;background:#fff;border:2px solid #3fa040;transform:translateX(-50%);left:0%;transition:left 0.4s ease;"></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+      <div id="pipeline-summary" style="font-size:11px;color:#666;font-family:'Raleway',sans-serif;letter-spacing:0.04em;"></div>
+      <button id="pipeline-cta" style="display:none;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:4px 12px;background:#fff;color:#000;border:none;border-radius:3px;cursor:pointer;font-family:'Raleway',sans-serif;"></button>
+    </div>
+  </div>
+  <!-- JD CONTEXT BAR -->
+  <div id="jd-context-bar" style="background:#111;border-top:1px solid #1a1a1a;padding:7px 3rem;display:none;align-items:center;justify-content:space-between;gap:1rem;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:22px;height:22px;border-radius:4px;background:#1a2744;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#fff" stroke-width="1.4"/><line x1="4" y1="5" x2="10" y2="5" stroke="#fff" stroke-width="1.1"/><line x1="4" y1="8" x2="8" y2="8" stroke="#fff" stroke-width="1.1"/></svg>
+      </div>
+      <div>
+        <div id="jd-ctx-title" style="font-size:12px;font-weight:500;color:#fff;line-height:1.2;"></div>
+        <div id="jd-ctx-meta" style="font-size:10px;color:#666;margin-top:1px;font-family:'Raleway',sans-serif;letter-spacing:0.04em;"></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div id="jd-ctx-ats" style="display:none;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:#0f3b1a;color:#4caf80;font-family:'Raleway',sans-serif;letter-spacing:0.04em;"></div>
+      <div id="jd-ctx-fit" style="display:none;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;font-family:'Raleway',sans-serif;letter-spacing:0.04em;"></div>
+      <button onclick="document.querySelector('nav a[data-panel=job-input]').click()" style="font-size:10px;color:#555;background:none;border:none;cursor:pointer;font-family:'Raleway',sans-serif;letter-spacing:0.04em;">Change ↓</button>
+    </div>
+  </div>
 </header>
+<script>
+(function(){
+  function setHeaderH(){
+    var h = document.querySelector('header');
+    if(h) document.documentElement.style.setProperty('--header-h', h.offsetHeight + 'px');
+  }
+  setHeaderH();
+  window.addEventListener('resize', setHeaderH);
+  window.addEventListener('load', setHeaderH);
+  if(window.ResizeObserver) new ResizeObserver(setHeaderH).observe(document.querySelector('header'));
+})();
+</script>
 
 <!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="settings-modal">
@@ -1349,10 +1391,8 @@
       </div>
 
     </div>
-
-    <!-- ── PANEL: JOB DESCRIPTION ── -->
-    <div class="panel" id="panel-job-input">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+          <div class="panel" id="panel-job-input">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
         <div>
           <div class="panel-title">Job <em>Description</em></div>
           <div class="divider"></div>
@@ -1453,6 +1493,15 @@
 
           <textarea id="le-additional-exp" style="display:none;"></textarea>
 
+          <label>Edit tone</label>
+          <div class="tab-row" id="le-tone-tabs" style="margin-bottom:1.25rem;">
+            <div class="tab active" data-letone="ats-first">ATS-First</div>
+            <div class="tab" data-letone="executive">Executive Voice</div>
+            <div class="tab" data-letone="impact">Impact-Forward</div>
+            <div class="tab" data-letone="narrative">Narrative Thread</div>
+            <div class="tab" data-letone="hybrid">ATS Executive Voice</div>
+          </div>
+
           <div class="btn-row">
             <button class="btn" id="gen-edits-btn">Generate Line-by-Line Edits</button>
           </div>
@@ -1485,6 +1534,7 @@
                   <strong style="font-size:1rem;font-family:'Open Sans',sans-serif;color:var(--black);">Generate Full Resume with Selected Edits</strong>
                   <div style="font-size:0.8rem;color:var(--mid);margin-top:0.3rem;">Check the edits above, then click Generate. The AI applies only your selected edits to produce the complete updated resume.</div>
                 </div>
+                <button class="btn btn-ghost" id="patch-resume-btn" onclick="patchResumeFromEdits(this)" title="Apply selected edits directly — faster, no AI needed">⚡ Patch (quick apply)</button>
                 <button class="btn" id="gen-resume-btn" onclick="generateResumeFromEdits(this)">Generate Resume</button>
               </div>
               <div class="loading" id="gr-loading" style="display:none;"><div class="spinner"></div>Applying edits and generating resume…</div>
@@ -1548,7 +1598,19 @@
         <!-- RIGHT: Controls + Results -->
         <div style="flex:1;min-width:0;">
           <label>Updated Resume Text *</label>
+          <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.4rem;">
+            <button class="btn btn-ghost" style="font-size:0.72rem;padding:0.3rem 0.75rem;" onclick="(function(){const leText=document.getElementById('le-output');if(!leText||!leText.innerText.trim()){alert('No updated resume found on the Line-by-Line Edits page.');return;}const ta=document.getElementById('updated-resume-text');if(ta){ta.value=window._grResumeText||leText.innerText.trim();}})()">← Load from Line Edits</button>
+          </div>
           <textarea id="updated-resume-text" placeholder="Paste your updated resume text here…" rows="14"></textarea>
+          <div style="display:flex;gap:0.5rem;margin-top:0.5rem;margin-bottom:0.75rem;flex-wrap:wrap;align-items:center;">
+            <button class="btn btn-ghost" onclick="(function(btn){const text=document.getElementById('updated-resume-text').value.trim();if(!text){alert('No resume text to copy.');return;}navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy Text',2000);});})(this)">Copy Text</button>
+            <div style="display:flex;align-items:center;gap:0;border:1px solid var(--border);border-radius:3px;overflow:hidden;">
+              <label style="display:flex;align-items:center;gap:0.3rem;padding:0 0.65rem;height:34px;cursor:pointer;font-size:0.75rem;font-weight:500;border-right:1px solid var(--border);background:#fff;"><input type="radio" name="rrc-pages" value="2" style="accent-color:var(--black);margin:0;"> 2-page</label>
+              <label style="display:flex;align-items:center;gap:0.3rem;padding:0 0.65rem;height:34px;cursor:pointer;font-size:0.75rem;font-weight:500;background:#fff;"><input type="radio" name="rrc-pages" value="3" checked style="accent-color:var(--black);margin:0;"> 3-page</label>
+            </div>
+            <button class="btn btn-ghost" onclick="downloadRrcAsDocx(this)">Download Word Doc</button>
+            <button class="btn" onclick="downloadRrcAsHTML(this)">Download Styled HTML</button>
+          </div>
 
           <div class="btn-row">
             <button class="btn" id="recheck-btn">Re-run ATS Check</button>
@@ -1615,7 +1677,7 @@
           <button class="copy-btn" style="float:none;margin:0;" onclick="copyCoverLetter(this)">Copy</button>
           <button class="copy-btn" style="float:none;margin:0;" onclick="downloadCLasDocx(this)">Download .docx</button>
         </div>
-        <div class="stream-output" id="cl-output"></div>
+        <div class="stream-output" id="cl-output" contenteditable="true" style="outline:none;min-height:200px;"></div>
       </div>
     </div>
 
@@ -1899,8 +1961,13 @@
       <div class="error-msg" id="interview-error"></div>
 
       <div class="result-box" id="interview-result">
-        <button class="copy-btn" onclick="copyResult('interview-output')">Copy</button>
-        <div class="stream-output" id="interview-output"></div>
+        <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center;">
+          <button class="copy-btn" style="float:none;margin:0;" onclick="copyInterviewPrep(this)">Copy</button>
+          <button class="copy-btn" style="float:none;margin:0;" onclick="downloadInterviewPrep()">Download / Print</button>
+        </div>
+        <div id="ip-tab-row" style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.25rem;"></div>
+        <div id="ip-tab-panels"></div>
+        <div class="stream-output" id="interview-output" style="display:none;"></div>
       </div>
 
       <!-- STAR Story Bank -->
@@ -2088,8 +2155,10 @@
         <div class="error-msg" id="recruiter-error"></div>
 
         <div class="result-box" id="recruiter-result">
-          <button class="copy-btn" onclick="copyResult('recruiter-output')">Copy</button>
-          <div class="stream-output" id="recruiter-output"></div>
+          <button class="copy-btn" style="float:right;margin-bottom:0.75rem;" onclick="copyRecruiterOutput(this)">Copy</button>
+          <div id="rec-tab-row" style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.25rem;clear:both;"></div>
+          <div id="rec-tab-panels"></div>
+          <div id="recruiter-output" style="display:none;"></div>
         </div>
       </div>
     </div>
@@ -2801,7 +2870,18 @@ document.querySelectorAll('nav a[data-panel]').forEach(link => {
     if (['company-research','interview-prep','linkedin-outreach','salary-intel'].includes(panelId)) {
       setTimeout(populateIntelDropdowns, 50);
       if (panelId === 'company-research') restoreIntelOutput('company-research', 'research-tab-snapshot');
-      if (panelId === 'interview-prep') restoreIntelOutput('interview-prep', 'interview-output');
+      if (panelId === 'interview-prep') {
+        const savedRaw = localStorage.getItem('cara_intel_interview-prep');
+        if (savedRaw && savedRaw.trim() && !savedRaw.trim().startsWith('<')) {
+          window._ipRawText = savedRaw;
+          document.getElementById('interview-result').classList.add('visible');
+          renderInterviewPrepC(savedRaw);
+        } else if (savedRaw && savedRaw.trim().startsWith('<')) {
+          // Legacy HTML stored — show raw in output div
+          const out = document.getElementById('interview-output');
+          if (out && !out.innerHTML.trim()) { out.innerHTML = savedRaw; out.style.display='block'; document.getElementById('interview-result').classList.add('visible'); }
+        }
+      }
       if (panelId === 'linkedin-outreach') restoreIntelOutput('linkedin-outreach', 'li-output');
       if (panelId === 'salary-intel') setTimeout(restoreSalaryNumbers, 50);
     }
@@ -2846,8 +2926,8 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
     if (roleEl && !roleEl.value && rolePart) roleEl.value = rolePart;
   }
   document.getElementById('jd-saved-msg').style.display = 'block';
-
-  // Auto-add to job tracker
+  updatePipeline();
+  updateJdContextBar();
   if (savedRoleName || savedJDUrl) {
     const newJob = {
       id: Date.now().toString(),
@@ -2868,6 +2948,20 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
   }
 
   setTimeout(() => {
+    // Auto-populate Ghost Job Detector JD field and scan
+    const gdJdEl = document.getElementById('gd-jd-text');
+    if (gdJdEl && savedJD) {
+      gdJdEl.value = savedJD;
+      if (!document.getElementById('gd-card-1')) gdRenderSignals();
+      gdScanText();
+      // Flash ghost detector nav to signal auto-scan ran
+      const gdLink = document.querySelector('nav a[data-panel="ghost-detector"]');
+      if (gdLink) {
+        gdLink.style.transition = 'background 0.3s';
+        gdLink.style.background = '#1a3a1a';
+        setTimeout(() => gdLink.style.background = '', 1500);
+      }
+    }
     document.querySelector('nav a[data-panel="ats-check"]').click();
   }, 800);
 });
@@ -3026,6 +3120,7 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
     ['ats-keywords-output','ats-flags-output','ats-path-output'].forEach(id => document.getElementById(id).style.display = 'none');
     document.getElementById('ats-best-output').style.display = 'block';
     markNavDone('ats-check');
+    showNudge('ats-check', '<strong>ATS Check complete.</strong> Your best match is ready — run Line-by-Line Edits to push your score above 95%.', 'Run Line Edits', 'line-edits');
   } catch (err) { showError('ats-error', 'Something went wrong: ' + err.message); document.getElementById('ats-result').classList.remove('visible');
   } finally { hideLoading('ats-loading'); }
 });
@@ -3051,20 +3146,38 @@ document.getElementById('recheck-btn').addEventListener('click', async () => {
   hideError('recheck-error');
   document.getElementById('recheck-result').classList.remove('visible');
 
+  const originalScore = (() => {
+    const cards = document.querySelectorAll('#score-cards-container .score-card');
+    let best = 0;
+    cards.forEach(c => { const n = parseInt(c.querySelector('.score-num')?.textContent); if (n > best) best = n; });
+    return best || null;
+  })();
+
   const systemPrompt = `You are an expert ATS analyst. Provide precise, actionable resume analysis.`;
   const userMsg = `JOB DESCRIPTION:
 ${jd}
 
 UPDATED RESUME:
 ${updatedResume}
+${originalScore ? `\nORIGINAL ATS SCORE (from prior ATS Check): ${originalScore}%` : ''}
 
-Run a comprehensive ATS check on this revised resume:
+Run a comprehensive ATS check on this revised resume. Output EXACTLY these lines first, each on its own line:
+RECHECK_SCORE: [XX]%
+PROJECTED_SCORE: [XX]%
+(PROJECTED_SCORE = realistic score if ALL remaining gaps below were addressed)
 
-1. **Overall ATS Score**: Give a percentage (0-100%). Output it on its own line EXACTLY like this: RECHECK_SCORE: [XX]%
-2. **Keyword Match**: Output as a markdown table with columns: | Keyword | Status | Where to Add |. Status should be ✅ Matched or ❌ Missing.
-3. **Score Improvement**: Output as a markdown table with columns: | Metric | Before | After |. Show old score vs new score, keyword coverage change, and overall improvement summary.
-4. **Remaining Gaps**: Output as a markdown table with columns: | Gap | Priority | Suggested Fix |. Priority should be HIGH, MEDIUM, or LOW.
-5. **Ready to Submit?**: Output as a markdown table with columns: | Item | Status | Action Needed |. Then give a final Yes/No verdict with one sentence explanation.
+Then output these five numbered sections:
+
+1. **Keyword Match**: Output as a markdown table with columns: | # | Keyword | Status | Where to Add |. Number every row starting at 1. Status = ✅ Matched or ❌ Missing.
+2. **Score Improvement**: Do NOT output a table. Instead output ONLY these structured lines:
+ORIGINAL: ${originalScore || '?'}%
+CURRENT: [same as RECHECK_SCORE]%
+PROJECTED: [same as PROJECTED_SCORE]%
+KW_ADDED: [number of keywords now matched vs before]
+BULLETS_IMPROVED: [estimated number of bullets strengthened]
+WORTH_IT: [one sentence on whether remaining edits are worth the effort]
+3. **Remaining Gaps**: Output as a markdown table with columns: | # | Gap | Priority | Suggested Fix |. Number every row starting at 1. Priority = HIGH, MEDIUM, or LOW.
+4. **Ready to Submit?**: Output as a markdown table with columns: | Item | Status | Action Needed |. Then give a final Yes/No verdict with one sentence explanation.
 
 Be specific and direct.`;
 
@@ -3141,14 +3254,17 @@ Be specific and direct.`;
     };
    await callClaude(systemPrompt, userMsg, (text) => {
       fullText = text;
-      kwOut.textContent = text; // plain text while streaming; formatted render fires on complete below
+      kwOut.textContent = text;
       const sm = text.match(/RECHECK_SCORE:\s*(\d+)%/);
+      const pm = text.match(/PROJECTED_SCORE:\s*(\d+)%/);
       if (sm) {
         const pct = parseInt(sm[1]);
+        const proj = pm ? parseInt(pm[1]) : null;
         const colorClass = pct >= 80 ? 'score-high' : pct >= 60 ? 'score-mid' : 'score-low';
         const card = document.getElementById('recheck-score-card');
         card.style.display = 'flex';
-        card.innerHTML = `<div class="score-card"><div class="score-label" style="margin-bottom:0.4rem;">Revised Resume Score</div><div class="score-num ${colorClass}">${pct}%</div></div>`;
+        card.innerHTML = `<div class="score-card"><div class="score-label" style="margin-bottom:0.4rem;">Current Score</div><div class="score-num ${colorClass}">${pct}%</div></div>`
+          + (proj ? `<div class="score-card"><div class="score-label" style="margin-bottom:0.4rem;">Projected (if gaps fixed)</div><div class="score-num score-high">${proj}%</div></div>` : '');
       }
     });
 
@@ -3165,7 +3281,7 @@ Be specific and direct.`;
     const ready= getSection(fullText, /READY TO SUBMIT/i,     null);
 
    kwOut.innerHTML   = renderRecheckTab(kw   || fullText, 'keywords');
-    impOut.innerHTML  = renderRecheckTab(imp  || '', 'improvement');
+    impOut.innerHTML  = renderScoreImprovementCard(fullText, originalScore);
     gapsOut.innerHTML = renderRecheckTab(gaps || '', 'gaps');
     readyOut.innerHTML= renderRecheckTab(ready|| '', 'ready');
 
@@ -3190,6 +3306,7 @@ Be specific and direct.`;
     // Show Turn into Line Edits button
     document.getElementById('recheck-to-le-row').style.display = 'block';
     markNavDone('resume-update');
+    showNudge('resume-update', '<strong>Resume check complete.</strong> Ready to draft your cover letter with this tailored resume as the base.', 'Write Cover Letter', 'cover-letter');
     const revisedText = document.getElementById('updated-resume-text')?.value?.trim();
     if (revisedText) autoSaveRevisedResumeToHub(revisedText);
     document.getElementById('recheck-to-le-btn').onclick = async () => {
@@ -3216,7 +3333,9 @@ Be specific and direct.`;
       r2.style.display = 'block';
       // Use latest generated resume for round 2+ — falls back to updated-resume-text textarea
       const jd2 = savedJD || document.getElementById('jd-text').value.trim();
-      const latestResume = window._grResumeText || updatedResume;
+      const textareaResume = document.getElementById('updated-resume-text')?.value?.trim();
+      const latestResume = textareaResume || window._grResumeText || updatedResume;
+      if (textareaResume) window._grResumeText = textareaResume;
       if (!jd2 || !latestResume) return;
       const sp2 = `You are a senior resume editor. PERSPECTIVE: You are advising from the point of view of a hiring manager. What problems does this role solve at a company like this? How do I empower Cara to position herself as that solution?\n\nYou produce precise, surgical edits — exact original text, exact replacement, and one-line reason. Never invent experience not in the resume.`;
 const um2 = `You are given a resume, a job description, and a set of recommendations from an ATS analysis. Your job is to translate each recommendation into a precise, surgical edit block.\n\nFor each recommendation:\n1. Find the EXACT line in the resume it refers to\n2. Rewrite only what needs changing\n3. Output in the structured format below\n\nRESUME:\n${latestResume}\n\nJOB DESCRIPTION:\n${jd2}\n\nRECOMMENDATIONS TO TRANSLATE:\n${fullText}\n\nFirst output this exact summary line:\nEDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+\n\nThen for each recommendation output a block in this EXACT format:\n\nSECTION: [section name — for Professional History include company name e.g. "Professional History — Kroger"]\nCONTEXT: [copy the 1-2 lines immediately surrounding the BEFORE line in the resume]\nBEFORE: [copy the exact original line from the resume verbatim — do not paraphrase]\nAFTER: [your rewritten version, ready to paste — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nSCORE_IMPACT: [estimated ATS point gain for this single edit, whole number]\nWHY: [one sentence explaining the specific improvement]\n\nRULES:\n- BEFORE must be copied verbatim from the resume — never invented\n- AFTER must be complete and ready to paste with no placeholders\n- Only make changes that are honest wordsmithing of existing experience\n- Never invent titles, companies, credentials or skills not in the resume\n- ABSOLUTE BAN — never insert spaces between individual letters in any AFTER text. "A R E A S O F E X P E R T I S E" is forbidden. Write unspaced words only.`;      const leOutput = document.getElementById('le-output');
@@ -3228,6 +3347,7 @@ const um2 = `You are given a resume, a job description, and a set of recommendat
         await callClaude(sp2, um2, (text) => { fullLe = text; leOutput.textContent = text; });
         renderEditBlocks(fullLe, leOutput);
         markNavDone('line-edits');
+        showNudge('line-edits', '<strong>Edits generated.</strong> Generate your resume, then paste it into Revised Resume Check to confirm your new ATS score.', 'Go to Recheck', 'resume-update');
       } catch(e) {
         leOutput.textContent = 'Error: ' + e.message;
       } finally {
@@ -4041,22 +4161,38 @@ function renderJobs() {
     const contactsHtml = `<div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
         <div style="font-size:0.78rem;color:var(--mid);">Track people at ${escHtml(j.company)} — recruiters, hiring managers, champions.</div>
-        <button onclick="event.stopPropagation();addJobContact('${j.id}')" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;background:var(--black);color:#fff;border:none;padding:0.35rem 0.9rem;cursor:pointer;">+ Add Contact</button>
+        <div style="display:flex;gap:0.5rem;">
+          <button onclick="event.stopPropagation();(function(){var nameEl=document.getElementById('company-name');var urlEl=document.getElementById('company-url');if(nameEl&&'${escHtml(j.company)}'!=='(see URL)')nameEl.value='${escHtml(j.company)}';if(urlEl&&'${escHtml(j.url||'')}')urlEl.value='${escHtml(j.url||'')}';document.querySelectorAll('nav a').forEach(l=>l.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));var link=document.querySelector('nav a[data-panel=company-research]');if(link)link.classList.add('active');var panel=document.getElementById('panel-company-research');if(panel)panel.classList.add('active');})()" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;background:transparent;border:1px solid var(--border);color:var(--mid);padding:0.3rem 0.7rem;cursor:pointer;border-radius:3px;">🔍 Research Company</button>
+          <button onclick="event.stopPropagation();addJobContact('${j.id}')" style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;background:var(--black);color:#fff;border:none;padding:0.35rem 0.9rem;cursor:pointer;">+ Add Contact</button>
+        </div>
       </div>
-      <div id="contacts-list-${j.id}">${contacts.length === 0 ? '<div style="font-size:0.8rem;color:var(--mid);font-style:italic;padding:0.5rem 0;">No contacts yet.</div>' : contacts.map((c,ci) => `
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0.5rem;align-items:start;padding:0.65rem 0.75rem;border:1px solid var(--border);border-radius:4px;margin-bottom:0.4rem;background:#fff;">
+      <div id="contacts-list-${j.id}">${contacts.length === 0 ? '<div style="font-size:0.8rem;color:var(--mid);font-style:italic;padding:0.5rem 0;">No contacts yet.</div>' : contacts.map((c,ci) => {
+        const contactTypeOpts = ['Hiring Manager','Recruiter','Champion','Other'].map(opt => `<option value="${opt}" ${(c.type||''===opt)?'selected':''}>${opt}</option>`).join('');
+        const isRecruiter = c.type === 'Recruiter';
+        const hasLinkedin = c.linkedin && !c.linkedin.includes('@');
+        return `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0.5rem;align-items:start;padding:0.65rem 0.75rem;border:1px solid var(--border);border-radius:4px;margin-bottom:0.4rem;background:#fff;${isRecruiter?'border-left:3px solid #2a4080;':'' }">
           <div><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">Name</div><input type="text" value="${escHtml(c.name||'')}" style="width:100%;font-size:0.8rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'name',this.value)" onclick="event.stopPropagation()"></div>
           <div><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">Title</div><input type="text" value="${escHtml(c.title||'')}" style="width:100%;font-size:0.8rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'title',this.value)" onclick="event.stopPropagation()"></div>
+          <div>
+            <div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">Contact Type</div>
+            <select onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'type',this.value);renderJobs();var r=document.querySelector('[data-detail-id=${j.id}]');if(r)r.style.display='table-row';setTimeout(()=>showJobTab('${j.id}','contacts'),10);" onclick="event.stopPropagation()" style="width:100%;font-family:inherit;font-size:0.8rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);">
+              <option value="">— type —</option>
+              ${contactTypeOpts}
+            </select>
+          </div>
+          <button onclick="event.stopPropagation();deleteJobContact('${j.id}',${ci})" style="background:none;border:none;cursor:pointer;color:var(--mid);font-size:1rem;padding:0.2rem 0.4rem;align-self:center;" title="Remove">✕</button>
           <div><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">LinkedIn / Email / URL</div>
             <div style="display:flex;gap:4px;">
               <input type="text" value="${escHtml(c.linkedin||'')}" id="clink-${j.id}-${ci}" style="flex:1;font-size:0.8rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'linkedin',this.value)" onclick="event.stopPropagation()">
               ${c.linkedin ? `<button onclick="event.stopPropagation();var el=document.getElementById('clink-${j.id}-${ci}');navigator.clipboard.writeText(el.value);this.textContent='✓';var b=this;setTimeout(()=>b.textContent='Copy',1800);" style="flex-shrink:0;font-size:0.65rem;font-weight:700;font-family:'Raleway',sans-serif;letter-spacing:.04em;padding:0.2rem 0.55rem;background:var(--black);color:#fff;border:none;border-radius:2px;cursor:pointer;white-space:nowrap;">Copy</button>` : ''}
-              ${c.linkedin && !c.linkedin.includes('@') ? `<a href="${c.linkedin.startsWith('http')?escHtml(c.linkedin):'https://'+escHtml(c.linkedin)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="flex-shrink:0;display:inline-flex;align-items:center;padding:0.2rem 0.55rem;background:var(--bgoff);border:1px solid var(--border);border-radius:2px;font-size:0.65rem;font-weight:700;font-family:'Raleway',sans-serif;color:var(--black);text-decoration:none;white-space:nowrap;">Open ↗</a>` : ''}
+              ${hasLinkedin ? `<button onclick="event.stopPropagation();prefillLinkedInOutreach('${escHtml(c.name||'')}','${escHtml(c.title||'')}','${escHtml(c.linkedin||'')}','${escHtml(c.notes||'')}')" style="flex-shrink:0;font-size:0.65rem;font-weight:700;font-family:'Raleway',sans-serif;letter-spacing:.04em;padding:0.2rem 0.55rem;background:#0a66c2;color:#fff;border:none;border-radius:2px;cursor:pointer;white-space:nowrap;" title="Pre-fill LinkedIn Outreach page">LI →</button>` : ''}
             </div>
           </div>
-          <button onclick="event.stopPropagation();deleteJobContact('${j.id}',${ci})" style="background:none;border:none;cursor:pointer;color:var(--mid);font-size:1rem;padding:0.2rem 0.4rem;align-self:center;" title="Remove">✕</button>
-          <div style="grid-column:1/-1;"><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">Notes</div><textarea rows="2" style="width:100%;font-size:0.78rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);resize:vertical;" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'notes',this.value)" onclick="event.stopPropagation()">${escHtml(c.notes||'')}</textarea></div>
-        </div>`).join('')}
+          <div style="grid-column:2/-1;"><div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:0.2rem;">Notes</div><textarea rows="2" style="width:100%;font-size:0.78rem;padding:0.3rem 0.5rem;border:1px solid var(--border);background:var(--bgoff);resize:vertical;" onchange="event.stopPropagation();updateJobContact('${j.id}',${ci},'notes',this.value)" onclick="event.stopPropagation()">${escHtml(c.notes||'')}</textarea></div>
+          ${isRecruiter ? `<div style="grid-column:1/-1;display:flex;justify-content:flex-end;margin-top:0.25rem;"><button onclick="event.stopPropagation();vetRecruiterFromContact('${escHtml(c.name||'')}','${escHtml(c.title||'')}','${escHtml(c.notes||'')}','${escHtml(j.role||'')}','${escHtml(j.company||'')}')" style="font-family:'Raleway',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;background:#fdf6ec;border:1px solid #f0c080;color:#854F0B;padding:0.3rem 0.8rem;cursor:pointer;border-radius:3px;">⚠ Vet This Recruiter →</button></div>` : ''}
+        </div>`;
+      }).join('')}
       </div>
     </div>`;
 
@@ -4245,6 +4381,51 @@ function showJobTab(jobId, tab) {
     btn.style.color = active ? 'var(--black)' : 'var(--mid)';
     pane.style.display = active ? 'block' : 'none';
   });
+}
+
+function prefillLinkedInOutreach(name, title, linkedin, notes) {
+  const nameEl = document.getElementById('li-name');
+  const titleEl = document.getElementById('li-title');
+  const ctxEl = document.getElementById('li-context');
+  if (nameEl) nameEl.value = name;
+  if (titleEl) titleEl.value = title;
+  if (ctxEl) {
+    const parts = [];
+    if (linkedin) parts.push('LinkedIn: ' + linkedin);
+    if (notes) parts.push(notes);
+    ctxEl.value = parts.join('\n');
+  }
+  document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const link = document.querySelector('nav a[data-panel="linkedin-outreach"]');
+  if (link) link.classList.add('active');
+  const panel = document.getElementById('panel-linkedin-outreach');
+  if (panel) panel.classList.add('active');
+  const main = document.querySelector('main');
+  if (main) main.scrollTop = 0;
+}
+
+function vetRecruiterFromContact(name, title, notes, role, company) {
+  const roleEl = document.getElementById('rec-role');
+  const infoEl = document.getElementById('rec-info');
+  if (roleEl) roleEl.value = role + (company ? ' at ' + company : '');
+  if (infoEl) infoEl.value = [
+    name ? 'Recruiter: ' + name : '',
+    title ? 'Title: ' + title : '',
+    notes ? 'Notes: ' + notes : ''
+  ].filter(Boolean).join('\n');
+  document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  // Switch to recruiter tab in salary intel panel
+  const salLink = document.querySelector('nav a[data-panel="salary-intel"]');
+  if (salLink) salLink.classList.add('active');
+  const salPanel = document.getElementById('panel-salary-intel');
+  if (salPanel) salPanel.classList.add('active');
+  // Switch to recruiter tab
+  const recTab = document.querySelector('#salary-mode-tabs .tab[data-salmode="recruiter"]');
+  if (recTab) recTab.click();
+  const main = document.querySelector('main');
+  if (main) main.scrollTop = 0;
 }
 
 function addJobContact(jobId) {
@@ -4563,7 +4744,38 @@ document.getElementById('gen-interview-btn').addEventListener('click', async () 
   hideError('interview-error');
   document.getElementById('interview-result').classList.remove('visible');
 
-  const systemPrompt = 'You are a world-class interview coach for senior design strategy roles. You prepare candidates with specific story-based answers — never generic advice. Every answer is grounded in real experience.';
+  const systemPrompt = `You are a world-class interview coach for senior design strategy roles. You prepare candidates with specific story-based answers — never generic advice. Every answer is grounded in real experience.
+
+CRITICAL OUTPUT FORMAT — follow exactly:
+
+## 60-SECOND OPENER
+[4-5 sentence tell me about yourself, written as Cara speaking]
+
+## Q1: [Question text]
+TYPE: LIKELY
+SITUATION: [one sentence]
+TASK: [one sentence]
+ACTION: [one sentence — specific actions taken]
+RESULT: [quantified outcome, bold key metrics with **asterisks**]
+
+## Q2: [Question text]
+TYPE: LIKELY
+SITUATION: ...
+TASK: ...
+ACTION: ...
+RESULT: ...
+
+[continue Q3–Q10 in same format]
+
+## LANDMINE 1: [Tricky question text]
+TYPE: LANDMINE
+HANDLE: [exact language to use — write the actual words Cara should say, in quotes]
+
+## LANDMINE 2: [Tricky question text]
+TYPE: LANDMINE
+HANDLE: [exact language]
+
+Use this exact format. No variations. No extra prose between blocks.`;
 
   const userMsg = [
     'Build a complete interview prep guide for Cara Brown.',
@@ -4571,17 +4783,21 @@ document.getElementById('gen-interview-btn').addEventListener('click', async () 
     'Job Description: ' + jd.substring(0, 1500),
     'Resume (' + resume.label + '): ' + resume.text.substring(0, 2500),
     focus ? 'Caras focus or concerns: ' + focus : null,
-    'Generate: PART 1 — 60-SECOND OPENER: Write Caras tell me about yourself for this role. 4-5 sentences. PART 2 — 10 MOST LIKELY QUESTIONS + STAR ANSWERS: For each, write the question then a complete STAR answer from Caras real experience. Bold each result and metric. PART 3 — LANDMINES TO WATCH: 2-3 tricky questions and exactly how to handle them.'
   ].filter(Boolean).join('\n\n');
-  
+
   try {
-    const output = document.getElementById('interview-output');
-    output.textContent = '';
+    const rawOut = document.getElementById('interview-output');
+    rawOut.textContent = '';
+    rawOut.style.display = 'block';
     document.getElementById('interview-result').classList.add('visible');
+    document.getElementById('ip-tab-row').innerHTML = '';
+    document.getElementById('ip-tab-panels').innerHTML = '';
     let ipFull = '';
-    await callClaude(systemPrompt, userMsg, text => { ipFull = text; output.textContent = text; });
+    await callClaude(systemPrompt, userMsg, text => { ipFull = text; rawOut.textContent = text; });
+    rawOut.style.display = 'none';
+    renderInterviewPrepC(ipFull);
     markNavDone('interview-prep');
-    saveIntelOutput('interview-prep', output.innerHTML);
+    saveIntelOutput('interview-prep', ipFull);
   } catch (err) {
     showError('interview-error', 'Error: ' + err.message);
     document.getElementById('interview-result').classList.remove('visible');
@@ -4589,6 +4805,260 @@ document.getElementById('gen-interview-btn').addEventListener('click', async () 
     hideLoading('interview-loading');
   }
 });
+
+// ─── INTERVIEW PREP OPTION C RENDERER ────────────────────────────────────────
+
+window._ipRawText = '';
+
+function renderInterviewPrepC(raw) {
+  window._ipRawText = raw;
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function md(s){ return s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>'); }
+
+  // Parse sections split on ## headings
+  const sections = raw.split(/\n(?=##\s)/);
+  const opener = { text: '' };
+  const questions = [];
+  const landmines = [];
+
+  sections.forEach(sec => {
+    const lines = sec.trim().split('\n');
+    const heading = lines[0].replace(/^#+\s*/,'').trim();
+    const body = lines.slice(1).join('\n').trim();
+
+    if (/60.SECOND OPENER/i.test(heading)) {
+      opener.text = body;
+    } else if (/^Q\d+:/i.test(heading) || /^QUESTION\s*\d+/i.test(heading)) {
+      const qText = heading.replace(/^Q\d+:\s*/i,'').replace(/^QUESTION\s*\d+:\s*/i,'').trim();
+      const getF = (lbl) => {
+        const m = body.match(new RegExp(lbl + ':\\s*([\\s\\S]*?)(?=\\n[A-Z]+:|$)'));
+        return m ? m[1].trim() : '';
+      };
+      questions.push({
+        q: qText,
+        type: getF('TYPE'),
+        situation: getF('SITUATION'),
+        task: getF('TASK'),
+        action: getF('ACTION'),
+        result: getF('RESULT'),
+      });
+    } else if (/^LANDMINE\s*\d+:/i.test(heading)) {
+      const qText = heading.replace(/^LANDMINE\s*\d+:\s*/i,'').trim();
+      const handleMatch = body.match(/HANDLE:\s*([\s\S]*?)$/i);
+      landmines.push({ q: qText, handle: handleMatch ? handleMatch[1].trim() : body });
+    }
+  });
+
+  // Build tab nav
+  const tabRow = document.getElementById('ip-tab-row');
+  const tabPanels = document.getElementById('ip-tab-panels');
+  const tabs = ['Opener', `${questions.length} Questions`, 'Landmines'];
+  tabRow.innerHTML = tabs.map((t,i) =>
+    `<button onclick="switchIpTab(${i})" id="ip-tab-btn-${i}" style="padding:0.5rem 1.1rem;font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid ${i===0?'var(--black)':'transparent'};margin-bottom:-1px;cursor:pointer;color:${i===0?'var(--black)':'var(--mid)'};">${t}</button>`
+  ).join('');
+
+  // PANEL 0: Opener
+  const openerHtml = `<div id="ip-panel-0">
+    <div style="background:#1a2744;border-radius:8px;padding:1.25rem 1.5rem;margin-bottom:1rem;">
+      <div style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:0.6rem;">Tell me about yourself — 60-second opener</div>
+      <div style="font-size:0.88rem;line-height:1.8;color:rgba(255,255,255,0.9);">${md(esc(opener.text||'Run the generator to see your opener.'))}</div>
+    </div>
+  </div>`;
+
+  // PANEL 1: Questions
+  const qHtml = `<div id="ip-panel-1" style="display:none;">
+    ${questions.map((q, idx) => {
+      const isLikely = !/curve|tricky|hard/i.test(q.type||'');
+      return `<div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:0.85rem;">
+        <div style="display:grid;grid-template-columns:64px 1fr;border-bottom:1px solid var(--border);">
+          <div style="background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0.6rem;gap:4px;">
+            <div style="font-family:'Raleway',sans-serif;font-size:0.75rem;font-weight:700;color:#fff;">Q${idx+1}</div>
+            <div style="font-size:0.55rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 6px;border-radius:20px;background:${isLikely?'#e8f0fe':'#fce8e8'};color:${isLikely?'#1a3a8f':'#791f1f'};">${isLikely?'Likely':'Watch'}</div>
+          </div>
+          <div style="padding:0.65rem 1rem;font-size:0.86rem;font-weight:600;color:var(--black);line-height:1.4;">${esc(q.q)}</div>
+        </div>
+        <div style="padding:0.75rem 1rem;display:flex;flex-direction:column;gap:5px;">
+          ${q.situation ? `<div style="display:flex;gap:8px;align-items:flex-start;"><span style="font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;min-width:58px;padding:3px 7px;border-radius:3px;background:#e6f1fb;color:#0c447c;flex-shrink:0;margin-top:2px;text-align:center;">Situation</span><span style="font-size:0.82rem;line-height:1.6;color:var(--mid);">${md(esc(q.situation))}</span></div>` : ''}
+          ${q.task ? `<div style="display:flex;gap:8px;align-items:flex-start;"><span style="font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;min-width:58px;padding:3px 7px;border-radius:3px;background:#eaf3de;color:#27500a;flex-shrink:0;margin-top:2px;text-align:center;">Task</span><span style="font-size:0.82rem;line-height:1.6;color:var(--mid);">${md(esc(q.task))}</span></div>` : ''}
+          ${q.action ? `<div style="display:flex;gap:8px;align-items:flex-start;"><span style="font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;min-width:58px;padding:3px 7px;border-radius:3px;background:#faeeda;color:#633806;flex-shrink:0;margin-top:2px;text-align:center;">Action</span><span style="font-size:0.82rem;line-height:1.6;color:var(--mid);">${md(esc(q.action))}</span></div>` : ''}
+          ${q.result ? `<div style="display:flex;gap:8px;align-items:flex-start;"><span style="font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;min-width:58px;padding:3px 7px;border-radius:3px;background:#f0e8ff;color:#4a1a8f;font-weight:700;flex-shrink:0;margin-top:2px;text-align:center;">Result</span><span style="font-size:0.82rem;line-height:1.6;color:var(--black);font-weight:500;">${md(esc(q.result))}</span></div>` : ''}
+        </div>
+        <div style="padding:0.5rem 1rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;">
+          <button onclick="addInterviewQToStarBank(${idx})" style="font-family:'Raleway',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:0.25rem 0.75rem;background:transparent;border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--mid);" title="Save this Q&A to your STAR Story Bank">+ Add to STAR Bank</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  // PANEL 2: Landmines
+  const lmHtml = `<div id="ip-panel-2" style="display:none;">
+    ${landmines.map((l, idx) => `
+      <div style="border:1px solid #f09595;border-radius:6px;overflow:hidden;margin-bottom:0.85rem;">
+        <div style="background:#fcebeb;padding:0.6rem 1rem;display:flex;align-items:center;gap:0.6rem;border-bottom:1px solid #f09595;">
+          <span style="font-size:0.8rem;">⚠</span>
+          <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:#791f1f;margin-right:0.5rem;">Landmine ${idx+1}</span>
+          <span style="font-size:0.86rem;font-weight:600;color:var(--black);">${esc(l.q)}</span>
+        </div>
+        <div style="padding:0.85rem 1rem;background:#fff;font-size:0.84rem;line-height:1.7;color:var(--mid);font-style:italic;">${md(esc(l.handle))}</div>
+      </div>
+    `).join('')}
+    ${!landmines.length ? '<div style="font-size:0.85rem;color:var(--mid);">No landmines identified for this role.</div>' : ''}
+  </div>`;
+
+  tabPanels.innerHTML = openerHtml + qHtml + lmHtml;
+
+  // Store parsed data for STAR bank
+  window._ipParsedQuestions = questions;
+}
+
+function switchIpTab(idx) {
+  [0,1,2].forEach(i => {
+    const btn = document.getElementById('ip-tab-btn-'+i);
+    const panel = document.getElementById('ip-panel-'+i);
+    if (btn) { btn.style.borderBottomColor = i===idx ? 'var(--black)' : 'transparent'; btn.style.color = i===idx ? 'var(--black)' : 'var(--mid)'; }
+    if (panel) panel.style.display = i===idx ? 'block' : 'none';
+  });
+}
+
+function addInterviewQToStarBank(idx) {
+  const q = (window._ipParsedQuestions || [])[idx];
+  if (!q) return;
+  const id = 'star_ip_' + Date.now();
+  starStories.unshift({
+    id,
+    title: q.q,
+    situation: q.situation || '',
+    task: q.task || '',
+    action: q.action || '',
+    result: (q.result || '').replace(/<\/?strong>/g,''),
+    tags: ['leadership']
+  });
+  saveStarStories();
+  renderStarStories();
+  const btn = event.target;
+  if (btn) { btn.textContent = '✓ Added'; btn.style.color = 'var(--success)'; btn.style.borderColor = 'var(--success)'; setTimeout(() => { btn.textContent = '+ Add to STAR Bank'; btn.style.color = ''; btn.style.borderColor = ''; }, 2000); }
+}
+
+function copyInterviewPrep(btn) {
+  const tabPanels = document.getElementById('ip-tab-panels');
+  if (!tabPanels || !tabPanels.innerHTML.trim()) return;
+  const raw = window._ipRawText || '';
+  navigator.clipboard.writeText(raw).then(() => {
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
+  });
+}
+
+function downloadInterviewPrep() {
+  const raw = window._ipRawText || '';
+  if (!raw.trim()) { alert('Generate interview prep first.'); return; }
+  const qs = window._ipParsedQuestions || [];
+  const role = savedRoleName || savedRoleTitle || 'This Role';
+  const stage = (document.querySelector('#interview-stage-tabs .tab.active')?.textContent || 'Interview').trim();
+
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function md(s){ return s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>'); }
+
+  // Parse opener
+  const openerMatch = raw.match(/##\s*60.SECOND OPENER\s*\n([\s\S]*?)(?=\n##|$)/i);
+  const openerText = openerMatch ? openerMatch[1].trim() : '';
+
+  // Parse landmines
+  const landmines = [];
+  const lmMatches = [...raw.matchAll(/##\s*LANDMINE\s*\d+:\s*(.+)\n([\s\S]*?)(?=\n##|$)/gi)];
+  lmMatches.forEach(m => {
+    const handleMatch = m[2].match(/HANDLE:\s*([\s\S]*?)$/i);
+    landmines.push({ q: m[1].trim(), handle: handleMatch ? handleMatch[1].trim() : m[2].trim() });
+  });
+
+  const HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Interview Prep — ${esc(role)}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  @page{size:letter;margin:0.75in 0.75in 0.75in 0.75in;}
+  body{font-family:'Helvetica Neue',Arial,sans-serif;font-size:10pt;color:#1e1e1c;background:#fff;line-height:1.5;}
+  .print-bar{background:#1a2744;color:#fff;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:999;}
+  .print-bar p{font-size:11px;opacity:0.7;}
+  .print-bar button{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:6px 18px;background:#fff;color:#1a2744;border:none;cursor:pointer;}
+  @media print{.print-bar{display:none!important;}body{padding-top:0!important;}}
+  .doc{padding:72px 0 48px;}
+  h1{font-size:18pt;font-weight:700;color:#0d0d0b;margin-bottom:4px;}
+  .meta{font-size:9pt;color:#888;margin-bottom:24px;}
+  .sec{margin-bottom:28px;}
+  .sec-label{font-size:7pt;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#2a4080;border-bottom:1px solid #dddad3;padding-bottom:4px;margin-bottom:14px;}
+  .opener-box{background:#1a2744;border-radius:6px;padding:16px 20px;color:rgba(255,255,255,0.9);font-size:10.5pt;line-height:1.75;}
+  .q-card{border:1px solid #dddad3;border-radius:6px;overflow:hidden;margin-bottom:12px;page-break-inside:avoid;}
+  .q-head{display:grid;grid-template-columns:56px 1fr;border-bottom:1px solid #dddad3;}
+  .q-num{background:#1e1e1c;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 6px;gap:3px;}
+  .q-num span:first-child{font-size:11pt;font-weight:700;color:#fff;}
+  .q-num span:last-child{font-size:7pt;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 5px;border-radius:20px;background:#e8f0fe;color:#1a3a8f;}
+  .q-text{padding:8px 12px;font-size:10pt;font-weight:600;color:#0d0d0b;display:flex;align-items:center;}
+  .star-rows{padding:10px 14px;display:flex;flex-direction:column;gap:5px;}
+  .star-row{display:flex;gap:8px;align-items:flex-start;}
+  .star-lbl{font-size:7pt;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;min-width:54px;padding:2px 6px;border-radius:3px;flex-shrink:0;margin-top:2px;text-align:center;}
+  .lbl-s{background:#e6f1fb;color:#0c447c;}
+  .lbl-t{background:#eaf3de;color:#27500a;}
+  .lbl-a{background:#faeeda;color:#633806;}
+  .lbl-r{background:#f0e8ff;color:#4a1a8f;font-weight:700;}
+  .star-val{font-size:9.5pt;line-height:1.55;color:#555;}
+  .result-val{color:#1e1e1c;font-weight:600;}
+  .lm-card{border:1px solid #f09595;border-radius:6px;overflow:hidden;margin-bottom:10px;page-break-inside:avoid;}
+  .lm-head{background:#fcebeb;padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f09595;}
+  .lm-head span{font-size:9pt;font-weight:600;color:#0d0d0b;}
+  .lm-body{padding:10px 14px;font-size:9.5pt;line-height:1.65;color:#555;font-style:italic;}
+  .footer{margin-top:24px;padding-top:12px;border-top:1px solid #dddad3;font-size:8pt;color:#aaa;display:flex;justify-content:space-between;}
+</style>
+</head>
+<body>
+<div class="print-bar"><p>Interview Prep — ${esc(role)} · ${esc(stage)}</p><button onclick="window.print()">Print / Save PDF</button></div>
+<div class="doc" style="max-width:7.5in;margin:0 auto;padding:72px 0 48px;">
+  <h1>Interview <em style="font-weight:300;">Prep Guide</em></h1>
+  <div class="meta">${esc(role)} &nbsp;·&nbsp; ${esc(stage)} &nbsp;·&nbsp; ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+
+  ${openerText ? `<div class="sec">
+    <div class="sec-label">60-second opener</div>
+    <div class="opener-box">${md(esc(openerText))}</div>
+  </div>` : ''}
+
+  <div class="sec">
+    <div class="sec-label">${qs.length} most likely questions</div>
+    ${qs.map((q, i) => `<div class="q-card">
+      <div class="q-head">
+        <div class="q-num"><span>Q${i+1}</span><span>Likely</span></div>
+        <div class="q-text">${esc(q.q)}</div>
+      </div>
+      <div class="star-rows">
+        ${q.situation ? `<div class="star-row"><span class="star-lbl lbl-s">Situation</span><span class="star-val">${md(esc(q.situation))}</span></div>` : ''}
+        ${q.task ? `<div class="star-row"><span class="star-lbl lbl-t">Task</span><span class="star-val">${md(esc(q.task))}</span></div>` : ''}
+        ${q.action ? `<div class="star-row"><span class="star-lbl lbl-a">Action</span><span class="star-val">${md(esc(q.action))}</span></div>` : ''}
+        ${q.result ? `<div class="star-row"><span class="star-lbl lbl-r">Result</span><span class="star-val result-val">${md(esc(q.result))}</span></div>` : ''}
+      </div>
+    </div>`).join('')}
+  </div>
+
+  ${landmines.length ? `<div class="sec">
+    <div class="sec-label">Landmines to watch</div>
+    ${landmines.map((l, i) => `<div class="lm-card">
+      <div class="lm-head"><span>⚠ Landmine ${i+1}</span><span>${esc(l.q)}</span></div>
+      <div class="lm-body">${md(esc(l.handle))}</div>
+    </div>`).join('')}
+  </div>` : ''}
+
+  <div class="footer"><span>Cara A. Brown, MBA &nbsp;·&nbsp; caraabrown.com</span><span>Confidential interview prep</span></div>
+</div>
+</body>
+</html>`;
+
+  const blob = new Blob([HTML], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'InterviewPrep_CaraBrown.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 // ─── SALARY & RECRUITER INTEL ─────────────────────────────────────────────────
 let salaryMode = 'salary';
@@ -4775,37 +5245,80 @@ document.getElementById('gen-recruiter-btn').addEventListener('click', async () 
   showLoading('recruiter-loading');
   hideError('recruiter-error');
   document.getElementById('recruiter-result').classList.remove('visible');
+  document.getElementById('rec-tab-row').innerHTML = '';
+  document.getElementById('rec-tab-panels').innerHTML = '';
 
-  const systemPrompt = 'You are an expert in recruiting industry dynamics and candidate protection. You help senior professionals navigate complex recruiter situations — spotting fakes, avoiding duplicate submissions, protecting their candidacy. Be direct and specific.';
+  const systemPrompt = `You are an expert in recruiting industry dynamics and candidate protection. You help senior professionals navigate complex recruiter situations — spotting fakes, avoiding duplicate submissions, protecting their candidacy. Be direct and specific.
+
+CRITICAL: Structure your response with EXACTLY these six ## headings, in this order:
+## SITUATION ASSESSMENT
+## RECRUITER LEGITIMACY
+## DUPLICATE SUBMISSION RISK
+## WHO TO RESPOND TO
+## QUESTIONS TO ASK
+## PROTOCOL GOING FORWARD`;
 
   const userMsg = [
     'Help Cara Brown analyze this recruiter situation.',
     'Role: ' + recRole,
     'Recruiter details: ' + recInfo,
     recJD ? 'JD or details shared: ' + recJD : null,
-    'Provide: 1. SITUATION ASSESSMENT — what is likely happening  2. RECRUITER LEGITIMACY — for each recruiter: tier (primary/secondary/body shop), red flags, green flags  3. DUPLICATE SUBMISSION RISK — what happens if two agencies submit her, how to protect herself  4. WHO TO RESPOND TO — specific recommendation and in what order  5. QUESTIONS TO ASK BEFORE CONSENTING — exact questions to ask each recruiter  6. PROTOCOL GOING FORWARD — standard process to avoid this again'
   ].filter(Boolean).join('\n\n');
-  
-  let formatRecruiterContent = function(raw) {
-    if (!raw) return '';
-    return '<div class="ats-result-section">' + raw.split('\n').map(line => {
+
+  function fmtRecSection(raw) {
+    if (!raw) return '<div style="font-size:0.85rem;color:var(--mid);">No content.</div>';
+    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function md(s){ return s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>'); }
+    return '<div>' + raw.split('\n').map(line => {
       const t = line.trim(); if (!t) return '';
-      if (/^#{1,3}\s/.test(t)) return '<div class="ats-heading">' + t.replace(/^#+\s*/,'').replace(/\*\*/g,'') + '</div>';
-      if (t.startsWith('**') && t.endsWith('**')) return '<div class="ats-subhead">' + t.replace(/\*\*/g,'') + '</div>';
-      if (/^[\u2713\u2714\u2705✅]/.test(t)) return '<div class="ats-line ats-win">' + t + '</div>';
-      if (/^[\u2717\u2718\u274C❌⚠️🚩]/.test(t)) return '<div class="ats-line ats-warn">' + t + '</div>';
-      if (/^[-•*]\s/.test(t)) return '<div class="ats-bullet">' + t.replace(/^[-•*]\s*/,'') + '</div>';
-      if (/^\d+\.\s*\*\*/.test(t)) return '<div class="ats-subhead">' + t.replace(/^\d+\.\s*/,'').replace(/\*\*/g,'') + '</div>';
-      let html = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      return '<div class="ats-paragraph">' + html + '</div>';
+      if (/^#{1,3}\s/.test(t)) return `<div style="font-family:'Raleway',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);border-bottom:1px solid var(--border);padding-bottom:0.3rem;margin:1rem 0 0.5rem;">${esc(t.replace(/^#+\s*/,''))}</div>`;
+      if (t.startsWith('**') && t.endsWith('**')) return `<div style="font-size:0.86rem;font-weight:600;color:var(--black);margin-bottom:0.3rem;">${md(esc(t))}</div>`;
+      if (/^[\u2713\u2714\u2705✅]/.test(t)) return `<div class="ats-line ats-win"><span class="ats-line-icon">✓</span><span>${md(esc(t.replace(/^[\u2713\u2714\u2705✅]\s*/,'')))}</span></div>`;
+      if (/^[\u2717\u2718\u274C❌⚠️🚩]/.test(t)) return `<div class="ats-line ats-warn"><span class="ats-line-icon">✕</span><span>${md(esc(t.replace(/^[\u2717\u2718\u274C❌⚠️🚩]\s*/,'')))}</span></div>`;
+      if (/^[-•*]\s/.test(t)) return `<div class="ats-bullet"><span>${md(esc(t.replace(/^[-•*]\s*/,'')))}</span></div>`;
+      if (/^\d+\.\s/.test(t)) return `<div style="font-size:0.86rem;line-height:1.7;margin-bottom:0.3rem;padding-left:0.25rem;">${md(esc(t))}</div>`;
+      return `<div style="font-size:0.86rem;line-height:1.8;color:var(--black);margin-bottom:0.3rem;">${md(esc(t))}</div>`;
     }).join('') + '</div>';
-  };
-  
+  }
+
+  const REC_TABS = [
+    { key: /##\s*SITUATION ASSESSMENT/i,    label: 'Assessment',   end: /##\s*RECRUITER LEGITIMACY/i },
+    { key: /##\s*RECRUITER LEGITIMACY/i,    label: 'Legitimacy',   end: /##\s*DUPLICATE SUBMISSION/i },
+    { key: /##\s*DUPLICATE SUBMISSION/i,    label: 'Dup. Risk',    end: /##\s*WHO TO RESPOND/i },
+    { key: /##\s*WHO TO RESPOND/i,          label: 'Who to Answer', end: /##\s*QUESTIONS TO ASK/i },
+    { key: /##\s*QUESTIONS TO ASK/i,        label: 'Questions',    end: /##\s*PROTOCOL/i },
+    { key: /##\s*PROTOCOL GOING FORWARD/i,  label: 'Protocol',     end: null },
+  ];
+
   try {
-    const output = document.getElementById('recruiter-output');
-    output.innerHTML = '';
+    const rawStore = { text: '' };
+    const rawEl = document.getElementById('recruiter-output');
+    rawEl.innerHTML = '';
     document.getElementById('recruiter-result').classList.add('visible');
-    await callClaude(systemPrompt, userMsg, text => { output.innerHTML = formatRecruiterContent(text); });
+
+    await callClaude(systemPrompt, userMsg, text => {
+      rawStore.text = text;
+      rawEl.textContent = text; // stream raw while generating
+    });
+
+    // Parse and render tabs
+    const full = rawStore.text;
+    const tabRow = document.getElementById('rec-tab-row');
+    const tabPanels = document.getElementById('rec-tab-panels');
+    rawEl.style.display = 'none';
+
+    tabRow.innerHTML = REC_TABS.map((t,i) =>
+      `<button onclick="switchRecTab(${i})" id="rec-tab-btn-${i}" style="padding:0.45rem 0.9rem;font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid ${i===0?'var(--black)':'transparent'};margin-bottom:-1px;cursor:pointer;color:${i===0?'var(--black)':'var(--mid)'};">${t.label}</button>`
+    ).join('');
+
+    tabPanels.innerHTML = REC_TABS.map((t, i) => {
+      const sm = full.search(t.key);
+      const em = t.end ? full.search(t.end) : -1;
+      const section = sm < 0 ? '' : (em > sm ? full.substring(sm, em) : full.substring(sm)).replace(/^##[^\n]*\n/, '').trim();
+      return `<div id="rec-panel-${i}" style="display:${i===0?'block':'none'};">${fmtRecSection(section || (i===0?full:''))}</div>`;
+    }).join('');
+
+    window._recRawText = full;
   } catch (err) {
     showError('recruiter-error', 'Error: ' + err.message);
     document.getElementById('recruiter-result').classList.remove('visible');
@@ -4813,6 +5326,23 @@ document.getElementById('gen-recruiter-btn').addEventListener('click', async () 
     hideLoading('recruiter-loading');
   }
 });
+
+function switchRecTab(idx) {
+  [0,1,2,3,4,5].forEach(i => {
+    const btn = document.getElementById('rec-tab-btn-'+i);
+    const panel = document.getElementById('rec-panel-'+i);
+    if (btn) { btn.style.borderBottomColor = i===idx?'var(--black)':'transparent'; btn.style.color = i===idx?'var(--black)':'var(--mid)'; }
+    if (panel) panel.style.display = i===idx?'block':'none';
+  });
+}
+
+function copyRecruiterOutput(btn) {
+  const raw = window._recRawText || '';
+  if (!raw) return;
+  navigator.clipboard.writeText(raw).then(() => {
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
+  });
+}
 
 
 
@@ -4916,6 +5446,16 @@ let selectedLeResume = 'principal_ds';
 let selectedLeFocus = 'full';
 let atsHighestResume = localStorage.getItem('cara_sess_ats_highest') || null;
 
+let selectedLeTone = 'ats-first';
+
+document.querySelectorAll('#le-tone-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#le-tone-tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedLeTone = tab.dataset.letone;
+  });
+});
+
 document.querySelectorAll('#le-focus-tabs .tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('#le-focus-tabs .tab').forEach(t => t.classList.remove('active'));
@@ -4955,9 +5495,23 @@ document.getElementById('gen-edits-btn').addEventListener('click', async () => {
   hideError('le-error');
   document.getElementById('le-result').classList.remove('visible');
 
-  const systemPrompt = `You are a senior resume editor and ATS optimization specialist. You produce precise, surgical edits — showing the exact original text, the exact replacement text, and a clear one-line reason for each change. You never give vague advice. Every edit is a specific, copyable rewrite that directly improves ATS keyword matching and relevance scoring for the target job description. CRITICAL RULE: You never invent experience, industries, credentials, or titles the candidate has not demonstrated in their resume. Your job is to find the best language for what is already true — not to fabricate. If a gap cannot be bridged honestly, you say so.`;
+  const toneMap = {
+    'ats-first':   'ATS-FIRST TONE: Maximum keyword density. Tight action-verb leads. Metrics foregrounded in the first clause of every bullet. Optimize every line for machine scoring — exact JD phrase matches where honest.',
+    'executive':   'EXECUTIVE VOICE TONE: Strategic framing and scope signals throughout. Use C-suite language — "enterprise-wide," "cross-functional alignment," "EVP partnership," "operating model." Every bullet sounds like a leader wrote it, not a job seeker.',
+    'impact':      'IMPACT-FORWARD TONE: Every bullet anchored to a quantified outcome. Results and numbers lead; context and method follow. If a bullet lacks a metric, find the closest honest proxy or restructure to foreground the outcome.',
+    'narrative':   'NARRATIVE THREAD TONE: Connect bullets into a coherent story of progression and causality. Show what was inherited, what was done, and what changed as a result. Bullets may be longer than typical — up to 3 sentences — to convey the arc. Prioritize this for the synopsis and 1–2 signature bullets per role.',
+    'hybrid':      'ATS EXECUTIVE VOICE TONE: Balance ATS keyword density with executive framing. Lead with action verbs and hard keywords from the JD, but frame outcomes in strategic language. Every bullet should pass a machine scan AND impress a hiring director.'
+  };
+  const toneInstruction = toneMap[selectedLeTone] || toneMap['ats-first'];
 
-  const userMsg = `Perform a line-by-line ATS edit of the following resume against this job description. Focus on: ${focusMap[selectedLeFocus]}.
+  const systemPrompt = `You are a senior resume editor and ATS optimization specialist. You produce precise, surgical edits — showing the exact original text, the exact replacement text, and a clear one-line reason for each change. You never give vague advice. Every edit is a specific, copyable rewrite that directly improves ATS keyword matching and relevance scoring for the target job description. CRITICAL RULE: You never invent experience, industries, credentials, or titles the candidate has not demonstrated in their resume. Your job is to find the best language for what is already true — not to fabricate. If a gap cannot be bridged honestly, you say so.
+
+ACTIVE TONE INSTRUCTION — apply this to every AFTER text you write:
+${toneInstruction}`;
+
+  const userMsg = `Perform a line-by-line ATS edit of the following resume against this job description. Focus on: ${focusMap[selectedLeFocus] || 'every section'}. Apply the ACTIVE TONE INSTRUCTION from the system prompt to every rewrite.
+
+SELECTED TONE: ${selectedLeTone.toUpperCase().replace(/-/g,' ')}
 
 JOB DESCRIPTION:
 ${jd}
@@ -5099,24 +5653,94 @@ function addCheckboxRow(html, tabId) {
   });
 }
 
+function renderScoreImprovementCard(fullText, originalScore) {
+  const orig  = parseInt((fullText.match(/ORIGINAL:\s*(\d+)%/) || [])[1]) || originalScore || null;
+  const curr  = parseInt((fullText.match(/RECHECK_SCORE:\s*(\d+)%/) || fullText.match(/CURRENT:\s*(\d+)%/) || [])[1]) || null;
+  const proj  = parseInt((fullText.match(/PROJECTED_SCORE:\s*(\d+)%/) || fullText.match(/PROJECTED:\s*(\d+)%/) || [])[1]) || null;
+  const kwAdded = parseInt((fullText.match(/KW_ADDED:\s*(\d+)/) || [])[1]) || null;
+  const bulletsImp = parseInt((fullText.match(/BULLETS_IMPROVED:\s*(\d+)/) || [])[1]) || null;
+  const worthIt = (fullText.match(/WORTH_IT:\s*(.+)/) || [])[1] || null;
+
+  const barColor = (pct) => pct >= 85 ? '#3B6D11' : pct >= 70 ? '#854F0B' : '#A32D2D';
+  const scoreColor = (pct) => pct >= 85 ? '#3B6D11' : pct >= 70 ? '#854F0B' : '#A32D2D';
+  const label = (pct) => pct >= 85 ? 'Strong' : pct >= 70 ? 'Fair' : 'Needs work';
+
+  function scoreNode(title, pct, isHighlight) {
+    if (!pct) return '';
+    const col = scoreColor(pct);
+    const lbl = label(pct);
+    return `<div style="flex:1;text-align:center;padding:1rem;${isHighlight?'background:#f0f7e8;border:1.5px solid #b2dfc0;border-radius:8px;':''}">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:600;color:${col};line-height:1;">${pct}%</div>
+      <div style="font-family:'Raleway',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:${col};margin-top:3px;">${lbl}</div>
+      <div style="font-size:0.72rem;color:var(--mid);margin-top:4px;">${title}</div>
+    </div>`;
+  }
+
+  function deltaBar(title, from, to) {
+    if (!from || !to) return '';
+    const gap = to - from;
+    const gapClosed = Math.max(0, Math.min(100, Math.round(((to - from) / (100 - from)) * 100)));
+    const col = barColor(to);
+    return `<div style="margin-bottom:0.85rem;">
+      <div style="display:flex;justify-content:space-between;font-size:0.72rem;font-family:'Raleway',sans-serif;margin-bottom:4px;">
+        <span style="color:var(--mid);">${title}</span>
+        <span style="font-weight:700;color:${col};">+${gap} pts · ${gapClosed}% of gap closed</span>
+      </div>
+      <div style="height:10px;background:var(--bgoff);border:1px solid var(--border);border-radius:20px;overflow:hidden;">
+        <div style="height:100%;width:${gapClosed}%;background:${col};border-radius:20px;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--light);margin-top:3px;"><span>${from}% baseline</span><span>${to}% now</span></div>
+    </div>`;
+  }
+
+  let html = `<div style="display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:1.25rem;">`;
+  html += scoreNode('Original (ATS Check)', orig, false);
+  if (orig && curr) html += `<div style="display:flex;align-items:center;justify-content:center;padding:0 0.5rem;font-size:1.1rem;color:var(--border);">→</div>`;
+  html += scoreNode('After edits', curr, false);
+  if (curr && proj) html += `<div style="display:flex;align-items:center;justify-content:center;padding:0 0.5rem;font-size:1.1rem;color:var(--border);">→</div>`;
+  html += scoreNode('If gaps fixed', proj, true);
+  html += `</div>`;
+
+  if (orig && curr) html += deltaBar('Original → Current', orig, curr);
+  if (curr && proj) html += deltaBar('Current → Projected', curr, proj);
+
+  if (kwAdded || bulletsImp) {
+    html += `<div style="display:flex;gap:0.75rem;margin-bottom:1rem;">`;
+    if (kwAdded) html += `<div style="flex:1;background:var(--bgoff);border:1px solid var(--border);border-radius:6px;padding:0.75rem 1rem;text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:#3B6D11;">+${kwAdded}</div><div style="font-size:0.65rem;font-family:'Raleway',sans-serif;text-transform:uppercase;letter-spacing:0.08em;color:var(--mid);">Keywords added</div></div>`;
+    if (bulletsImp) html += `<div style="flex:1;background:var(--bgoff);border:1px solid var(--border);border-radius:6px;padding:0.75rem 1rem;text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:#2a4080;">+${bulletsImp}</div><div style="font-size:0.65rem;font-family:'Raleway',sans-serif;text-transform:uppercase;letter-spacing:0.08em;color:var(--mid);">Bullets improved</div></div>`;
+    html += `</div>`;
+  }
+
+  if (worthIt) {
+    html += `<div style="background:#f7f6f4;border-left:3px solid var(--black);border-radius:0 4px 4px 0;padding:0.75rem 1rem;font-size:0.84rem;line-height:1.6;color:var(--black);"><span style="font-family:'Raleway',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);display:block;margin-bottom:4px;">Worth doing more edits?</span>${worthIt}</div>`;
+  }
+
+  if (!orig && !curr && !proj) {
+    html += `<div style="font-size:0.85rem;color:var(--mid);padding:1rem 0;">Run the Revised Resume Check to see your score progression.</div>`;
+  }
+
+  return html;
+}
+
 function renderRecheckTab(raw, tabId) {
   if (!raw) return '';
   const formatted = (typeof formatRecheckContent === 'function') ? formatRecheckContent(raw) : raw;
-  // Inject checkboxes into table rows
   let result = formatted;
   const saved = JSON.parse(localStorage.getItem('recheck_checks_' + tabId) || '{}');
   let ri = 0;
   result = result.replace(/<tbody>([\s\S]*?)<\/tbody>/g, (match, tbody) => {
     let newTbody = tbody.replace(/<tr>/g, () => {
-      const id = tabId + '_' + ri++;
+      const id = tabId + '_' + ri;
+      const rowNum = ri + 1;
+      ri++;
       const checked = saved[id] ? 'checked' : '';
       const bg = saved[id] ? 'background:#f0faf4;opacity:0.6;' : '';
-      return `<tr style="${bg}"><td style="padding:0.4rem 0.5rem;border:1px solid #dedede;width:32px;text-align:center;"><input type="checkbox" ${checked} style="width:15px;height:15px;cursor:pointer;accent-color:#1e6b35;" onchange="(function(el){var id='${id}',tab='${tabId}',saved=JSON.parse(localStorage.getItem('recheck_checks_'+tab)||'{}');saved[id]=el.checked;localStorage.setItem('recheck_checks_'+tab,JSON.stringify(saved));el.closest('tr').style.background=el.checked?'#f0faf4':'';el.closest('tr').style.opacity=el.checked?'0.6':'1';})(this)"></td>`;
+      return `<tr style="${bg}"><td style="padding:0.4rem 0.5rem;border:1px solid #dedede;width:28px;text-align:center;font-family:'Raleway',sans-serif;font-size:0.58rem;font-weight:700;color:var(--mid);">${String(rowNum).padStart(2,'0')}</td><td style="padding:0.4rem 0.5rem;border:1px solid #dedede;width:32px;text-align:center;"><input type="checkbox" ${checked} style="width:15px;height:15px;cursor:pointer;accent-color:#1e6b35;" onchange="(function(el){var id='${id}',tab='${tabId}',saved=JSON.parse(localStorage.getItem('recheck_checks_'+tab)||'{}');saved[id]=el.checked;localStorage.setItem('recheck_checks_'+tab,JSON.stringify(saved));el.closest('tr').style.background=el.checked?'#f0faf4':'';el.closest('tr').style.opacity=el.checked?'0.6':'1';})(this)"></td>`;
     });
     return '<tbody>' + newTbody + '</tbody>';
   });
-  // Add checkbox column to thead
-  result = result.replace(/<thead><tr>/, '<thead><tr><th style="padding:0.4rem 0.5rem;background:#f7f6f4;border:1px solid #dedede;width:32px;"></th>');
+  // Add # and checkbox columns to thead
+  result = result.replace(/<thead><tr>/, '<thead><tr><th style="padding:0.4rem 0.5rem;background:#f7f6f4;border:1px solid #dedede;width:28px;font-family:\'Raleway\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);">#</th><th style="padding:0.4rem 0.5rem;background:#f7f6f4;border:1px solid #dedede;width:32px;"></th>');
   return result;
 }
 
@@ -5652,7 +6276,7 @@ function filterStarStories(tag, el) {
   document.querySelectorAll('.star-tag-filter').forEach(t => {
     t.style.background = 'transparent'; t.style.color = 'var(--mid)'; t.style.borderColor = 'var(--border)';
   });
-  if (el) { el.style.background = 'var(--black)'; el.style.color = 'var(--white)'; el.style.borderColor = 'var(--black)'; }
+  if (el) { el.style.background = 'var(--black)'; el.style.color = '#ffffff'; el.style.borderColor = 'var(--black)'; }
   renderStarStories();
 }
 
@@ -6048,6 +6672,44 @@ document.addEventListener('change', function(e) {
 
 // ─── GENERATE RESUME FROM SELECTED EDITS ──────────────────────────────────────
 
+function patchResumeFromEdits(btn) {
+  const baseResume = RESUMES[selectedLeResume]?.text || window._grResumeText || '';
+  if (!baseResume) { alert('No base resume selected.'); return; }
+  const blocks = document.querySelectorAll('#le-output .edit-block');
+  let patched = baseResume;
+  let applied = 0, skipped = 0;
+  blocks.forEach(b => {
+    const cb = b.querySelector('input[type="checkbox"]');
+    if (!cb || !cb.checked) return;
+    const before = b.dataset.before || '';
+    const after = b.dataset.after || '';
+    const isInsert = b.dataset.isinsert === 'true';
+    if (isInsert) {
+      patched += '\n' + after;
+      applied++;
+    } else if (before && patched.includes(before)) {
+      patched = patched.replace(before, after);
+      applied++;
+    } else {
+      skipped++;
+    }
+  });
+  if (applied === 0) { alert('No checked edits could be matched to the resume text. Use Generate Resume instead.'); return; }
+  window._grResumeText = patched;
+  const rcTa = document.getElementById('updated-resume-text');
+  if (rcTa) rcTa.value = patched;
+  document.getElementById('gr-output').innerHTML = renderResumePreview(patched);
+  document.getElementById('gr-result').style.display = 'block';
+  storeResumeVersion(patched, selectedLeResume, (window._sessionCtx?.currentRound || 1), '');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = `✓ ${applied} edit${applied>1?'s':''} applied${skipped?' ('+skipped+' skipped)':''}`;
+    btn.style.color = 'var(--success)';
+    btn.style.borderColor = 'var(--success)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; btn.style.borderColor = ''; }, 3000);
+  }
+}
+
 async function generateResumeFromEdits(btn) {
   const baseResume = RESUMES[selectedLeResume]?.text || '';
   if (!baseResume) { alert('No base resume is selected. Select one in the Line-by-Line Edits tab.'); return; }
@@ -6104,7 +6766,7 @@ Rules:
     // Also strip any legacy editor notes pattern just in case
     resumeText = resumeText.replace(/[-—]{2,}\s*EDITOR['']?S?\s*NOTES?[\s\S]*$/i, '').trim();
 
-    document.getElementById('gr-output').textContent = resumeText;
+    document.getElementById('gr-output').innerHTML = renderResumePreview(resumeText);
     document.getElementById('gr-result').style.display = 'block';
     window._grResumeText = resumeText;
     window._grResumeKey = selectedLeResume;
@@ -6134,8 +6796,94 @@ Rules:
   }
 }
 
+function renderResumePreview(text) {
+  if (!text || !text.trim()) return '';
+  const ACCENT = '#2a4080'; const MID = '#888680'; const INK = '#1e1e1c'; const BLACK = '#0d0d0b'; const RULE = '#dddad3';
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function md(s){ return s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>'); }
+  const lines = text.split('\n');
+  let html = `<div style="font-family:'Helvetica Neue',Arial,sans-serif;color:${INK};font-size:9pt;line-height:1.5;">`;
+  let firstNameDone = false;
+  let firstRuleDone = false;
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i]; const line = raw.trim();
+    if (!line) { html += '<div style="height:5px;"></div>'; continue; }
+    // Name line (first non-empty)
+    if (!firstNameDone) {
+      firstNameDone = true;
+      const parts = line.split(/,\s*/);
+      html += `<div style="font-size:20pt;font-weight:700;letter-spacing:-0.02em;color:${BLACK};line-height:1;margin-bottom:2px;">${esc(parts[0])}${parts[1]?`<span style="font-weight:300;">, ${esc(parts[1])}</span>`:''}</div>`;
+      continue;
+    }
+    // Title/role line (ALL CAPS long line containing · or — before contact info)
+    if (!firstRuleDone && line.includes('·') && line === line.toUpperCase() && !line.includes('@')) {
+      html += `<div style="font-size:6.5pt;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:${ACCENT};margin-bottom:2px;">${esc(line)}</div>`;
+      continue;
+    }
+    // Contact line (has @ or linkedin)
+    if (!firstRuleDone && (line.includes('@') || line.toLowerCase().includes('linkedin') || (line.includes('·') && line.toLowerCase().includes('caraabrown')))) {
+      firstRuleDone = true;
+      html += `<div style="font-size:7pt;font-weight:300;color:${MID};margin-bottom:4px;">${esc(line)}</div>`;
+      html += `<div style="height:2px;background:${ACCENT};margin:4px 0 6px;"></div>`;
+      continue;
+    }
+    // Section heading: ALL CAPS short, no bullets, length > 2
+    if (line === line.toUpperCase() && line.length > 2 && line.length < 60 && !line.startsWith('—') && !line.includes('·')) {
+      html += `<div style="font-size:5.8pt;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:${ACCENT};border-bottom:1px solid ${RULE};padding-bottom:2px;margin:8px 0 4px;">${esc(line)}</div>`;
+      continue;
+    }
+    // Bullet (em-dash or hyphen)
+    if (line.startsWith('—') || line.startsWith('\u2014') || (line.startsWith('•'))) {
+      const bulletText = line.replace(/^[—\u2014•]\s*/, '');
+      html += `<div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:2px;padding-left:4px;"><span style="color:${ACCENT};font-weight:700;flex-shrink:0;font-size:9pt;">—</span><span style="font-size:8pt;line-height:1.5;color:${INK};">${md(esc(bulletText))}</span></div>`;
+      continue;
+    }
+    // Job title line (has | or contains Designer/Strategist/Director/Manager etc and short)
+    if ((line.includes('|') || /Designer|Strategist|Director|Manager|Coordinator|Founder|Officer|Lead|Principal|Analyst|Consultant/.test(line)) && line.length < 100 && !line.startsWith('—')) {
+      html += `<div style="font-size:8.5pt;font-weight:600;color:${ACCENT};margin-bottom:1px;">${md(esc(line))}</div>`;
+      continue;
+    }
+    // Colon-separated detail (e.g. "TOOLS: Figma | Miro")
+    if (/^[A-Z\s]+:/.test(line) && line.length < 200) {
+      const ci = line.indexOf(':');
+      html += `<div style="font-size:7.5pt;line-height:1.5;margin-bottom:2px;"><span style="font-weight:700;color:${BLACK};">${esc(line.substring(0,ci+1))}</span> <span style="color:${MID};">${esc(line.substring(ci+1).trim())}</span></div>`;
+      continue;
+    }
+    // Default paragraph
+    html += `<div style="font-size:8pt;line-height:1.6;color:${INK};margin-bottom:2px;">${md(esc(line))}</div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+async function downloadRrcAsDocx(btn) {
+  const ta = document.getElementById('updated-resume-text');
+  const text = (ta && ta.value.trim()) ? ta.value.trim() : window._grResumeText || '';
+  if (!text) { alert('No resume text found. Paste your updated resume first.'); return; }
+  const prev = window._grResumeText;
+  window._grResumeText = text;
+  await downloadGrAsDocx(btn);
+  window._grResumeText = prev;
+}
+
+async function downloadRrcAsHTML(btn) {
+  const ta = document.getElementById('updated-resume-text');
+  const text = (ta && ta.value.trim()) ? ta.value.trim() : window._grResumeText || '';
+  if (!text) { alert('No resume text found. Paste your updated resume first.'); return; }
+  const prev = window._grResumeText;
+  const prevKey = window._grResumeKey;
+  window._grResumeText = text;
+  // Read rrc-pages radio; fall back to gr-pages
+  const rrcPage = document.querySelector('input[name="rrc-pages"]:checked');
+  const grPage = document.querySelector('input[name="gr-pages"]:checked');
+  if (rrcPage && grPage) { grPage.checked = false; rrcPage.value === '2' ? document.querySelector('input[name="gr-pages"][value="2"]').checked = true : document.querySelector('input[name="gr-pages"][value="3"]').checked = true; }
+  await downloadGrAsHTML(btn);
+  window._grResumeText = prev;
+  window._grResumeKey = prevKey;
+}
+
 function copyGrOutput(btn) {
-  const text = document.getElementById('gr-output')?.textContent || '';
+  const text = window._grResumeText || document.getElementById('gr-output')?.innerText || '';
   navigator.clipboard.writeText(text).then(() => {
     if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy Text', 2000); }
   });
@@ -6544,6 +7292,332 @@ function renderWsCards(data) {
   }
 }
 
+// ─── PIPELINE PROGRESS BAR ────────────────────────────────────────────────────
+
+const PIPELINE_STEPS = [
+  { key: 'job-input',        label: 'Job Description', num: '04' },
+  { key: 'ats-check',        label: 'ATS Check',       num: '05' },
+  { key: 'line-edits',       label: 'Line Edits',      num: '06' },
+  { key: 'resume-update',    label: 'Recheck',         num: '07' },
+  { key: 'cover-letter',     label: 'Cover Letter',    num: '08' },
+  { key: 'work-samples',     label: 'Work Samples',    num: '09' },
+  { key: 'linkedin-outreach',label: 'Engagement',      num: '13' },
+  { key: 'interview-prep',   label: 'Interview Prep',  num: '14' },
+];
+
+function updatePipeline() {
+  const bar = document.getElementById('pipeline-bar');
+  const stepsEl = document.getElementById('pipeline-steps');
+  const fill = document.getElementById('pipeline-fill');
+  const glow = document.getElementById('pipeline-glow');
+  const summary = document.getElementById('pipeline-summary');
+  const cta = document.getElementById('pipeline-cta');
+  if (!bar || !stepsEl) return;
+
+  if (!savedJD) { bar.style.display = 'none'; return; }
+  bar.style.display = 'block';
+
+  const done = JSON.parse(localStorage.getItem('cara_nav_done') || '[]');
+  const activePanel = document.querySelector('nav a.active')?.dataset?.panel || '';
+  const activeIdx = PIPELINE_STEPS.findIndex(s => s.key === activePanel);
+
+  let doneCount = 0;
+  let firstIncomplete = null;
+
+  stepsEl.innerHTML = PIPELINE_STEPS.map((step, i) => {
+    const isDone = done.includes(step.key);
+    const isActive = step.key === activePanel;
+    if (isDone) doneCount++;
+    else if (!firstIncomplete) firstIncomplete = step;
+    const col = isDone ? '#3fa040' : isActive ? '#ffffff' : '#333';
+    const bg = isDone ? '#3fa040' : isActive ? '#ffffff' : '#1a1a1a';
+    const textCol = isDone ? '#4caf80' : isActive ? '#ffffff' : '#444';
+    const icon = isDone ? '✓' : isActive ? '→' : step.num;
+    const score = isDone && step.key === 'ats-check' && atsHighestResume ? '' : '';
+    return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;position:relative;">
+      ${i < PIPELINE_STEPS.length - 1 ? `<div style="position:absolute;top:10px;left:calc(50% + 12px);right:calc(-50% + 12px);height:1.5px;background:${isDone?'#3fa040':'#1e1e1e'};z-index:0;"></div>` : ''}
+      <div style="width:22px;height:22px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:${isDone?'#fff':isActive?'#000':'#555'};position:relative;z-index:1;margin-bottom:5px;">${icon}</div>
+      <div style="font-size:9px;font-weight:500;color:${textCol};text-align:center;line-height:1.3;white-space:nowrap;">${step.label}</div>
+    </div>`;
+  }).join('');
+
+  const pct = Math.round((doneCount / PIPELINE_STEPS.length) * 100);
+  fill.style.width = pct + '%';
+  glow.style.left = pct + '%';
+
+  const role = savedRoleName || savedRoleTitle || 'current application';
+  summary.innerHTML = `<strong style="color:#4caf80;">${doneCount} of ${PIPELINE_STEPS.length} steps done</strong> &nbsp;·&nbsp; ${escHtml(role)}`;
+
+  if (firstIncomplete && firstIncomplete.key !== activePanel) {
+    cta.style.display = 'block';
+    cta.textContent = 'Next: ' + firstIncomplete.label + ' →';
+    cta.onclick = () => document.querySelector(`nav a[data-panel="${firstIncomplete.key}"]`)?.click();
+  } else {
+    cta.style.display = 'none';
+  }
+}
+
+function updateJdContextBar() {
+  const bar = document.getElementById('jd-context-bar');
+  const titleEl = document.getElementById('jd-ctx-title');
+  const metaEl = document.getElementById('jd-ctx-meta');
+  const atsEl = document.getElementById('jd-ctx-ats');
+  const fitEl = document.getElementById('jd-ctx-fit');
+  if (!bar) return;
+  if (!savedJD) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const role = savedRoleTitle || savedRoleName || 'Role';
+  const company = savedCompany || '';
+  titleEl.textContent = company ? role + ' · ' + company : role;
+  const done = JSON.parse(localStorage.getItem('cara_nav_done') || '[]');
+  const doneCount = PIPELINE_STEPS.filter(s => done.includes(s.key)).length;
+  metaEl.textContent = doneCount + ' of ' + PIPELINE_STEPS.length + ' steps complete';
+  if (atsHighestResume && RESUMES[atsHighestResume]) {
+    const scoreCard = document.querySelector('#score-cards-container .score-card .score-num');
+    const score = scoreCard ? scoreCard.textContent : null;
+    if (score) { atsEl.style.display = 'block'; atsEl.textContent = 'ATS ' + score; }
+  }
+  const fitLabel = localStorage.getItem('cara_fit_label');
+  if (fitLabel) {
+    fitEl.style.display = 'block';
+    fitEl.textContent = 'Fit: ' + fitLabel;
+    fitEl.style.background = fitLabel === 'Strong' ? '#0f3b1a' : fitLabel === 'Moderate' ? '#3a2800' : '#3b0f0f';
+    fitEl.style.color = fitLabel === 'Strong' ? '#4caf80' : fitLabel === 'Moderate' ? '#f0a000' : '#f07070';
+  }
+}
+
+// Capture fit label when company research runs
+const _origFitEl = document.getElementById('research-fit-label');
+if (_origFitEl) {
+  const _fitObs = new MutationObserver(() => {
+    const txt = _origFitEl.textContent.trim();
+    if (txt && txt !== '—') { localStorage.setItem('cara_fit_label', txt); updateJdContextBar(); }
+  });
+  _fitObs.observe(_origFitEl, { childList: true, characterData: true, subtree: true });
+}
+
+// Hook pipeline + context bar into nav clicks
+(function() {
+  const origNav = document.querySelector('nav');
+  if (origNav) {
+    origNav.addEventListener('click', function() {
+      setTimeout(() => { updatePipeline(); updateJdContextBar(); }, 50);
+    });
+  }
+})();
+
+// Hook into markNavDone to update pipeline
+const _origMarkNavDone = markNavDone;
+const markNavDoneWithPipeline = function(panelId) {
+  _origMarkNavDone(panelId);
+  setTimeout(() => { updatePipeline(); updateJdContextBar(); }, 100);
+};
+window.markNavDone = markNavDoneWithPipeline;
+
+// ─── SMART NEXT-STEP NUDGE ────────────────────────────────────────────────────
+
+function showNudge(panelId, message, ctaLabel, ctaPanel) {
+  const existing = document.getElementById('panel-nudge-' + panelId);
+  if (existing) return;
+  const panel = document.getElementById('panel-' + panelId);
+  if (!panel) return;
+  const nudge = document.createElement('div');
+  nudge.id = 'panel-nudge-' + panelId;
+  nudge.style.cssText = 'background:#eaf3de;border:0.5px solid #b2dfc0;border-radius:6px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;';
+  nudge.innerHTML = `<div style="font-size:0.82rem;color:#27500a;line-height:1.4;">${message}</div>`
+    + `<button onclick="document.querySelector('nav a[data-panel=${ctaPanel}]').click();this.closest('[id^=panel-nudge]').remove();" style="font-size:0.7rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:5px 12px;background:#27500a;color:#fff;border:none;border-radius:3px;cursor:pointer;white-space:nowrap;margin-left:12px;font-family:'Raleway',sans-serif;">${ctaLabel} →</button>`;
+  const firstChild = panel.querySelector('.panel-title');
+  if (firstChild && firstChild.parentNode === panel) {
+    panel.insertBefore(nudge, firstChild.nextSibling?.nextSibling || firstChild.nextSibling);
+  }
+}
+
+// ─── KEYBOARD SHORTCUTS ───────────────────────────────────────────────────────
+
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.isContentEditable) return;
+  if ((e.metaKey || e.ctrlKey) && e.key >= '1' && e.key <= '9') {
+    e.preventDefault();
+    const panels = ['dashboard','job-tracker','my-resumes','job-input','ats-check','line-edits','resume-update','cover-letter','interview-prep'];
+    const target = panels[parseInt(e.key) - 1];
+    if (target) document.querySelector(`nav a[data-panel="${target}"]`)?.click();
+  }
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+    document.querySelectorAll('.prep-menu').forEach(m => m.style.display = 'none');
+  }
+});
+
+// ─── SIDE-BY-SIDE TOGGLE (pg 06) ─────────────────────────────────────────────
+
+(function() {
+  let sideBySideActive = false;
+
+  function injectSideBySideToggle() {
+    if (document.getElementById('le-sidebyside-btn')) return;
+    const leResult = document.getElementById('le-result');
+    if (!leResult) return;
+    const btn = document.createElement('button');
+    btn.id = 'le-sidebyside-btn';
+    btn.style.cssText = 'font-family:\'Raleway\',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:0.25rem 0.7rem;background:transparent;border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--mid);';
+    btn.textContent = '⇔ Side-by-Side';
+    btn.title = 'Toggle side-by-side view: original resume alongside edits';
+    btn.onclick = toggleSideBySide;
+    const header = leResult.querySelector('div');
+    if (header) header.appendChild(btn);
+  }
+
+  function toggleSideBySide() {
+    sideBySideActive = !sideBySideActive;
+    const btn = document.getElementById('le-sidebyside-btn');
+    const leOutput = document.getElementById('le-output');
+    const rightCol = leOutput?.closest('div[style*="flex:1"]');
+    if (!rightCol) return;
+
+    let panel = document.getElementById('le-sidebyside-panel');
+    if (sideBySideActive) {
+      const resumeText = RESUMES[selectedLeResume]?.text || window._grResumeText || '';
+      if (!panel) {
+        panel = document.createElement('div');
+        panel.id = 'le-sidebyside-panel';
+        panel.style.cssText = 'width:320px;flex-shrink:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;position:sticky;top:1rem;max-height:calc(100vh - 120px);display:flex;flex-direction:column;';
+        panel.innerHTML = '<div style="background:var(--black);padding:0.55rem 1rem;font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:#fff;flex-shrink:0;">Original Resume</div>'
+          + '<div style="overflow-y:auto;padding:1rem;font-size:0.75rem;line-height:1.7;white-space:pre-wrap;font-family:\'Instrument Sans\',sans-serif;color:var(--mid);flex:1;">' + escHtml(resumeText) + '</div>';
+        rightCol.parentNode.insertBefore(panel, rightCol);
+      } else {
+        panel.style.display = 'flex';
+      }
+      if (btn) { btn.textContent = '⇔ Exit Side-by-Side'; btn.style.color = 'var(--black)'; btn.style.borderColor = 'var(--black)'; }
+    } else {
+      if (panel) panel.style.display = 'none';
+      if (btn) { btn.textContent = '⇔ Side-by-Side'; btn.style.color = ''; btn.style.borderColor = ''; }
+    }
+  }
+
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('nav a[data-panel="line-edits"]');
+    if (link) setTimeout(injectSideBySideToggle, 300);
+  });
+})();
+
+// ─── EDIT ACCEPTANCE RATE TRACKING ───────────────────────────────────────────
+
+function recordEditDecision(checked, total) {
+  if (!total) return;
+  const history = JSON.parse(localStorage.getItem('cara_edit_acceptance') || '[]');
+  history.push({ checked, total, ts: Date.now(), resume: selectedLeResume });
+  if (history.length > 50) history.shift();
+  localStorage.setItem('cara_edit_acceptance', JSON.stringify(history));
+}
+
+// Hook into generateResumeFromEdits to record acceptance rate
+const _origGenResume = generateResumeFromEdits;
+window.generateResumeFromEdits = async function(btn) {
+  const blocks = document.querySelectorAll('#le-output .edit-block');
+  const checked = Array.from(blocks).filter(b => b.querySelector('input[type="checkbox"]:checked')).length;
+  recordEditDecision(checked, blocks.length);
+  return _origGenResume(btn);
+};
+
+function getAcceptanceRate() {
+  const history = JSON.parse(localStorage.getItem('cara_edit_acceptance') || '[]');
+  if (!history.length) return null;
+  const total = history.reduce((a, h) => a + h.total, 0);
+  const checked = history.reduce((a, h) => a + h.checked, 0);
+  return total ? Math.round((checked / total) * 100) : null;
+}
+
+// ─── URGENCY / DEADLINE FIELD IN TRACKER ─────────────────────────────────────
+
+function addDeadlineToManualForm() {
+  const formGrid = document.querySelector('.job-form-grid');
+  if (!formGrid || document.getElementById('man-deadline')) return;
+  const deadlineDiv = document.createElement('div');
+  deadlineDiv.innerHTML = '<label>Application Deadline</label><input type="date" id="man-deadline" style="width:100%;font-family:inherit;font-size:0.88rem;padding:0.6rem 0.75rem;border:1px solid var(--border);background:var(--bgoff);">';
+  formGrid.insertBefore(deadlineDiv, formGrid.querySelector('.full') || null);
+}
+
+// Patch man-add-save-btn to capture deadline
+const _origManSave = document.getElementById('man-add-save-btn');
+if (_origManSave) {
+  const _origClick = _origManSave.onclick;
+  _origManSave.addEventListener('click', function() {
+    const deadline = document.getElementById('man-deadline')?.value || '';
+    if (jobs.length && deadline) { jobs[0].deadline = deadline; saveJobs(); }
+  }, { capture: false });
+}
+
+// ─── RESPONSE RATE BY RESUME VERSION ─────────────────────────────────────────
+
+function recordResumeResponse(jobId, resumeKey) {
+  const job = jobs.find(j => j.id === jobId);
+  if (!job) return;
+  job.resumeVersionUsed = resumeKey;
+  saveJobs();
+}
+
+function getResponseRateByResume() {
+  const map = {};
+  jobs.forEach(j => {
+    const key = j.resumeVersionUsed || 'unknown';
+    if (!map[key]) map[key] = { applied: 0, responded: 0 };
+    map[key].applied++;
+    if (j.screening || j.interview || j.hired) map[key].responded++;
+  });
+  return map;
+}
+
+// ─── STAR STORY AUTO-MATCH TO INTERVIEW QUESTIONS ────────────────────────────
+
+function autoMatchStarStories(questionText) {
+  if (!starStories.length) return [];
+  const qLower = questionText.toLowerCase();
+  const keywords = qLower.split(/\W+/).filter(w => w.length > 3);
+  return starStories.map(story => {
+    const storyText = [story.title, story.situation, story.task, story.action, story.result, ...(story.tags||[])].join(' ').toLowerCase();
+    const matches = keywords.filter(kw => storyText.includes(kw)).length;
+    return { story, score: matches };
+  }).filter(s => s.score > 0).sort((a,b) => b.score - a.score).slice(0, 3).map(s => s.story);
+}
+
+function injectStarMatchButtons() {
+  const panels = document.querySelectorAll('#ip-panel-1 .edit-block-header, #ip-panel-1 > div > div');
+  document.querySelectorAll('#ip-panel-1 [data-q-text]').forEach(el => {
+    if (el.dataset.starInjected) return;
+    el.dataset.starInjected = '1';
+    const qText = el.dataset.qText || '';
+    const matches = autoMatchStarStories(qText);
+    if (!matches.length) return;
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'padding:0.4rem 1rem 0.6rem;border-top:1px solid var(--border);background:#fafafa;';
+    wrap.innerHTML = '<div style="font-family:\'Raleway\',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:4px;">Matching STAR stories</div>'
+      + matches.map(s => `<div style="font-size:0.75rem;color:var(--black);padding:3px 0;display:flex;align-items:center;gap:6px;"><span style="color:#3B6D11;">✦</span>${escHtml(s.title||'Untitled story')}</div>`).join('');
+    el.parentNode?.appendChild(wrap);
+  });
+}
+
+// Patch renderInterviewPrepC to tag question divs for STAR matching
+const _origRenderIPc = renderInterviewPrepC;
+window.renderInterviewPrepC = function(raw) {
+  _origRenderIPc(raw);
+  setTimeout(() => {
+    document.querySelectorAll('#ip-panel-1 > div').forEach((card, i) => {
+      const qEl = card.querySelector('div[style*="font-weight:600"]');
+      if (qEl && !card.dataset.qText) {
+        card.dataset.qText = qEl.textContent;
+        const matches = autoMatchStarStories(qEl.textContent);
+        if (matches.length) {
+          const wrap = document.createElement('div');
+          wrap.style.cssText = 'padding:0.4rem 1rem 0.6rem;border-top:1px solid var(--border);background:#fafafa;';
+          wrap.innerHTML = '<div style="font-family:\'Raleway\',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:4px;">Matching STAR stories</div>'
+            + matches.map(s => `<div style="font-size:0.75rem;color:var(--black);padding:3px 0;display:flex;align-items:center;gap:6px;"><span style="color:#3B6D11;">✦</span>${escHtml(s.title||'Untitled')}</div>`).join('');
+          card.appendChild(wrap);
+        }
+      }
+    });
+  }, 200);
+};
+
 // ─── PAGE INIT ───────────────────────────────────────────────────────────────
 loadSavedResumes();
 buildUploadSlots();
@@ -6572,6 +7646,9 @@ renderAllOptimizers();
   }
   renderDashboard();
   updateNavStates();
+  updatePipeline();
+  updateJdContextBar();
+  addDeadlineToManualForm();
   setTimeout(maybeAutoFocus, 800);
 })();
 
