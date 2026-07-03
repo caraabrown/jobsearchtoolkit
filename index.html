@@ -627,18 +627,15 @@
   .settings-btn {
     margin-left: auto;
     background: transparent;
-    border: 1px solid #444444;
+    border: 1px solid rgba(255,255,255,0.15);
     color: #aaaaaa;
-    font-family: 'Raleway', sans-serif;
-    font-size: 0.74rem;
-    letter-spacing: 0.08em;
-    padding: 0.55rem 1.1rem;
+    font-size: 14px;
+    padding: 4px 7px;
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: 4px;
     transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
+    line-height: 1;
+    min-width: 0;
     white-space: nowrap;
   }
   .settings-btn:hover { border-color: #ffffff; color: #ffffff; }
@@ -1009,7 +1006,7 @@
   </div>
   <button class="hamburger" id="nav-hamburger" onclick="toggleMobileNav()" aria-label="Open navigation"><span></span><span></span><span></span></button>
   <button id="manual-sync-btn" onclick="manualSync()" title="Pull latest data from all devices" style="display:none;background:none;border:1px solid rgba(255,255,255,0.15);color:var(--mid);font-size:0.7rem;font-family:'Raleway',sans-serif;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:0.3rem 0.7rem;cursor:pointer;border-radius:3px;">↻ Sync</button>
-  <button class="settings-btn" id="settings-open-btn">⚙ API Key</button>
+  <button class="settings-btn" id="settings-open-btn" title="API Key Settings" style="margin-left:auto;padding:4px 7px;font-size:13px;line-height:1;min-width:0;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:var(--mid);cursor:pointer;">⚙</button>
   <div id="gh-sync-indicator" title="GitHub Sync" style="display:none;align-items:center;gap:5px;font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--mid);cursor:default;">
     <span id="gh-sync-dot" style="width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0;display:inline-block;"></span>
     <span id="gh-sync-label">Synced</span>
@@ -1202,6 +1199,14 @@
           <button class="slot-btn upload-trigger-btn" onclick="document.querySelector('nav a[data-panel=next-steps]').click()">Generate More ↗</button>
         </div>
         <div id="dash-priority-steps" style="padding:0.5rem 1rem;"></div>
+      </div>
+
+      <!-- ── EDIT TYPE INSIGHTS ── -->
+      <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:1.5rem;">
+        <div style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);">
+          <div style="font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);">Resume Edit Type Insights</div>
+        </div>
+        <div id="dash-edit-insights" style="padding:1rem;"></div>
       </div>
 
       <!-- ── SEARCH ANALYTICS ── -->
@@ -1412,6 +1417,8 @@
         <div><label>Role / Title</label><input type="text" id="jd-role" placeholder="e.g., Principal Service Designer"></div>
       </div>
 
+      <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem;"><input type="checkbox" id="jd-workday" style="width:14px;height:14px;accent-color:var(--black);flex-shrink:0;"><label style="margin:0;font-family:'Raleway',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0;text-transform:none;color:var(--black);cursor:pointer;" for="jd-workday">Applied via Workday ATS</label><span style="font-size:0.7rem;color:var(--mid);">(Workday's AI may mis-screen candidates)</span></div>
+
       <div class="btn-row">
         <button class="btn" id="save-jd-btn">Save & Continue →</button>
       </div>
@@ -1492,6 +1499,14 @@
           </div>
 
           <textarea id="le-additional-exp" style="display:none;"></textarea>
+
+          <label>Edit focus</label>
+          <div class="tab-row" id="le-focus-tabs" style="margin-bottom:1rem;flex-wrap:wrap;">
+            <div class="tab active" data-lefocus="full">Full Resume</div>
+            <div class="tab" data-lefocus="summary">Synopsis</div>
+            <div class="tab" data-lefocus="competencies">Skills</div>
+            <div class="tab" data-lefocus="bullets">Bullets Only</div>
+          </div>
 
           <label>Edit tone</label>
           <div class="tab-row" id="le-tone-tabs" style="margin-bottom:1.25rem;">
@@ -1937,8 +1952,6 @@
         </select>
         <button class="btn btn-ghost" onclick="intelLoadJob('ip-job-select',null,null,'interview-focus')">Load</button>
       </div>
-
-      <div class="step-hint">Save a job description first. The more specific the JD, the sharper the questions and answers.</div>
 
       <label>Interview stage</label>
       <div class="tab-row" id="interview-stage-tabs">
@@ -2940,7 +2953,8 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
       screening: false,
       interview: false,
       rejected: false,
-      hired: false
+      hired: false,
+      workday: document.getElementById('jd-workday') ? document.getElementById('jd-workday').checked : false
     };
     jobs.unshift(newJob);
     saveJobs();
@@ -3763,12 +3777,14 @@ function updateKeyStatus() {
     msg.textContent = '✓ API key saved (' + key.substring(0,12) + '…)';
     msg.className = 'key-status set';
     btn.className = 'settings-btn key-set';
-    btn.textContent = '✓ API Key Set';
+    btn.textContent = '⚙';
+    btn.title = 'API Key Set ✓';
   } else {
     msg.textContent = 'No API key saved — tools will not work without one.';
     msg.className = 'key-status unset';
     btn.className = 'settings-btn';
-    btn.textContent = '⚙ API Key';
+    btn.textContent = '⚙';
+    btn.title = 'API Key Settings';
   }
 }
 
@@ -4728,10 +4744,9 @@ document.querySelectorAll('#interview-stage-tabs .tab').forEach(tab => {
 });
 
 document.getElementById('gen-interview-btn').addEventListener('click', async () => {
-  const jd = savedJD || document.getElementById('jd-text').value.trim();
-  if (!jd) { showError('interview-error', 'Please save a job description in Step 01 first.'); return; }
-
   const focus = document.getElementById('interview-focus').value.trim();
+  const jd = savedJD || document.getElementById('jd-text').value.trim() || focus;
+  if (!jd) { showError('interview-error', 'Please save a job description in Step 01 first, or load a job from the tracker.'); return; }
   const resume = RESUMES[selectedInterviewResume];
 
   const stageMap = {
@@ -5818,7 +5833,7 @@ function renderEditBlocks(rawText, container) {
     const impact = parseInt(scoreImpact) || 0;
     const editId = 'edit-block-' + i;
     const isInsert = before === 'INSERT' || (type || '').toLowerCase() === 'insert';
-    html += `<div class="edit-block" id="${editId}" data-impact="${impact}" data-checked="false" data-before="${escHtml(before)}" data-after="${escHtml(after)}" data-isinsert="${isInsert}" style="${fromChat ? 'border-left:3px solid #7c3aed;background:#faf5ff;' : ''}">
+    html += `<div class="edit-block" id="${editId}" data-impact="${impact}" data-checked="false" data-before="${escHtml(before)}" data-after="${escHtml(after)}" data-isinsert="${isInsert}" data-why="${escHtml(why)}" style="${fromChat ? 'border-left:3px solid #7c3aed;background:#faf5ff;' : ''}">
    <div class="edit-block-header">
         <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
           <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;margin:0;">
@@ -5880,6 +5895,26 @@ function updateLeScoreTracker(checkbox, idx) {
   if (block) {
     block.style.opacity = checkbox.checked ? '0.55' : '1';
     block.style.background = checkbox.checked ? '#f0faf4' : '';
+    if (checkbox.checked && typeof recordCategoryUsage === 'function') {
+      const whyEl = block.querySelector('[data-why]');
+      const why = whyEl ? whyEl.dataset.why : (block.textContent || '');
+      const catMap = {
+        keyword: /keyword|terminolog|acronym|phrase match/i,
+        role: /position|title|function|reframe|reposit/i,
+        impact: /metric|quantif|outcome|dollar|percent|\$|\d+%/i,
+        experience: /surface|bury|emphasis|space|highlight/i,
+        gap: /gap|date|timeline|alanne/i,
+        synopsis: /synopsis|opening|summary|value prop|credential/i,
+        skills: /tool|skill|software|platform/i,
+        bullet: /bullet|action verb|outcome.based|task.based/i,
+        scope: /enterprise|scale|budget|team size|org.level/i,
+        industry: /healthcare|logistics|retail|government|sector/i
+      };
+      var matched = [];
+      Object.entries(catMap).forEach(function(e){ if(e[1].test(why)) matched.push(e[0]); });
+      if (!matched.length) matched = ['keyword'];
+      recordCategoryUsage(matched);
+    }
   }
   const blocks = document.querySelectorAll('#le-output .edit-block');
   let checked = 0, totalImpact = 0;
@@ -6556,6 +6591,63 @@ var trackTips=['How Applied (every job)','Resume used per app','Recruiter name +
   }
 
   renderPrioritySteps();
+  renderEditInsightsDashboard();
+}
+
+function getCategoryStats() {
+  try { return JSON.parse(localStorage.getItem('cara_edit_cat_stats') || '{}'); } catch(e) { return {}; }
+}
+function saveCategoryStats(stats) {
+  localStorage.setItem('cara_edit_cat_stats', JSON.stringify(stats));
+}
+function recordCategoryUsage(categories) {
+  if (!categories || !categories.length) return;
+  var stats = getCategoryStats();
+  categories.forEach(function(cat) {
+    if (!stats[cat]) stats[cat] = 0;
+    stats[cat]++;
+  });
+  saveCategoryStats(stats);
+}
+
+var EDIT_CATEGORIES = [
+  { key: 'keyword', label: 'Keyword & Language', desc: 'Missing keywords added, terminology matched to JD, acronyms expanded' },
+  { key: 'role', label: 'Role Positioning', desc: 'Title alignment, function framing, repositioning experience toward the target role' },
+  { key: 'impact', label: 'Impact & Quantification', desc: 'Adding/improving metrics, outcomes, dollar amounts, percentages' },
+  { key: 'experience', label: 'Experience Emphasis', desc: 'Which roles/bullets are surfaced vs. buried, what gets more or less space' },
+  { key: 'gap', label: 'Gap & Timeline', desc: 'Employment gap framing, date formatting, Alanne International positioning' },
+  { key: 'synopsis', label: 'Synopsis & Framing', desc: 'Opening paragraph rewrite, credential-forward language, value proposition' },
+  { key: 'skills', label: 'Skills & Tools', desc: 'Tools section accuracy, keyword-matching tools to JD requirements' },
+  { key: 'bullet', label: 'Bullet Strength', desc: 'Weak task-based bullets converted to outcome-based, action verb upgrades' },
+  { key: 'scope', label: 'Scope Signals', desc: 'Enterprise scale language, team size, budget, org-level indicators' },
+  { key: 'industry', label: 'Industry Context', desc: 'Sector-specific language added (healthcare, logistics, retail, government, etc.)' }
+];
+
+function renderEditInsightsDashboard() {
+  var el = document.getElementById('dash-edit-insights');
+  if (!el) return;
+  var stats = getCategoryStats();
+  var total = Object.values(stats).reduce(function(a,b){return a+b;},0);
+  if (total === 0) {
+    el.innerHTML = '<div style="font-size:0.8rem;color:var(--mid);font-style:italic;">No edit data yet. Run Line-by-Line Edits to start tracking.</div>';
+    return;
+  }
+  var max = Math.max.apply(null, EDIT_CATEGORIES.map(function(c){ return stats[c.key]||0; }));
+  var rows = EDIT_CATEGORIES.filter(function(c){ return (stats[c.key]||0)>0; })
+    .sort(function(a,b){ return (stats[b.key]||0)-(stats[a.key]||0); })
+    .map(function(c) {
+      var n = stats[c.key]||0;
+      var pct = Math.round((n/max)*100);
+      return '<div style="margin-bottom:0.55rem;">'
+        +'<div style="display:flex;justify-content:space-between;margin-bottom:3px;">'
+        +'<span style="font-size:0.75rem;font-weight:600;color:var(--black);">'+c.label+'</span>'
+        +'<span style="font-size:0.72rem;color:var(--mid);">'+n+'</span>'
+        +'</div>'
+        +'<div style="height:5px;background:var(--bgoff);border-radius:3px;overflow:hidden;">'
+        +'<div style="height:100%;width:'+pct+'%;background:var(--black);border-radius:3px;"></div>'
+        +'</div></div>';
+    }).join('');
+  el.innerHTML = rows;
 }
 
 function dashMarkStepDone(jobId) {
