@@ -1144,18 +1144,18 @@
     <div id="key-status-msg" class="key-status unset" style="margin-top:1rem;">No API key saved</div>
 
     <hr style="border:none;border-top:1px solid var(--border);margin:1.8rem 0;">
-    <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;margin-bottom:0.3rem;">Job Tracker <em>Cloud Sync</em></h2>
-    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem;line-height:1.6;">Your job tracker data is saved to a <strong>private GitHub Gist</strong> — it will never be erased by clearing your browser cache. Enter a GitHub Personal Access Token (with <strong>gist</strong> scope) once and your data syncs permanently to GitHub.</p>
-    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">Get a token at <a href="https://github.com/settings/tokens/new?scopes=gist&description=ApplyKit+Toolkit" target="_blank" style="color:var(--black);font-weight:600;">github.com/settings/tokens</a> — select only the <strong>gist</strong> scope, set no expiry.</p>
-
-    <label>GitHub Personal Access Token</label>
-    <input type="password" id="gh-token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="margin-bottom:0.75rem;">
-    <label>Gist ID <span style="font-weight:400;color:var(--light);font-size:0.78rem;">(leave blank on first setup — will be created automatically)</span></label>
-    <input type="text" id="gh-gist-id-input" placeholder="Leave blank to create a new Gist" style="margin-bottom:1rem;">
-    <div class="btn-row">
-      <button class="btn" id="save-gh-btn">Connect GitHub</button>
-      <button class="btn btn-ghost" id="clear-gh-btn">Disconnect</button>
-    </div>
+    <h2>Job Tracker <em>Cloud Sync</em></h2>
+<p style="font-size:0.82rem;color:var(--muted);">Your data syncs automatically across every device signed in with the same code below. Copy it once, paste it into the same panel on your other device.</p>
+<label>Your Sync Code</label>
+<input type="text" id="fb-sync-code-display" readonly style="font-family:monospace;">
+<button class="btn btn-ghost" onclick="navigator.clipboard.writeText(syncCode)">Copy Code</button>
+<hr>
+<label>Paste a code from another device to link it here instead</label>
+<input type="text" id="fb-sync-code-input" placeholder="Paste code from your other device">
+<button class="btn" onclick="
+  const v = document.getElementById('fb-sync-code-input').value.trim();
+  if (v) { syncCode = v; localStorage.setItem('cara_sync_code', v); location.reload(); }
+">Link This Device</button>
     <div id="gh-status-msg" style="margin-top:0.75rem;font-size:0.82rem;font-weight:600;"></div>
     <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6;">Save your GoDaddy resume URLs here so you can copy and paste them instantly when applications ask you to link or upload a resume. These are stored in your browser.</p>
 
@@ -4321,179 +4321,114 @@ loadResumeLinks();
 // localStorage is only a fast-read cache — Gist is the source of truth.
 // Clearing browser storage loses only the credential, never the data.
 
-const GIST_FILENAME = 'applykit_tracker.json';
-let ghToken = localStorage.getItem('cara_gh_token') || '';
-let ghGistId = 'a6d92ba7e84e3bc462000db1c4a02e92'; // hardcoded — survives any browser/cache/storage clear
-localStorage.setItem('cara_gh_gist_id', ghGistId);
-let _gistSaveTimer = null;
-let _gistReady = false; // WRITE LOCK — nothing writes to Gist until initial load is done
-let _gistLastSaved = ''; // ISO timestamp of last confirmed Gist read — used to detect remote changes
-let _writeFailStreak = 0; // consecutive gistPatch failures — throttles repeat banners without going silent
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import {
+    getFirestore, doc, setDoc, getDoc, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-function setGhSyncStatus(state) {
-  const ind = document.getElementById('gh-sync-indicator');
-  const dot = document.getElementById('gh-sync-dot');
-  const lbl = document.getElementById('gh-sync-label');
-  if (!ind) return;
-  if (!ghToken || !ghGistId) { ind.style.display = 'none'; return; }
-  ind.style.display = 'flex';
-  const map = { saving:['#c9a84c','Saving…'], saved:['#1e6b35','Synced'], error:['#8b2020','Sync error'], auth:['#8b2020','Token expired'], connecting:['#999','Connecting…'] };
-  const [color, text] = map[state] || ['#999', state];
-  dot.style.background = color; lbl.textContent = text;
+  const firebaseConfig = {
+    apiKey: "AIzaSyBSfM1NZR2hVDqww9ypcqOTeTA6tuwEFaY",
+    authDomain: "job-search-tool-kit.firebaseapp.com",
+    projectId: "job-search-tool-kit",
+    storageBucket: "job-search-tool-kit.firebasestorage.app",
+    messagingSenderId: "236804768074",
+    appId: "1:236804768074:web:30cf5174e4645fce80c1b3"
+  };
+
+  const fbApp = initializeApp(firebaseConfig);
+  window._db = getFirestore(fbApp);
+  window._fsDoc = doc;
+  window._fsSetDoc = setDoc;
+  window._fsGetDoc = getDoc;
+  window._fsOnSnapshot = onSnapshot;
+  window._firebaseReady = true;
+  document.dispatchEvent(new Event('firebase-ready'));
+</script>
+  
+
+// ─── FIREBASE SYNC ───────────────────────────────────────────────────────────
+function genSyncCode() {
+  const bytes = crypto.getRandomValues(new Uint8Array(15));
+  return Array.from(bytes, b => b.toString(36).padStart(2,'0')).join('').slice(0,24);
 }
 
-function showSyncBanner(msg, isError) {
-  let b = document.getElementById('gh-sync-banner');
-  if (!b) {
-    b = document.createElement('div');
-    b.id = 'gh-sync-banner';
-    b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;padding:12px 24px;font-family:sans-serif;font-size:13px;font-weight:600;text-align:center;cursor:pointer;line-height:1.5;';
-    b.onclick = () => b.remove();
-    document.body.appendChild(b);
+let syncCode = localStorage.getItem('cara_sync_code') || '';
+let _fbReady = false;   // write lock, mirrors old _gistReady
+let _fbUnsub = null;    // live-listener handle
+
+function ensureSyncCode() {
+  if (!syncCode) {
+    syncCode = genSyncCode();
+    localStorage.setItem('cara_sync_code', syncCode);
   }
-  b.style.background = isError ? '#8b2020' : '#1e6b35';
-  b.style.color = '#fff';
-  b.textContent = msg + ' (click to dismiss)';
-  if (!isError) setTimeout(() => { if (b) b.remove(); }, 5000);
+  return syncCode;
 }
 
-async function gistGet() {
-  const res = await fetch(`https://api.github.com/gists/${ghGistId}`, {
-    headers: { 'Authorization': `token ${ghToken}`, 'Accept': 'application/vnd.github.v3+json' }
-  });
-  if (res.status === 401 || res.status === 403) throw { type: 'auth' };
-  if (res.status === 404) throw { type: 'notfound' };
-  if (!res.ok) throw { type: 'network', status: res.status };
-  const data = await res.json();
-  const content = data.files?.[GIST_FILENAME]?.content;
-  if (!content) throw { type: 'empty' };
-  return JSON.parse(content);
-}
-
-async function gistPatch(payload) {
-  if (!ghToken || !ghGistId || !_gistReady) return false;
-  const res = await fetch(`https://api.github.com/gists/${ghGistId}`, {
-    method: 'PATCH',
-    headers: { 'Authorization': `token ${ghToken}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
-    body: JSON.stringify({ files: { [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) } } })
-  });
-  if (res.status === 401 || res.status === 403) {
-    _gistReady = false;
-    setGhSyncStatus('auth');
-    showSyncBanner('⚠ GitHub token expired. Open ⚙ Settings → Job Tracker Cloud Sync → paste a new token. Your data is safe in GitHub.', true);
-    return false;
-  }
-  if (!res.ok) {
-    let detail = '';
-    try { const body = await res.json(); detail = body?.message || ''; } catch(e) {}
-    _writeFailStreak++;
-    console.error('[gistPatch] write failed', res.status, detail);
-    setGhSyncStatus('error');
-    if (_writeFailStreak === 1 || _writeFailStreak % 5 === 0) {
-      showSyncBanner(`⚠ GitHub save failed (HTTP ${res.status}${detail ? ': ' + detail : ''}). Your data is only saved locally right now — do not close this tab/browser until sync recovers. Reopening this app will retry automatically.`, true);
-    }
-    return false;
-  }
-  _writeFailStreak = 0;
-  return true;
-}
-
-async function gistCreate() {
-  if (!ghToken) return null;
-  const payload = { jobs: [], starStories: [], created: new Date().toISOString() };
-  const res = await fetch('https://api.github.com/gists', {
-    method: 'POST',
-    headers: { 'Authorization': `token ${ghToken}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
-    body: JSON.stringify({ description: 'ApplyKit Job Tracker Data — DO NOT DELETE', public: false, files: { [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) } } })
-  });
-  if (!res.ok) return null;
-  return (await res.json()).id;
-}
-
-async function loadFromGist() {
-  if (!ghToken || !ghGistId) return false;
-  setGhSyncStatus('connecting');
+async function fbSave(payload) {
+  if (!window._firebaseReady || !syncCode || !_fbReady) return false;
   try {
-    const parsed = await gistGet();
-    jobs        = Array.isArray(parsed.jobs)        ? parsed.jobs        : [];
-    starStories = Array.isArray(parsed.starStories) ? parsed.starStories : [];
-    localStorage.setItem('cara_jobs',         JSON.stringify(jobs));
-    localStorage.setItem('cara_star_stories', JSON.stringify(starStories));
-    _gistLastSaved = parsed.lastSaved || '';
-    _gistReady = true;
-    setGhSyncStatus('saved');
-    const sb = document.getElementById('manual-sync-btn'); if (sb) sb.style.display = 'inline-block';
+    await window._fsSetDoc(
+      window._fsDoc(window._db, 'trackers', syncCode),
+      { ...payload, lastSaved: new Date().toISOString() }
+    );
     return true;
-  } catch(err) {
-    if (err && err.type === 'auth') {
-      _gistReady = false;
-      setGhSyncStatus('auth');
-      showSyncBanner('⚠ GitHub token expired or invalid — your data is safe in GitHub but cannot load until you reconnect. Open ⚙ Settings → Job Tracker Cloud Sync → paste a new token (no expiry).', true);
-      return false;
-    }
-    if (err && err.type === 'notfound') {
-      _gistReady = false;
-      setGhSyncStatus('error');
-      showSyncBanner('⚠ Gist not found. Check the Gist ID in ⚙ Settings → Job Tracker Cloud Sync.', true);
-      return false;
-    }
-    if (err && err.type === 'empty') {
-      // Gist exists but file not there yet — seed it with current local data
-      _gistReady = true;
-      await gistPatch({ jobs, starStories, lastSaved: new Date().toISOString() });
-      setGhSyncStatus('saved');
-      return true;
-    }
-    // Network error — use localStorage as-is, allow writes so user isn't blocked
-    _gistReady = true;
-    setGhSyncStatus('error');
-    showSyncBanner('⚠ Could not reach GitHub. Using local data — changes will sync when connection restores.', false);
+  } catch (e) {
+    console.error('[fbSave] failed', e);
     return false;
   }
 }
 
-// Flush pending Gist save before tab close
-window.addEventListener('beforeunload', function() {
-  if (!ghToken || !ghGistId || !_gistReady || !_gistSaveTimer) return;
-  clearTimeout(_gistSaveTimer);
-  _gistSaveTimer = null;
-  const payload = JSON.stringify({ files: { [GIST_FILENAME]: { content: JSON.stringify({ jobs, starStories, lastSaved: new Date().toISOString() }) } } });
-  fetch('https://api.github.com/gists/' + ghGistId, { method: 'PATCH', headers: { 'Authorization': 'token ' + ghToken, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' }, body: payload, keepalive: true });
-});
+async function fbLoad() {
+  if (!window._firebaseReady || !syncCode) return false;
+  try {
+    const snap = await window._fsGetDoc(window._fsDoc(window._db, 'trackers', syncCode));
+    if (!snap.exists()) return false;
+    const data = snap.data();
+    jobs        = Array.isArray(data.jobs)        ? data.jobs        : jobs;
+    starStories = Array.isArray(data.starStories) ? data.starStories : starStories;
+    localStorage.setItem('cara_jobs', JSON.stringify(jobs));
+    return true;
+  } catch (e) {
+    console.error('[fbLoad] failed', e);
+    return false;
+  }
+}
+
+// Live sync: pushes remote changes (e.g. edits made on your phone) into this tab instantly.
+function fbListen() {
+  if (!window._firebaseReady || !syncCode) return;
+  if (_fbUnsub) _fbUnsub();
+  _fbUnsub = window._fsOnSnapshot(window._fsDoc(window._db, 'trackers', syncCode), (snap) => {
+    if (!snap.exists()) return;
+    const data = snap.data();
+    if (data.lastSaved === _fbLastSaved) return; // ignore our own write echo
+    _fbLastSaved = data.lastSaved;
+    jobs        = Array.isArray(data.jobs)        ? data.jobs        : jobs;
+    starStories = Array.isArray(data.starStories) ? data.starStories : starStories;
+    localStorage.setItem('cara_jobs', JSON.stringify(jobs));
+    renderJobs();
+  });
+}
+let _fbLastSaved = '';
+
+async function initFirebaseSync() {
+  ensureSyncCode();
+  document.addEventListener('firebase-ready', async () => {
+    const existed = await fbLoad();
+    if (!existed) await fbSave({ jobs, starStories: starStories || [] }); // first device seeds the doc
+    _fbReady = true;
+    fbListen();
+    document.getElementById('fb-sync-code-display').textContent = syncCode;
+  }, { once: true });
+}
+initFirebaseSync();
 
 function scheduleSave() {
   localStorage.setItem('cara_jobs', JSON.stringify(jobs));
   localStorage.setItem('cara_star_stories', JSON.stringify(starStories));
-  if (!ghToken || !ghGistId || !_gistReady) return;
-  setGhSyncStatus('saving');
-  clearTimeout(_gistSaveTimer);
-  _gistSaveTimer = setTimeout(async () => {
-    try {
-      const _ts = new Date().toISOString();
-      const ok = await gistPatch({ jobs, starStories, lastSaved: _ts });
-      if (ok) _gistLastSaved = _ts;
-      setGhSyncStatus(ok ? 'saved' : 'error');
-    } catch(e) { setGhSyncStatus('error'); }
-  }, 2000);
+  fbSave({ jobs, starStories });
 }
-
-// ─── PERIODIC GIST SYNC — picks up changes from other devices ──────────────────
-setInterval(async function() {
-  if (!ghToken || !ghGistId || !_gistReady) return;
-  if (_gistSaveTimer) return; // skip poll while a local save is pending
-  try {
-    const parsed = await gistGet();
-    if (parsed.lastSaved && parsed.lastSaved !== _gistLastSaved) {
-      _gistLastSaved = parsed.lastSaved;
-      jobs        = Array.isArray(parsed.jobs)        ? parsed.jobs        : jobs;
-      starStories = Array.isArray(parsed.starStories) ? parsed.starStories : starStories;
-      localStorage.setItem('cara_jobs',         JSON.stringify(jobs));
-      localStorage.setItem('cara_star_stories', JSON.stringify(starStories));
-      renderJobs(); renderDashboard();
-      setGhSyncStatus('saved');
-    }
-  } catch(e) { /* silent — don't disrupt the user on poll failure */ }
-}, 90000);
 
 // ─── JOB TRACKER ──────────────────────────────────────────────────────────────
 let jobs = JSON.parse(localStorage.getItem('cara_jobs') || '[]');
