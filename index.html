@@ -1277,10 +1277,43 @@
       <div class="error-msg" id="le-error"></div>
 
       <div class="result-box" id="le-result">
-        <div style="margin-bottom:1rem;">
-          <h3 style="margin:0;">Edits to Apply</h3>
+        <div style="margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <h3 style="margin:0;">Edits to Apply</h3>
+            <div id="le-sel-btns" style="display:none;gap:0.4rem;">
+              <button onclick="leSelectAll(true)" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:#1a1a1a;color:#fff;border:none;padding:0.25rem 0.7rem;cursor:pointer;border-radius:2px;">Select All</button>
+              <button onclick="leSelectAll(false)" style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:none;color:#555;border:1px solid #ccc;padding:0.25rem 0.7rem;cursor:pointer;border-radius:2px;">Deselect All</button>
+            </div>
+          </div>
         </div>
         <div class="stream-output" id="le-output"></div>
+
+        <!-- ── GENERATE RESUME FROM EDITS ── -->
+        <div id="le-gen-resume-section" style="display:none; margin-top:1.75rem; padding-top:1.5rem; border-top:2px solid #dedede;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:0.75rem;">
+            <div>
+              <div style="font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:#888;margin-bottom:0.3rem;">Next Step</div>
+              <strong style="font-size:1rem;color:#1a1a1a;">Generate Full Resume with Selected Edits</strong>
+              <div style="font-size:0.8rem;color:#888;margin-top:0.3rem;">Check the edits above, then click Generate. Claude assembles the complete, full resume with only the selected edits applied.</div>
+            </div>
+            <button class="btn" id="gen-resume-btn" onclick="generateResumeFromEdits(this)" title="Generate the complete resume with the selected edits applied">Generate Resume</button>
+          </div>
+          <div class="loading" id="gr-loading"><div class="spinner"></div>Applying selected edits…</div>
+          <div class="error-msg" id="gr-error"></div>
+          <div class="result-box" id="gr-result" style="display:none;margin-top:1rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+              <div>
+                <strong>Updated Resume</strong>
+                <div style="font-size:0.75rem;color:#888;margin-top:0.2rem;">Review the text below, then copy it into Step 04 or download it.</div>
+              </div>
+              <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+                <button class="btn btn-ghost" onclick="copyGrOutput(this)">Copy Text</button>
+                <button class="btn" onclick="downloadGrAsPDF()">Download PDF</button>
+              </div>
+            </div>
+            <div class="stream-output" id="gr-output" style="white-space:pre-wrap;"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2239,7 +2272,7 @@ document.getElementById('save-jd-btn').addEventListener('click', () => {
 });
 
 // ─── API CALL HELPER ─────────────────────────────────────────────────────────
-async function callClaude(systemPrompt, userMessage, onChunk) {
+async function callClaude(systemPrompt, userMessage, onChunk, maxTokens) {
   const hiringManagerLens = `PERSPECTIVE: You are advising from the point of view of a hiring manager, not a resume coach. For every response, ask yourself: What problems does this role solve at a company like this? How do I advise and empower Cara to position herself as that solution? Frame all edits, scores, cover letters, answers, and advice through that lens — what a hiring manager needs to see, not just what looks good on paper.\n\n`;
   const atsContext = (savedAtsKeywords || savedAtsFlags || savedAtsPath) ? `ATS INSIGHTS FROM PRIOR ANALYSIS (use these to strengthen your response):\n${savedAtsKeywords ? 'MISSING KEYWORDS:\n' + savedAtsKeywords + '\n\n' : ''}${savedAtsFlags ? 'RED FLAGS & WINS:\n' + savedAtsFlags + '\n\n' : ''}${savedAtsPath ? 'FASTEST PATH TO 95%+:\n' + savedAtsPath + '\n\n' : ''}` : '';
   systemPrompt = hiringManagerLens + atsContext + systemPrompt;
@@ -2257,7 +2290,7 @@ async function callClaude(systemPrompt, userMessage, onChunk) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 4096,
+      max_tokens: maxTokens || 4096,
       system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }]
     })
@@ -3500,8 +3533,9 @@ function renderEditBlocks(rawText, container) {
     if (!before && !after) return;
 
     const editId = 'edit-block-' + i;
-    html += `<div class="edit-block" id="${editId}">
-   <div class="edit-block-header">
+    html += `<div class="edit-block" id="${editId}" data-section="${escHtml(section)}" data-before="${escHtml(before)}" data-after="${escHtml(after)}">
+   <div class="edit-block-header" style="display:flex;align-items:flex-start;gap:0.5rem;">
+        <input type="checkbox" class="edit-block-check" checked style="margin-top:0.2rem;width:15px;height:15px;cursor:pointer;flex-shrink:0;" onchange="updateLeSelCount()">
         <div><strong>Edit ${i + 1}</strong>${section ? `<span style="display:inline-block;margin-left:0.6rem;padding:0.15rem 0.55rem;background:#1a1a1a;border:1px solid #1a1a1a;border-radius:3px;font-size:0.68rem;font-weight:600;color:#ffffff;letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}${type ? `<span style="display:inline-block;margin-left:0.4rem;padding:0.15rem 0.55rem;background:#e8f0fe;border:1px solid #c5d4f5;border-radius:3px;font-size:0.68rem;font-weight:600;color:#2a4db5;letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}</div>
       </div>
       <div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>
@@ -3512,10 +3546,117 @@ function renderEditBlocks(rawText, container) {
 
   if (blocks.length === 0 && !summaryMatch) {
     container.textContent = rawText;
+    document.getElementById('le-sel-btns').style.display = 'none';
+    document.getElementById('le-gen-resume-section').style.display = 'none';
     return;
   }
 
   container.innerHTML = html || `<div style="white-space:pre-wrap;font-size:0.85rem;">${escHtml(rawText)}</div>`;
+
+  const selBtns = document.getElementById('le-sel-btns');
+  const genSection = document.getElementById('le-gen-resume-section');
+  if (blocks.length > 0) {
+    if (selBtns) selBtns.style.display = 'flex';
+    if (genSection) genSection.style.display = 'block';
+    document.getElementById('gr-result').style.display = 'none';
+    hideError('gr-error');
+  } else {
+    if (selBtns) selBtns.style.display = 'none';
+    if (genSection) genSection.style.display = 'none';
+  }
+}
+
+function leSelectAll(checked) {
+  document.querySelectorAll('#le-output .edit-block-check').forEach(cb => { cb.checked = checked; });
+}
+
+function updateLeSelCount() {
+  // Placeholder hook — kept for parity with future score-tracker UI; no-op today.
+}
+
+async function generateResumeFromEdits(btn) {
+  const baseResume = RESUMES[selectedLeResume]?.text || '';
+  if (!baseResume) { alert('No base resume selected.'); return; }
+
+  const blocks = document.querySelectorAll('#le-output .edit-block');
+  const checkedEdits = [];
+  blocks.forEach(b => {
+    const cb = b.querySelector('.edit-block-check');
+    if (cb && cb.checked) {
+      checkedEdits.push({
+        section: b.dataset.section || '',
+        before: b.dataset.before || '',
+        after: b.dataset.after || ''
+      });
+    }
+  });
+
+  if (checkedEdits.length === 0) { alert('Check at least one edit to apply, then click Generate.'); return; }
+
+  const editsList = checkedEdits.map((e, i) => {
+    const label = e.section ? ` [${e.section}]` : '';
+    return `EDIT ${i + 1}${label} \u2014 REPLACE:\n"${e.before}"\nWITH:\n"${e.after}"`;
+  }).join('\n\n');
+
+  const systemPrompt = `You are assembling a final, complete resume from a base resume and a list of pre-approved edits. Every edit listed has already been reviewed and approved by the candidate \u2014 your only job is to apply them and output the full resulting resume, start to finish.
+
+CRITICAL RULES (non-negotiable):
+- Apply ONLY the listed edits. Do not make any other wording, structural, or content change.
+- Never invent, add, or remove any employer, title, credential, metric, tool, or skill beyond what the listed edits specify.
+- Preserve every section, job entry, and bullet from the base resume that is not targeted by an edit \u2014 copy it through verbatim, including exact wording and line breaks.
+- Never omit, condense, cut, or summarize any part of the resume to save space. Output the ENTIRE resume from the header through the last line.
+- If an edit's BEFORE text cannot be found verbatim in the base resume, use your best judgment to locate the closest matching line by meaning and apply the AFTER text there \u2014 do not skip it and do not fabricate a new line for it.
+- Output plain text only: one line per resume line, section headers in ALL CAPS on their own line, a blank line between sections, bullets on their own lines starting with an em dash (\u2014). No markdown formatting, no commentary, no preamble, no explanations \u2014 output only the final resume text.`;
+
+  const userMsg = `BASE RESUME (apply the approved edits to this text; keep everything else exactly as-is):\n${baseResume}\n\nAPPROVED EDITS TO APPLY (${checkedEdits.length} total):\n${editsList}\n\nOutput the complete, final resume text with the above edits applied and everything else preserved exactly.`;
+
+  showLoading('gr-loading');
+  hideError('gr-error');
+  document.getElementById('gr-result').style.display = 'none';
+
+  try {
+    let fullText = '';
+    await callClaude(systemPrompt, userMsg, (text) => { fullText = text; }, 8192);
+
+    window._grResumeText = fullText;
+
+    const rcTa = document.getElementById('updated-resume-text');
+    if (rcTa) rcTa.value = fullText;
+
+    document.getElementById('gr-output').textContent = fullText;
+    document.getElementById('gr-result').style.display = 'block';
+
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = `\u2713 ${checkedEdits.length} edit${checkedEdits.length > 1 ? 's' : ''} applied`;
+      btn.style.color = '#1e6b35';
+      btn.style.borderColor = '#1e6b35';
+      setTimeout(() => { btn.textContent = orig; btn.style.color = ''; btn.style.borderColor = ''; }, 3000);
+    }
+  } catch (err) {
+    showError('gr-error', 'Something went wrong: ' + err.message);
+  } finally {
+    hideLoading('gr-loading');
+  }
+}
+
+function copyGrOutput(btn) {
+  const text = document.getElementById('gr-output').textContent;
+  if (!text.trim()) return;
+  navigator.clipboard.writeText(text).then(() => {
+    if (btn) { const orig = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = orig, 2000); }
+  });
+}
+
+function downloadGrAsPDF() {
+  const text = document.getElementById('gr-output').textContent;
+  if (!text.trim()) { alert('Generate a resume first.'); return; }
+  const win = window.open('', '_blank');
+  win.document.write('<html><head><title>Resume</title><style>body{font-family:Georgia,serif;max-width:750px;margin:60px auto;font-size:13px;line-height:1.6;color:#222;white-space:pre-wrap;}</style></head><body>');
+  win.document.write(text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+  win.document.write('</body></html>');
+  win.document.close();
+  win.print();
 }
 
 
