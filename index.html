@@ -7387,13 +7387,10 @@ async function generateResumeFromEdits(btn) {
 
     const finalResume = normalizeResumeText(assembled);
 
-    // Structural check only — the model never touched the assembled text, so there is nothing to
-    // scan for fabricated notes. This just guards against an unexpectedly short result.
-    if (!finalResume || finalResume.length < baseResume.length * 0.9) {
-      showError('gr-error', 'Assembly produced a shorter result than expected. Please try again or check the edits.');
-      return;
-    }
-    // Kept as a defense-in-depth check on the assembled text (placeholders, stray note phrasing).
+    // The model never touched the assembled text, so there's nothing to scan for fabricated notes.
+    // validateResumeOutput below still checks for empty output, a genuinely truncated result (under
+    // 50% of the base resume — legitimate wordsmithing edits routinely shorten text, so a tighter
+    // floor would false-positive on normal, correct output), missing key sections, and placeholders.
     const validation = validateResumeOutput(finalResume, baseResume);
     if (!validation.valid) {
       showError('gr-error', 'Assembly check failed: ' + validation.reason + ' Please try again.');
