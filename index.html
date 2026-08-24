@@ -7277,16 +7277,25 @@ function applyReplaceEdit(resumeText, before, after) {
   let idx = resumeText.indexOf(before);
   if (idx !== -1) {
     const occurrences = resumeText.split(before).length - 1;
-    return { text: resumeText.slice(0, idx) + after + resumeText.slice(idx + before.length), matched: true, ambiguous: occurrences > 1 };
+    return { text: resumeText.slice(0, idx) + after + resumeText.slice(idx + before.length), matched: true, ambiguous: occurrences > 1, matchedLength: before.length };
   }
   // Fallback: whitespace-flexible match, for BEFORE text with minor spacing differences from the live resume.
   const escaped = before.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
   let re;
-  try { re = new RegExp(escaped); } catch (err) { return { text: resumeText, matched: false, ambiguous: false }; }
+  try { re = new RegExp(escaped); } catch (err) { return { text: resumeText, matched: false, ambiguous: false, matchedLength: 0 }; }
   const m = resumeText.match(re);
-  if (!m) return { text: resumeText, matched: false, ambiguous: false };
+  if (!m) return { text: resumeText, matched: false, ambiguous: false, matchedLength: 0 };
   const occurrences = (resumeText.match(new RegExp(escaped, 'g')) || []).length;
-  return { text: resumeText.slice(0, m.index) + after + resumeText.slice(m.index + m[0].length), matched: true, ambiguous: occurrences > 1 };
+  return { text: resumeText.slice(0, m.index) + after + resumeText.slice(m.index + m[0].length), matched: true, ambiguous: occurrences > 1, matchedLength: m[0].length };
+}
+
+function postLeChatNote(text) {
+  const col = document.getElementById('le-chat-column');
+  if (col) col.style.display = 'block';
+  const thread = document.getElementById('le-chat-thread');
+  if (!thread) return;
+  thread.insertAdjacentHTML('beforeend', '<div style="margin-bottom:0.5rem;padding:0.4rem 0.7rem;border-left:3px solid var(--amber);font-size:0.83rem;background:#fdf9ef;"><div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--amber);margin-bottom:0.15rem;">Assembly Note</div><div style="white-space:pre-wrap;">' + escHtml(text) + '</div></div>');
+  thread.scrollTop = thread.scrollHeight;
 }
 
 async function generateResumeFromEdits(btn) {
@@ -7330,7 +7339,7 @@ async function generateResumeFromEdits(btn) {
   });
 
   if (applicableEdits.length === 0) {
-    showError('gr-error', 'None of the selected edits could be matched to exact text in your base resume, so nothing was generated. Please re-check the Line-by-Line Edits against the resume you selected.');
+    postLeChatNote('None of the selected edits could be matched to exact text in your base resume, so nothing was generated. Please re-check the Line-by-Line Edits against the resume you selected.');
     return;
   }
 
@@ -7353,11 +7362,22 @@ async function generateResumeFromEdits(btn) {
     const insertEdits = applicableEdits.filter(e => e.isInsert);
     const ambiguousEdits = [];
     const unmatchedReplaceEdits = [];
+    const oversizedEdits = [];
+    // Generous enough for a full paragraph-level edit (the SYNOPSIS is typically 400-500 chars);
+    // well below anything spanning a whole competencies block or job entry.
+    const MAX_SINGLE_EDIT_SPAN = 800;
 
     let assembled = baseResume;
     replaceEdits.forEach(e => {
       const result = applyReplaceEdit(assembled, e.before, e.after);
       if (!result.matched) { unmatchedReplaceEdits.push(e); return; }
+      if (result.matchedLength > MAX_SINGLE_EDIT_SPAN) {
+        // Refuse to auto-apply — an implausibly large match is the signature of an overmatched or
+        // miscaptured BEFORE, not a real single edit. Skip and surface it rather than risk silently
+        // collapsing the resume toward empty.
+        oversizedEdits.push(e);
+        return;
+      }
       assembled = result.text;
       if (result.ambiguous) ambiguousEdits.push(e);
     });
@@ -7393,7 +7413,7 @@ async function generateResumeFromEdits(btn) {
     // floor would false-positive on normal, correct output), missing key sections, and placeholders.
     const validation = validateResumeOutput(finalResume, baseResume);
     if (!validation.valid) {
-      showError('gr-error', 'Assembly check failed: ' + validation.reason + ' Please try again.');
+      postLeChatNote('Assembly check failed: ' + validation.reason + ' Please try again.');
       return;
     }
 
@@ -7412,15 +7432,16 @@ async function generateResumeFromEdits(btn) {
     // Render the full resume
     document.getElementById('gr-output').innerHTML = renderResumePreview(finalResume);
     document.getElementById('gr-result').style.display = 'block';
-    storeResumeVersion(finalResume, selectedLeResume, (window._sessionCtx?.currentRound || 1), '');
+    if (typeof storeResumeVersion === 'function') storeResumeVersion(finalResume, selectedLeResume, (window._sessionCtx?.currentRound || 1), '');
 
-    const appliedCount = replaceEdits.length + insertEdits.length - unmatchedReplaceEdits.length - unplacedInserts.length;
+    const appliedCount = replaceEdits.length + insertEdits.length - unmatchedReplaceEdits.length - unplacedInserts.length - oversizedEdits.length;
     const notices = [];
+    if (oversizedEdits.length > 0) notices.push(`${oversizedEdits.length} edit${oversizedEdits.length > 1 ? 's' : ''} matched an unexpectedly large chunk of the resume and ${oversizedEdits.length > 1 ? 'were' : 'was'} skipped rather than risk it, add manually if intended: ${oversizedEdits.map(e => '"' + e.before.slice(0, 40) + '..."').join(', ')}.`);
     if (skippedCount > 0) notices.push(`${skippedCount} selected edit${skippedCount > 1 ? 's' : ''} could not be matched to exact text in your resume and ${skippedCount > 1 ? 'were' : 'was'} skipped.`);
     if (unmatchedReplaceEdits.length > 0) notices.push(`${unmatchedReplaceEdits.length} edit${unmatchedReplaceEdits.length > 1 ? 's' : ''} skipped during assembly: ${unmatchedReplaceEdits.map(e => '"' + e.before.slice(0, 40) + '..."').join(', ')}.`);
     if (ambiguousEdits.length > 0) notices.push(`${ambiguousEdits.length} edit${ambiguousEdits.length > 1 ? 's' : ''} matched more than one spot \u2014 the first match was used, please verify: ${ambiguousEdits.map(e => '"' + e.before.slice(0, 40) + '..."').join(', ')}.`);
     if (unplacedInserts.length > 0) notices.push(`${unplacedInserts.length} new line${unplacedInserts.length > 1 ? 's' : ''} couldn't be placed automatically, add manually: ${unplacedInserts.map(e => '"' + e.after.slice(0, 40) + '..."').join(', ')}.`);
-    if (notices.length > 0) showError('gr-error', notices.join(' '));
+    if (notices.length > 0) postLeChatNote(notices.join(' '));
 
     if (btn) {
       const orig = btn.textContent;
@@ -7430,7 +7451,7 @@ async function generateResumeFromEdits(btn) {
       setTimeout(() => { btn.textContent = orig; btn.style.color = ''; btn.style.borderColor = ''; }, 3000);
     }
   } catch (err) {
-    showError('gr-error', 'Something went wrong: ' + err.message);
+    postLeChatNote('Something went wrong: ' + err.message);
   } finally {
     hideLoading('gr-loading');
   }
