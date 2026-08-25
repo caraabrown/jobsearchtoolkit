@@ -2834,7 +2834,7 @@ let customResumeCounter = parseInt(localStorage.getItem('cara_custom_counter') |
 function loadSavedResumes() {
   RESUME_KEYS.forEach(({ key }) => {
     const saved = localStorage.getItem(LS_PREFIX + key);
-    if (saved) { RESUMES[key].text = saved; RESUMES[key].custom = true; }
+    if (saved && saved.trim()) { RESUMES[key].text = saved; RESUMES[key].custom = true; }
     const savedLabel = localStorage.getItem(LS_PREFIX + key + '_label');
     if (savedLabel) RESUMES[key].label = savedLabel;
     const hidden = localStorage.getItem(LS_PREFIX + key + '_hidden');
@@ -5940,10 +5940,21 @@ document.getElementById('gen-edits-btn').addEventListener('click', async () => {
   // belong to a different track. A plain click of this button should always work the same way:
   // fresh resume + whatever's in the chat box. (The dedicated "Turn into Line Edits" button after
   // a Revised Resume Check is the intentional path for iterating on an already-edited resume.)
-  const baseResumeText = normalizeResumeText(RESUMES[selectedLeResume]?.text || '');
+  let baseResumeText = normalizeResumeText(RESUMES[selectedLeResume]?.text || '');
   if (!baseResumeText.trim()) {
-    postLeChatNote('No resume text found for ' + (RESUMES[selectedLeResume]?.label || 'the selected resume') + ' — nothing was sent to Claude. Select a resume above (or re-paste it in Set Up) and try again.');
-    return;
+    // The saved/custom text for this track is empty or corrupted (e.g. a bad save overwrote it).
+    // Self-heal from the built-in default for this track instead of just blocking — and persist
+    // the recovery so it doesn't happen again on the next click.
+    const fallback = normalizeResumeText(RESUME_DEFAULTS[selectedLeResume] || '');
+    if (fallback.trim()) {
+      baseResumeText = fallback;
+      if (RESUMES[selectedLeResume]) RESUMES[selectedLeResume].text = fallback;
+      try { localStorage.setItem(LS_PREFIX + selectedLeResume, fallback); } catch (e) {}
+      postLeChatNote('The saved text for ' + (RESUMES[selectedLeResume]?.label || 'this resume') + ' was empty, so this run used the built-in default instead and saved it back \u2014 if you had custom edits on this track, they were lost before this point and will need to be re-added.');
+    } else {
+      postLeChatNote('No resume text found for ' + (RESUMES[selectedLeResume]?.label || 'the selected resume') + ' — nothing was sent to Claude. Select a resume above (or re-paste it in Set Up) and try again.');
+      return;
+    }
   }
   const resume = { label: RESUMES[selectedLeResume]?.label || 'Resume', text: baseResumeText };
   const additionalExp = (document.getElementById('le-additional-exp').value || '').trim();
