@@ -3643,7 +3643,7 @@ Be specific and direct.`;
       window._leBaseResumeText = latestResume;
       if (!jd2 || !latestResume) return;
       const sp2 = `You are a senior resume editor. PERSPECTIVE: You are advising from the point of view of a hiring manager. What problems does this role solve at a company like this? How do I empower Cara to position herself as that solution?\n\nYou produce precise, surgical edits — exact original text, exact replacement, and one-line reason. Never invent experience not in the resume.`;
-const um2 = `You are given a resume, a job description, and a set of recommendations from an ATS analysis. Your job is to translate each recommendation into a precise, surgical edit block.\n\nFor each recommendation:\n1. Find the EXACT line in the resume it refers to\n2. Rewrite only what needs changing\n3. Output in the structured format below\n\nRESUME:\n${latestResume}\n\nJOB DESCRIPTION:\n${jd2}\n\nRECOMMENDATIONS TO TRANSLATE:\n${fullText}\n\nFirst output this exact summary line:\nEDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+\n\nThen for each recommendation output a block in this EXACT format:\n\nSECTION: [section name — for Professional History include company name e.g. "Professional History — Kroger"]\nCONTEXT: [copy the 1-2 lines immediately surrounding the BEFORE line in the resume]\nBEFORE: [copy the exact original line from the resume verbatim — do not paraphrase]\nAFTER: [your rewritten version, ready to paste — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nSCORE_IMPACT: [estimated ATS point gain for this single edit, whole number]\nWHY: [one sentence explaining the specific improvement]\n\nRULES:\n- BEFORE must be copied verbatim from the resume — never invented\n- AFTER must be complete and ready to paste with no placeholders\n- Only make changes that are honest wordsmithing of existing experience\n- Never invent titles, companies, credentials or skills not in the resume\n- ABSOLUTE BAN — never insert spaces between individual letters in any AFTER text. "A R E A S O F E X P E R T I S E" is forbidden. Write unspaced words only.`;      const leOutput = document.getElementById('le-output');
+const um2 = `You are given a resume, a job description, and a set of recommendations from an ATS analysis. Your job is to translate each recommendation into a precise, surgical edit block.\n\nFor each recommendation:\n1. Find the EXACT line in the resume it refers to\n2. Rewrite only what needs changing\n3. Output in the structured format below\n\nRESUME:\n${latestResume}\n\nJOB DESCRIPTION:\n${jd2}\n\nRECOMMENDATIONS TO TRANSLATE:\n${fullText}\n\nFirst output this exact summary line:\nEDIT_SUMMARY: [N] edits needed | Projected score: [XX]% → 96%+\n\nThen for each recommendation output a block in this EXACT format:\n\nSECTION: [section name — for Professional History include company name e.g. "Professional History — Kroger"]\nCONTEXT: [copy the 1-2 lines immediately surrounding the BEFORE line in the resume]\nBEFORE: [copy the exact original line from the resume verbatim — do not paraphrase]\nAFTER: [your rewritten version, ready to paste — no subsection label if Highlights, punctuation matched to context]\nTYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry]\nSCORE_IMPACT: [estimated ATS point gain for this single edit, whole number]\nWHY: [one sentence explaining the specific improvement]\n\nRULES:\n- BEFORE must be copied verbatim from the resume — never invented\n- AFTER must be complete and ready to paste with no placeholders\n- Only make changes that are honest wordsmithing of existing experience\n- Never invent titles, companies, credentials or skills not in the resume\n- Never change, reformat, or touch any date, date range, month, year, or duration for any reason. If the BEFORE line contains a date, AFTER must contain that exact same date, unchanged. If a date is the only thing worth changing, do not propose that edit.\n- ABSOLUTE BAN — never insert spaces between individual letters in any AFTER text. "A R E A S O F E X P E R T I S E" is forbidden. Write unspaced words only.`;      const leOutput = document.getElementById('le-output');
       leOutput.textContent = '';
       showLoading('le-loading');
       document.getElementById('le-result').classList.add('visible');
@@ -6012,6 +6012,7 @@ INTEGRITY RULES (non-negotiable):
 - NEVER add industries, sectors, titles, tools, credentials, or skills not evidenced in the resume
 - NEVER suggest changing a title (e.g. do not suggest VP, Director, or any level Cara has not held)
 - NEVER invent client names, company names, or domains (e.g. fintech, healthcare, federal) not in the resume
+- NEVER change, reformat, or touch any date, date range, month, year, or duration for any reason \u2014 not even to fix formatting. If a line you're editing contains a date (e.g. "03/2022 \u2013 09/2025"), the AFTER text must contain that exact same date, character-for-character, unchanged. If the only thing worth changing about a line is its date, skip it \u2014 do not propose that edit at all.
 - If a JD keyword requires experience Cara does not have, flag it as a gap — do not fabricate a match
 - The goal is the highest score achievable through honest wordsmithing only
 
@@ -7279,10 +7280,10 @@ function validateResumeOutput(text, baseResume) {
   const anchors = ['@', /linkedin/i, /experience/i, /education/i];
   const matched = anchors.filter(a => new RegExp(a).test(text)).length;
   if (matched < 2) return { valid: false, reason: 'Output is missing key resume sections (contact, experience, education).' };
-  // Reject placeholder/templated brackets (e.g. "[Last Name]", "[City, State]", "[Phone]") — means the model
-  // fabricated a generic template instead of using the real contact info already present in the base resume.
-  if (/\[(last name|city,?\s*state|phone|email|linkedin)\]/i.test(text)) {
-    return { valid: false, reason: 'Output contains placeholder text (e.g. "[Last Name]" or "[Phone]") instead of your real contact info from the base resume.' };
+  // Reject placeholder/templated brackets (e.g. "[Last Name]", "[City, State]", "[dates]") — means
+  // real content was lost and replaced with a generic fill-in-the-blank instead of actual text.
+  if (/\[(last name|city,?\s*state|phone|email|linkedin|dates?|years?|month|duration|tbd|xx+|company( name)?|employer( name)?|job title|title|role|start date|end date|location)\]/i.test(text)) {
+    return { valid: false, reason: 'Output contains placeholder text (e.g. "[dates]" or "[Company]") instead of real content — some content was likely lost during assembly.' };
   }
   // Reject inline commentary/notes left instead of directly applying an edit — those belong in chat, never in the resume.
   if (/\[\s*note (for cara|to self)/i.test(text) || /\bupdate (this|these) (bullet|line|section)s? directly\b/i.test(text) || /\bconfirm the exact text\b/i.test(text)) {
@@ -7296,16 +7297,48 @@ function applyReplaceEdit(resumeText, before, after) {
   let idx = resumeText.indexOf(before);
   if (idx !== -1) {
     const occurrences = resumeText.split(before).length - 1;
-    return { text: resumeText.slice(0, idx) + after + resumeText.slice(idx + before.length), matched: true, ambiguous: occurrences > 1, matchedLength: before.length };
+    return { text: resumeText.slice(0, idx) + after + resumeText.slice(idx + before.length), matched: true, ambiguous: occurrences > 1, matchedLength: before.length, matchedText: before };
   }
   // Fallback: whitespace-flexible match, for BEFORE text with minor spacing differences from the live resume.
   const escaped = before.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
   let re;
-  try { re = new RegExp(escaped); } catch (err) { return { text: resumeText, matched: false, ambiguous: false, matchedLength: 0 }; }
+  try { re = new RegExp(escaped); } catch (err) { return { text: resumeText, matched: false, ambiguous: false, matchedLength: 0, matchedText: '' }; }
   const m = resumeText.match(re);
-  if (!m) return { text: resumeText, matched: false, ambiguous: false, matchedLength: 0 };
+  if (!m) return { text: resumeText, matched: false, ambiguous: false, matchedLength: 0, matchedText: '' };
   const occurrences = (resumeText.match(new RegExp(escaped, 'g')) || []).length;
-  return { text: resumeText.slice(0, m.index) + after + resumeText.slice(m.index + m[0].length), matched: true, ambiguous: occurrences > 1, matchedLength: m[0].length };
+  return { text: resumeText.slice(0, m.index) + after + resumeText.slice(m.index + m[0].length), matched: true, ambiguous: occurrences > 1, matchedLength: m[0].length, matchedText: m[0] };
+}
+
+function extractDateTokens(text) {
+  const months = 'jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?';
+  const re = new RegExp('\\b(0?[1-9]|1[0-2])\\/(19|20)\\d{2}\\b|\\b(' + months + ')\\.?\\s+(19|20)\\d{2}\\b|\\b(19|20)\\d{2}\\b|\\bpresent\\b|\\bcurrent(?:ly)?\\b', 'gi');
+  return (text.match(re) || []).map(s => s.toLowerCase().replace(/\s+/g, ' ').trim()).sort();
+}
+
+function editChangesDates(before, after) {
+  // Never let an edit alter a date, date range, month, year, or duration — even if the AI proposed
+  // it. This compares the actual date-like tokens on each side rather than trusting instructions,
+  // so it holds regardless of prompt compliance.
+  const b = extractDateTokens(before);
+  const a = extractDateTokens(after);
+  if (b.length === 0 && a.length === 0) return false;
+  return b.join('|') !== a.join('|');
+}
+
+function matchCrossesEntryBoundary(matchedText) {
+  // A legitimate single-line/single-bullet/single-paragraph edit should never contain an
+  // "ENTRY HEADER | Title | Dates"-style line (the pattern this resume uses for every job entry —
+  // "KROGER | Sr. Service Designer | 03/2022 – 09/2025" etc.) UNLESS that header is the very start
+  // of the match (the edit legitimately targets that header line itself). A header line preceded by
+  // other matched content means the match bled in from a prior entry; two or more header lines means
+  // it spans multiple entries outright. A blank-line paragraph break into an all-caps section header
+  // inside the match is the same signal for section-level boundaries (e.g. into EDUCATION).
+  const headerPattern = /(^|\n)[A-Z][A-Z&,.'\/\s]{2,50}\|/g;
+  const matches = [...matchedText.matchAll(headerPattern)];
+  if (matches.length > 1) return true;
+  if (matches.length === 1 && matchedText.slice(0, matches[0].index).trim().length > 0) return true;
+  if (/\n\s*\n\s*[A-Z][A-Z\s]{3,40}\n/.test(matchedText)) return true;
+  return false;
 }
 
 function postLeChatNote(text) {
@@ -7390,18 +7423,25 @@ async function generateResumeFromEdits(btn) {
     const ambiguousEdits = [];
     const unmatchedReplaceEdits = [];
     const oversizedEdits = [];
+    const dateChangedEdits = [];
     // Generous enough for a full paragraph-level edit (the SYNOPSIS is typically 400-500 chars);
     // well below anything spanning a whole competencies block or job entry.
     const MAX_SINGLE_EDIT_SPAN = 800;
 
     let assembled = baseResume;
     replaceEdits.forEach(e => {
+      if (editChangesDates(e.before, e.after)) {
+        // Dates are never touched, full stop — checked against the actual text regardless of what
+        // the edit's source (AI-generated or chat-revised) intended.
+        dateChangedEdits.push(e);
+        return;
+      }
       const result = applyReplaceEdit(assembled, e.before, e.after);
       if (!result.matched) { unmatchedReplaceEdits.push(e); return; }
-      if (result.matchedLength > MAX_SINGLE_EDIT_SPAN) {
-        // Refuse to auto-apply — an implausibly large match is the signature of an overmatched or
-        // miscaptured BEFORE, not a real single edit. Skip and surface it rather than risk silently
-        // collapsing the resume toward empty.
+      if (result.matchedLength > MAX_SINGLE_EDIT_SPAN || matchCrossesEntryBoundary(result.matchedText)) {
+        // Refuse to auto-apply — an implausibly large match, or one that crosses into another job
+        // entry/section, is the signature of an overmatched or miscaptured BEFORE, not a real single
+        // edit. Skip and surface it rather than risk silently swallowing content between entries.
         oversizedEdits.push(e);
         return;
       }
@@ -7465,8 +7505,9 @@ async function generateResumeFromEdits(btn) {
     document.getElementById('gr-result').style.display = 'block';
     if (typeof storeResumeVersion === 'function') storeResumeVersion(finalResume, selectedLeResume, (window._sessionCtx?.currentRound || 1), '');
 
-    const appliedCount = usedFallback ? 0 : (replaceEdits.length + insertEdits.length - unmatchedReplaceEdits.length - unplacedInserts.length - oversizedEdits.length);
+    const appliedCount = usedFallback ? 0 : (replaceEdits.length + insertEdits.length - unmatchedReplaceEdits.length - unplacedInserts.length - oversizedEdits.length - dateChangedEdits.length);
     const notices = [];
+    if (dateChangedEdits.length > 0) notices.push(`${dateChangedEdits.length} edit${dateChangedEdits.length > 1 ? 's' : ''} would have changed a date and ${dateChangedEdits.length > 1 ? 'were' : 'was'} blocked \u2014 dates are never changed: ${dateChangedEdits.map(e => '"' + e.before.slice(0, 40) + '..."').join(', ')}.`);
     if (oversizedEdits.length > 0) notices.push(`${oversizedEdits.length} edit${oversizedEdits.length > 1 ? 's' : ''} matched an unexpectedly large chunk of the resume and ${oversizedEdits.length > 1 ? 'were' : 'was'} skipped rather than risk it, add manually if intended: ${oversizedEdits.map(e => '"' + e.before.slice(0, 40) + '..."').join(', ')}.`);
     if (skippedCount > 0) notices.push(`${skippedCount} selected edit${skippedCount > 1 ? 's' : ''} could not be matched to exact text in your resume and ${skippedCount > 1 ? 'were' : 'was'} skipped.`);
     if (unmatchedReplaceEdits.length > 0) notices.push(`${unmatchedReplaceEdits.length} edit${unmatchedReplaceEdits.length > 1 ? 's' : ''} skipped during assembly: ${unmatchedReplaceEdits.map(e => '"' + e.before.slice(0, 40) + '..."').join(', ')}.`);
