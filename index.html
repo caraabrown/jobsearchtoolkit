@@ -3308,6 +3308,101 @@ async function callClaude(systemPrompt, userMessage, onChunk, skipLensContext) {
 
 
 // ─── ATS CHECK ───────────────────────────────────────────────────────────────
+// ─── DETERMINISTIC ATS KEYWORD ENGINE ─────────────────────────────────────────
+// Frequency + presence keyword matcher, same category of technique Jobscan-style
+// tools use. Runs entirely client-side, same JD+resume always produces the same
+// score — unlike an LLM-judged percentage, which can vary run to run.
+const ATS_STOPWORDS = new Set(['the','a','an','and','or','but','if','then','else','of','to','in','on','at','for','with','by','from','as','is','are','was','were','be','been','being','this','that','these','those','it','its','it\'s','you','your','we','our','they','their','he','she','his','her','i','me','my','which','who','whom','what','when','where','why','how','not','no','nor','so','such','than','too','very','can','will','just','should','now','also','into','out','up','down','over','under','again','further','once','here','there','all','any','both','each','few','more','most','other','some','same','own','only','about','above','below','between','because','while','during','before','after','through','per','via','etc','including','include','includes','across','within','without','upon','among','throughout','toward','towards','used','use','using','one','two','three','years','year','including','ability','abilities','strong','excellent','proven','demonstrated','required','preferred','plus','must','ideal','looking','seeking','join','role','position','job','company','team','work','working','works','responsibilities','responsible','requirements','requirement','qualifications','qualification','skills','skill','experience','experienced','candidate','candidates','applicant','applicants','opportunity','environment','ensure','ensuring','help','helps','helping','support','supporting','various','other','new','well','good','high','level','levels','related','etc','area','areas']);
+
+function atsTokenize(text) {
+  return (text || '').toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9\/\-\s]/g, ' ').split(/\s+/).filter(Boolean);
+}
+
+function atsExtractKeywords(jdText) {
+  const lines = (jdText || '').split('\n');
+  const candidates = {}; // phrase -> weight
+  function addCandidate(phrase, weight) {
+    if (!phrase || phrase.length < 3) return;
+    candidates[phrase] = (candidates[phrase] || 0) + weight;
+  }
+  lines.forEach(line => {
+    const t = line.trim();
+    if (!t) return;
+    const isBullet = /^[-•*\u2022]|^\d+[.)]/.test(t);
+    const isReqSection = /require|qualif|preferred|must have|nice to have|responsibilit|you (will|have|bring)/i.test(t);
+    const lineWeight = (isBullet ? 1.4 : 1) * (isReqSection ? 1.6 : 1);
+    const words = atsTokenize(t);
+    // Unigrams — safe across the whole line
+    words.forEach(w => { if (w.length >= 3 && !ATS_STOPWORDS.has(w) && !/^\d+$/.test(w)) addCandidate(w, 1 * lineWeight); });
+    // Bigrams / trigrams — must stay within a single clause, or "...workshops. Strong background..."
+    // produces meaningless cross-sentence phrases like "workshops strong background".
+    const clauses = t.split(/[.,;:]+/).map(c => c.trim()).filter(Boolean);
+    clauses.forEach(clause => {
+      const cWords = atsTokenize(clause);
+      for (let n = 2; n <= 3; n++) {
+        for (let i = 0; i + n <= cWords.length; i++) {
+          const slice = cWords.slice(i, i + n);
+          if (ATS_STOPWORDS.has(slice[0]) || ATS_STOPWORDS.has(slice[slice.length - 1])) continue;
+          if (slice.some(w => /^\d+$/.test(w))) continue;
+          const phrase = slice.join(' ');
+          if (phrase.length < 5) continue;
+          addCandidate(phrase, (n === 2 ? 1.6 : 2.1) * lineWeight);
+        }
+      }
+    });
+  });
+  // Drop unigrams that are fully contained inside a higher-weighted bigram/trigram already captured,
+  // to avoid double-counting the same signal as two separate keywords.
+  const sorted = Object.entries(candidates).sort((a, b) => b[1] - a[1]);
+  const kept = [];
+  const keptPhrases = [];
+  for (const [phrase, weight] of sorted) {
+    const isSubstringOfKept = keptPhrases.some(k => k !== phrase && k.includes(phrase) && k.split(' ').length > phrase.split(' ').length);
+    if (isSubstringOfKept) continue;
+    kept.push({ phrase, weight });
+    keptPhrases.push(phrase);
+    if (kept.length >= 40) break;
+  }
+  return kept;
+}
+
+function atsResumeHasPhrase(resumeLower, phrase) {
+  // word-boundary-ish match, tolerant of simple plural/singular variants
+  const esc = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('(^|[^a-z0-9])' + esc + 's?([^a-z0-9]|$)', 'i');
+  return re.test(resumeLower);
+}
+
+function atsScoreResume(keywords, resumeText) {
+  const resumeLower = (resumeText || '').toLowerCase();
+  let totalWeight = 0, matchedWeight = 0;
+  const matched = [], missing = [];
+  keywords.forEach(({ phrase, weight }) => {
+    totalWeight += weight;
+    if (atsResumeHasPhrase(resumeLower, phrase)) { matchedWeight += weight; matched.push({ phrase, weight }); }
+    else missing.push({ phrase, weight });
+  });
+  missing.sort((a, b) => b.weight - a.weight);
+  matched.sort((a, b) => b.weight - a.weight);
+  const rawPct = totalWeight > 0 ? (matchedWeight / totalWeight) * 100 : 0;
+  // Mild curve: keyword-only matching structurally can't reach 100% the way a human reviewer would
+  // score fit, so compress the top end slightly rather than reporting a misleadingly harsh raw number.
+  const score = Math.round(Math.min(99, rawPct * 0.92 + 8));
+  // Projected score if the top 8 highest-weight missing keywords were honestly added.
+  const topMissing = missing.slice(0, 8);
+  const projMatchedWeight = matchedWeight + topMissing.reduce((s, m) => s + m.weight, 0);
+  const projRawPct = totalWeight > 0 ? (projMatchedWeight / totalWeight) * 100 : 0;
+  const projected = Math.round(Math.min(99, projRawPct * 0.92 + 8));
+  return { score, projected, matched, missing, totalWeight };
+}
+
+function atsComputeAllScores(jd, resumeEntries) {
+  const keywords = atsExtractKeywords(jd);
+  const results = {};
+  resumeEntries.forEach(r => { results[r.key] = { label: r.label, keywords, ...atsScoreResume(keywords, r.text) }; });
+  return results;
+}
+
 document.getElementById('run-ats-btn').addEventListener('click', async () => {
   const jd = savedJD || document.getElementById('jd-text').value.trim();
   if (!jd) { showError('ats-error', 'Please save a job description in Step 01 first.'); return; }
@@ -3315,47 +3410,39 @@ document.getElementById('run-ats-btn').addEventListener('click', async () => {
   const resumeTexts = [...selectedResumesForATS].map(key => ({ key, label: RESUMES[key].label, text: RESUMES[key].text }));
   showLoading('ats-loading'); hideError('ats-error');
   document.getElementById('ats-result').classList.remove('visible');
-  const systemPrompt = 'You are an expert ATS analyst. Be precise, data-driven, and honest. Never inflate scores or suggest fabricating experience.';
-  const resumeBlock = resumeTexts.map(r => r.label + '\n---\n' + r.text).join('\n\n======\n\n');
-  const userMsg = ['JOB DESCRIPTION:', jd, savedRoleName ? 'Role: ' + savedRoleName : null, 'RESUMES TO ANALYZE:', resumeBlock, 'IMPORTANT: Use these exact resume names in your SCORE and IMPROVED_SCORE lines: ' + resumeTexts.map(r => r.label).join(', '),
-    'For each resume give an ATS score 0-100% based strictly on what is actually in the resume. Output each score on its own line EXACTLY like this (use the exact resume name as listed above): SCORE: [Exact Resume Name] = [XX]%\n\nFor each resume also output the realistic improved score if honest keyword wordsmithing were applied: IMPROVED_SCORE: [Exact Resume Name] = [XX]%\n\nThen output the following four sections with EXACTLY these headers:\n\n## BEST MATCH\n[Which resume scored highest and a 2-3 sentence explanation of why it fits best]\n\n## MISSING KEYWORDS\nOutput as a markdown pipe table with these exact columns:\n| Keyword | Status | Priority | Where to Add |\nStatus = ✅ Matched or ❌ Missing. Priority = HIGH, MEDIUM, or LOW.\n\n## RED FLAGS & WINS\n[Use ✅ for strengths and ❌ for gaps — one per line]\n\n## FASTEST PATH TO 95%+\nOutput as a markdown pipe table with these exact columns:\n| Edit | Section | Impact | Action |\nImpact = HIGH, MEDIUM, or LOW. Action = specific honest wordsmithing instruction.\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume.'
+
+  // ── Deterministic keyword scoring runs first — this is the ground truth score. ──
+  const atsResults = atsComputeAllScores(jd, resumeTexts);
+  document.getElementById('ats-result').classList.add('visible');
+  document.getElementById('score-cards-container').innerHTML = '';
+  let highestPct = -1, highestKey = null, highestLabel = null;
+  resumeTexts.forEach(r => {
+    const res = atsResults[r.key];
+    const colorClass = res.score >= 80 ? 'score-high' : res.score >= 60 ? 'score-mid' : 'score-low';
+    document.getElementById('score-cards-container').innerHTML += `
+      <div class="score-card">
+        <div class="score-label" style="margin-bottom:0.4rem;">${escHtml(r.label)}</div>
+        <div class="score-num ${colorClass}">${res.score}%</div>
+        <div class="score-improved-inline">↑ ${res.projected}% with edits</div>
+      </div>`;
+    if (res.score > highestPct) { highestPct = res.score; highestKey = r.key; highestLabel = r.label; }
+  });
+  if (highestKey) autoSelectBestResume(highestKey, highestLabel);
+
+  const systemPrompt = 'You are an expert ATS analyst. A rules-based keyword engine has already computed the match scores below — treat those numbers as ground truth and do not generate or imply any different percentage. Your job is narrative analysis only: explain the best match, call out real strengths and gaps, and give specific wordsmithing instructions. Never inflate anything or suggest fabricating experience.';
+  const resumeBlock = resumeTexts.map(r => {
+    const res = atsResults[r.key];
+    const matchedList = res.matched.slice(0, 20).map(m => m.phrase).join(', ') || '(none)';
+    const missingList = res.missing.slice(0, 15).map(m => m.phrase).join(', ') || '(none)';
+    return r.label + ' — SCORE: ' + res.score + '% (projected ' + res.projected + '% if top gaps closed)\nMATCHED KEYWORDS: ' + matchedList + '\nMISSING KEYWORDS (highest weight first): ' + missingList + '\n---\nRESUME TEXT:\n' + r.text;
+  }).join('\n\n======\n\n');
+  const userMsg = ['JOB DESCRIPTION:', jd, savedRoleName ? 'Role: ' + savedRoleName : null,
+    'RESUMES WITH PRE-COMPUTED KEYWORD SCORES (ground truth — do not recalculate or restate a different percentage):', resumeBlock,
+    'Using the scores and keyword lists above exactly as given, output the following four sections with EXACTLY these headers:\n\n## BEST MATCH\n[State which resume has the highest score (' + escHtml(highestLabel || '') + ' at ' + highestPct + '%) and a 2-3 sentence explanation of why it fits best]\n\n## MISSING KEYWORDS\nOutput as a markdown pipe table with these exact columns:\n| Keyword | Status | Priority | Where to Add |\nUse the MISSING KEYWORDS list above for ❌ Missing rows and a few top MATCHED KEYWORDS for ✅ Matched rows. Priority = HIGH, MEDIUM, or LOW based on how central the keyword is to the role.\n\n## RED FLAGS & WINS\n[Use ✅ for strengths and ❌ for gaps — one per line, grounded in the matched/missing lists and the resume text]\n\n## FASTEST PATH TO 95%+\nOutput as a markdown pipe table with these exact columns:\n| Edit | Section | Impact | Action |\nImpact = HIGH, MEDIUM, or LOW. Action = specific honest wordsmithing instruction that would work the missing keyword in naturally.\n\nIMPORTANT: Only flag genuine gaps. Do not suggest adding industries, titles, credentials, or skills not evidenced in the resume.'
   ].filter(Boolean).join('\n\n');
   try {
-    document.getElementById('ats-result').classList.add('visible');
     let fullText = '';
     await callClaude(systemPrompt, userMsg, (text) => {
-      document.getElementById('score-cards-container').innerHTML = '';
-     const scoreMatches = [...text.matchAll(/^SCORE:\s*(.+?)\s*=\s*(\d+)%/gm)];
-      if (scoreMatches.length > 0) {
-        let highestPct = 0, highestKey = null, highestLabel = null;
-        const resumeKeyMap = {};
-        for (const [key, val] of Object.entries(RESUMES)) resumeKeyMap[val.label] = key;
-        const improvedMatches = [...text.matchAll(/IMPROVED_SCORE:\s*(.+?)\s*=\s*(\d+)%/g)];
-        const improvedMap = {};
-        improvedMatches.forEach(m => { improvedMap[m[1].trim()] = parseInt(m[2]); });
-        scoreMatches.forEach(match => {
-          const name = match[1].trim();
-          const pct = parseInt(match[2]);
-          const colorClass = pct >= 80 ? 'score-high' : pct >= 60 ? 'score-mid' : 'score-low';
-          let improved = improvedMap[name];
-          if (!improved) {
-            for (const [k,v] of Object.entries(improvedMap)) {
-              if (name.includes(k) || k.includes(name)) { improved = v; break; }
-            }
-          }
-          const improvedHtml = improved ? `<div class="score-improved-inline">↑ ${improved}% with edits</div>` : '';
-          document.getElementById('score-cards-container').innerHTML += `
-            <div class="score-card">
-              <div class="score-label" style="margin-bottom:0.4rem;">${name}</div>
-              <div class="score-num ${colorClass}">${pct}%</div>
-              ${improvedHtml}
-            </div>`;
-          if (pct > highestPct) { highestPct = pct; highestLabel = name;
-            for (const [label, key] of Object.entries(resumeKeyMap)) { if (name.includes(label) || label.includes(name)) { highestKey = key; break; } }
-          }
-        });
-        if (highestKey) autoSelectBestResume(highestKey, highestLabel);
-      }
       fullText = text;
       document.getElementById('ats-best-output').textContent = text;
     });
