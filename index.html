@@ -6021,13 +6021,11 @@ document.getElementById('gen-edits-btn').addEventListener('click', async () => {
   const jd = savedJD || document.getElementById('jd-text').value.trim();
   if (!jd) { postLeChatNote('Please save a job description in Step 01 first.'); return; }
 
-  // Base resume is always the stable, original text for the selected track — never the shared
-  // window._grResumeText global, which gets written from several unrelated places in this file
-  // (the "Turn into Line Edits" flow, the resume editor, Generate Resume) and can go stale or
-  // belong to a different track. A plain click of this button should always work the same way:
-  // fresh resume + whatever's in the chat box. (The dedicated "Turn into Line Edits" button after
-  // a Revised Resume Check is the intentional path for iterating on an already-edited resume.)
-  let baseResumeText = normalizeResumeText(RESUMES[selectedLeResume]?.text || '');
+  // Base resume is the last-edited version of this track (window._grResumeText), so every round
+  // after the first continues from where the previous round left off. Falls back to the track's
+  // original text only for round 1, or after "New Application" / a track switch has cleared
+  // _grResumeText (both of which only ever happen between JDs, never mid-JD, so this is safe).
+  let baseResumeText = normalizeResumeText(window._grResumeText || RESUMES[selectedLeResume]?.text || '');
   if (!baseResumeText.trim()) {
     // The saved/custom text for this track is empty or corrupted (e.g. a bad save overwrote it).
     // Self-heal from the built-in default for this track instead of just blocking — and persist
@@ -7438,9 +7436,12 @@ function postLeChatNote(text) {
 }
 
 async function generateResumeFromEdits(btn) {
-  // Use the latest revised resume as base in round 2+, fall back to original
-  // Normalize to clean PDF extraction artifacts (footer lines, split ligatures)
-  const rawBase = window._grResumeText || RESUMES[selectedLeResume]?.text || '';
+  // Base MUST be the exact snapshot the currently-displayed edits' BEFORE text was quoted
+  // from (_leBaseResumeText), not whatever _grResumeText last happened to hold. A plain click
+  // of "Generate Line-by-Line Edits" always re-quotes from the original resume, so if a prior
+  // round's generated resume is still sitting in _grResumeText, using it here would try to
+  // match BEFORE text against already-changed text and fail — which is exactly what happened.
+  const rawBase = window._leBaseResumeText || window._grResumeText || RESUMES[selectedLeResume]?.text || '';
   if (!rawBase) { alert('No base resume selected.'); return; }
   const baseResume = normalizeResumeText(rawBase);
 
