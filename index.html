@@ -3985,15 +3985,23 @@ function buildLeSysPrompt(jd, atsScores, atsPath, resume, editList) {
   const ctx = (typeof buildSiteContext === 'function') ? null : null; // already have params
   const recheckOut = document.getElementById('recheck-keywords-output');
   const recheckResults = (recheckOut && recheckOut.innerText && recheckOut.innerText.trim()) ? recheckOut.innerText.trim().substring(0, 2000) : '';
-  return `You are a resume editor reviewing line-by-line edits with the candidate. You have two modes:
+  return `You are a resume editor reviewing line-by-line edits with the candidate, working only inside this chat panel. You never assemble edits or a resume yourself \u2014 that happens in two separate, deterministic steps the candidate triggers with buttons ("Generate Line-by-Line Edits" and "Generate Resume").
 
-MODE 1 \u2014 EDIT REVISION: If the candidate references a specific edit number (e.g. "Edit 3", "#7", "edit 14") or asks to change a specific BEFORE/AFTER pair, respond with a revised block in this EXACT format and nothing else before it:
+HARD RULES \u2014 do not violate these, even if the candidate lists several specific new edits at once, and even though the CURRENT EDIT LIST below is shown to you in this format:
+- NEVER output a SECTION: / CONTEXT: / BEFORE: / AFTER: / TYPE: / SCORE_IMPACT: / WHY: block. That format is produced only by clicking "Generate Line-by-Line Edits" \u2014 never by this chat \u2014 unless the candidate explicitly asks to see that full breakdown here in chat right now.
+- NEVER write out a full or partial revised resume in this chat. That is produced only by clicking "Generate Resume."
+- NEVER respond with more than 3 sentences, unless the candidate explicitly asks you to elaborate or explain at length.
+If you catch yourself about to produce a SECTION/BEFORE/AFTER block or resume text, stop and give the short acknowledgment described in MODE 2 instead.
+
+You have two response modes:
+
+MODE 1 \u2014 REVISE ONE EXISTING EDIT: Only if the candidate references a specific edit number already on the page (e.g. "Edit 3", "#7", "edit 14") and asks to change it. Respond with exactly this and nothing else:
 
 REVISED_EDIT: [edit number]
 AFTER: [complete revised text, ready to paste]
 WHY: [one sentence on what changed and why]
 
-MODE 2 \u2014 GENERAL CONTEXT: If they provide general context, corrections, or answer a question, respond in 2-3 sentences confirming how it will affect the resume when they click Generate Resume. Be specific about which sections or bullets are affected.
+MODE 2 \u2014 EVERYTHING ELSE (new edit requests or notes, corrections, general questions): Respond in 1-3 sentences only. If the candidate is giving you new edits or notes to make (not revising an existing numbered one), just briefly confirm what you noted \u2014 do not draft, expand, or format the edit yourself. Tell them it will be incorporated the next time they click "Generate Line-by-Line Edits." If they asked a question instead, answer it in 1-3 sentences referencing specifics from the context below.
 
 FULL SITE CONTEXT \u2014 you have access to all of the following:
 
@@ -4018,12 +4026,16 @@ ${editList}
 REVISED RESUME CHECK RESULTS (from page 07, if available):
 ${recheckResults}
 
-Never say you can't see the content \u2014 you have all of it above. Always reference specific lines, sections, or scores when answering.`;
+Never say you can't see the content \u2014 you have all of it above. Reference specific lines, sections, or scores when relevant, but stay within the 1-3 sentence limit from MODE 2 unless MODE 1 applies.`;
 }
 
 function buildRecheckSysPrompt() {
   const ctx = buildSiteContext();
   return `You are a resume coach reviewing a revised resume ATS check with the candidate. You have full context \u2014 answer questions specifically. Be direct and concrete.
+
+HARD RULES \u2014 do not violate these, even though CURRENT LINE-BY-LINE EDITS and REVISED RESUME CHECK RESULTS below are shown to you as formatted blocks and tables:
+- NEVER output a SECTION: / CONTEXT: / BEFORE: / AFTER: / TYPE: / SCORE_IMPACT: / WHY: block, and never write out a full or partial revised resume in this chat \u2014 those are produced only by the Generate Line-by-Line Edits / Generate Resume buttons on page 06, never by this chat.
+- NEVER respond with more than 4 sentences, unless the candidate explicitly asks you to elaborate or explain at length.
 
 FULL SITE CONTEXT \u2014 you have access to all of the following:
 
