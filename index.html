@@ -3752,6 +3752,9 @@ const um2 = `You are given a resume, a job description, and a set of recommendat
       try {
         await callClaude(sp2, um2, (text) => { fullLe = text; leOutput.textContent = text; });
         renderEditBlocks(fullLe, leOutput);
+        leHistory = [];
+        window._leChatIndexAtLastResumeGenerate = 0;
+        window._leRoundClosed = false;
         markNavDone('line-edits');
         showNudge('line-edits', '<strong>Edits generated.</strong> Generate your resume, then paste it into Revised Resume Check to confirm your new ATS score.', 'Go to Recheck', 'resume-update');
       } catch(e) {
@@ -5953,6 +5956,7 @@ document.getElementById('new-application-btn').addEventListener('click', () => {
   window._grResumeKey = null;
   window._leBaseResumeText = null;
   window._leHasGeneratedResume = false;
+  window._leRoundClosed = true;
   window._leChatIndexAtLastResumeGenerate = undefined;
   window._rcGapsRaw = null;
   window._rcFullText = null;
@@ -6021,6 +6025,7 @@ function setLeResume(newKey) {
     window._grResumeKey = null;
     window._leBaseResumeText = null;
     window._leHasGeneratedResume = false;
+    window._leRoundClosed = true;
     window._leChatIndexAtLastResumeGenerate = undefined;
     window._rcGapsRaw = null;
     window._rcFullText = null;
@@ -6119,6 +6124,23 @@ document.getElementById('gen-edits-btn').addEventListener('click', async () => {
   }
   const resume = { label: RESUMES[selectedLeResume]?.label || 'Resume', text: baseResumeText };
   const additionalExp = (document.getElementById('le-additional-exp').value || '').trim();
+
+  // A round stays "open" from the moment edits are first generated until "Generate Resume" is
+  // clicked. While open, a new click here augments the existing edit list (add/modify/delete)
+  // instead of throwing it away and regenerating everything from scratch. Generate Resume is the
+  // only thing that closes a round; only then does the next click here start a genuinely fresh list.
+  const existingLeBlocks = document.querySelectorAll('#le-output .edit-block');
+  if (existingLeBlocks.length > 0 && window._leRoundClosed === false) {
+    const noteStart = (typeof window._leChatIndexAtLastResumeGenerate === 'number') ? window._leChatIndexAtLastResumeGenerate : 0;
+    const newNotes = leHistory.slice(noteStart).filter(m => m.role === 'user').map(m => m.content).join('\n').trim();
+    if (!newNotes && !additionalExp) {
+      postLeChatNote('No new chat notes since your last generation \u2014 type new edits in the chat, then click Generate Line-by-Line Edits again to add them.');
+      return;
+    }
+    await mergeLeEditsFromChat(baseResumeText, jd, newNotes, additionalExp, selectedLeTone);
+    return;
+  }
+
   const focusMap = {
     full: 'every section of the resume — synopsis, core competencies, and all experience bullets',
     summary: 'only the Synopsis / professional summary section at the top',
@@ -6210,6 +6232,8 @@ Output nothing else — just the EDIT_SUMMARY line followed by the edit blocks.$
     window._leBaseResumeText = baseResumeText;
     // Show chat + init history
     leHistory = [{role:'user',content:userMsg},{role:'assistant',content:fullText}];
+    window._leChatIndexAtLastResumeGenerate = leHistory.length;
+    window._leRoundClosed = false;
     const _leJD = savedJD || document.getElementById('jd-text')?.value?.trim() || '';
     const _leAtsScores = savedAtsKeywords || localStorage.getItem('cara_sess_ats_kw') || '';
     const _leAtsPath = savedAtsPath || localStorage.getItem('cara_sess_ats_path') || '';
@@ -6452,6 +6476,263 @@ function commitPendingGaps(btn) {
   appendGapRowsToTable(items);
   var wrap = btn.closest('.rc-pending-gaps');
   if (wrap) wrap.innerHTML = '<div style="font-size:0.8rem;color:#1e6b35;">\u2713 Added ' + items.length + ' item' + (items.length > 1 ? 's' : '') + ' to Remaining Gaps</div>';
+}
+
+// ─── LINE EDITS: MERGE NEW CHAT NOTES INTO AN OPEN (UNAPPLIED) EDIT LIST ────────
+// Only runs when gen-edits-btn detects an open round (edits already generated, "Generate
+// Resume" not yet clicked). Asks the model for ONLY the delta needed — which existing edits to
+// drop, which to change, and what's genuinely new — then applies that delta with plain string/DOM
+// operations. Existing edits the model doesn't mention are never touched, reproduced, or reworded.
+async function mergeLeEditsFromChat(baseResumeText, jd, newNotes, additionalExp, tone) {
+  const container = document.getElementById('le-output');
+  const existingBlocks = Array.from(container.querySelectorAll('.edit-block'));
+  const existingEditsText = existingBlocks.map((b, i) =>
+    `EDIT ${i + 1}\nSECTION: ${b.dataset.section || ''}\nBEFORE: ${b.dataset.before || ''}\nAFTER: ${b.dataset.after || ''}\nWHY: ${b.dataset.why || ''}`
+  ).join('\n\n');
+
+  const toneMap = {
+    'ats-first':   'ATS-FIRST TONE: Maximum keyword density. Tight action-verb leads. Metrics foregrounded in the first clause of every bullet.',
+    'executive':   'EXECUTIVE VOICE TONE: Strategic framing and scope signals throughout. Use C-suite language.',
+    'impact':      'IMPACT-FORWARD TONE: Every bullet anchored to a quantified outcome.',
+    'narrative':   'NARRATIVE THREAD TONE: Connect bullets into a coherent story of progression and causality.',
+    'hybrid':      'ATS EXECUTIVE VOICE TONE: Balance ATS keyword density with executive framing.'
+  };
+  const toneInstruction = toneMap[tone] || toneMap['ats-first'];
+
+  showLoading('le-loading');
+  hideError('le-error');
+
+  const systemPrompt = `You are a senior resume editor and ATS optimization specialist maintaining an existing list of proposed line-by-line edits. You produce precise, surgical edits \u2014 exact original text, exact replacement text, and a one-line reason. You never invent experience, industries, credentials, or titles the candidate has not demonstrated in their resume.
+
+ACTIVE TONE INSTRUCTION \u2014 apply this to any new or modified AFTER text:
+${toneInstruction}`;
+
+  const userMsg = `The candidate has an existing set of line-by-line edits already proposed for this resume against this job description. They've now added new notes in chat. Your job is to output ONLY the changes needed to incorporate the new notes \u2014 do not regenerate, restate, reword, or renumber any existing edit the new notes don't affect.
+
+JOB DESCRIPTION:
+${jd}
+
+CURRENT RESUME (every BEFORE below must match this exact text verbatim):
+${baseResumeText}
+
+EXISTING EDITS (already proposed \u2014 leave every one of these alone unless a new note below specifically changes or cancels it):
+${existingEditsText || '(none yet)'}
+
+NEW NOTES FROM THE CANDIDATE (not yet incorporated):
+${newNotes || '(none)'}
+${additionalExp ? `\nADDITIONAL EXPERIENCE TO INCORPORATE (each needs its own new INSERT edit under ADD):\n${additionalExp}` : ''}
+
+For each new note, decide:
+- Does it change what an EXISTING edit above should say? \u2192 put it under MODIFY, referencing that edit's number.
+- Does it contradict or cancel an EXISTING edit above, such that it should no longer be applied? \u2192 put its number under DELETE.
+- Is it unrelated to any existing edit? \u2192 put it under ADD as a brand new edit block.
+
+Output ONLY in this exact format \u2014 write NONE for any section with nothing to report, and output nothing else before, between, or after these three sections:
+
+DELETE: [comma-separated existing edit numbers to remove, or NONE]
+
+MODIFY:
+EDIT [number]
+AFTER: [complete revised text, ready to paste]
+WHY: [one sentence on what changed and why]
+(repeat one EDIT block per modified edit, or write NONE)
+
+ADD:
+SECTION: [section name \u2014 for Professional History include company name e.g. "Professional History \u2014 Kroger"]
+CONTEXT: [copy the 1-2 lines immediately surrounding the BEFORE line in the resume]
+BEFORE: [exact original text copied verbatim, or the word INSERT if this is a brand new line]
+AFTER: [complete rewritten or new text, ready to paste]
+TYPE: [Full Sentence | Partial Sentence | Full Bullet | Partial Bullet | Paragraph | List Entry | Insert]
+SCORE_IMPACT: [estimated ATS point gain for this single edit, whole number]
+WHY: [one sentence explaining the specific ATS improvement]
+(repeat one block per new edit, or write NONE)
+
+INTEGRITY RULES (non-negotiable):
+- NEVER add industries, sectors, titles, tools, credentials, or skills not evidenced in the resume
+- NEVER suggest changing a title, or invent client/company names or domains not in the resume
+- NEVER change, reformat, or touch any date, date range, month, or year for any reason
+- BEFORE (for ADD) must be copied verbatim from the resume text above \u2014 never invented
+- AFTER must be complete and ready to paste \u2014 no [brackets], no placeholders
+- ABSOLUTE BAN \u2014 never insert spaces between individual letters in any AFTER text.`;
+
+  try {
+    document.getElementById('le-result').classList.add('visible');
+    let fullText = '';
+    await callClaude(systemPrompt, userMsg, (text) => { fullText = text; });
+    const result = applyLeMergeDelta(fullText, container);
+    refreshLeScoreTrackerCounts();
+    updateLeSummaryBar(container);
+    window._leChatIndexAtLastResumeGenerate = leHistory.length;
+    if (typeof saveEditsForOptimizers === 'function') saveEditsForOptimizers(fullText, selectedLeResume);
+    const parts = [];
+    if (result.addedCount) parts.push(result.addedCount + ' added');
+    if (result.modifiedCount) parts.push(result.modifiedCount + ' modified');
+    if (result.deletedCount) parts.push(result.deletedCount + ' removed');
+    const totalNow = container.querySelectorAll('.edit-block').length;
+    postLeChatNote((parts.length ? parts.join(', ') + ' \u2014 ' : 'No changes needed \u2014 ') + totalNow + ' edit' + (totalNow === 1 ? '' : 's') + ' total now.');
+  } catch (e) {
+    postLeChatNote('Something went wrong incorporating your chat notes: ' + e.message + ' \u2014 your existing edits are unchanged.');
+  } finally {
+    hideLoading('le-loading');
+  }
+}
+
+// Applies a DELETE/MODIFY/ADD delta to the existing DOM edit blocks. Edit numbers in the delta
+// refer to the ORIGINAL pre-delta numbering, so MODIFY is applied first (positions still match),
+// then DELETE, then ADD, then everything is renumbered once at the end.
+function applyLeMergeDelta(deltaText, container) {
+  const originalBlocks = Array.from(container.querySelectorAll('.edit-block'));
+
+  const modMatch = deltaText.match(/MODIFY:\s*([\s\S]*?)(?=\n\s*ADD:|$)/i);
+  const modMap = new Map();
+  if (modMatch && !/^\s*none\s*$/i.test(modMatch[1].trim())) {
+    const parts = modMatch[1].split(/EDIT\s+(\d+)/i).slice(1);
+    for (let k = 0; k < parts.length; k += 2) {
+      const num = parseInt(parts[k], 10);
+      const body = parts[k + 1] || '';
+      const afterM = body.match(/AFTER:\s*([\s\S]*?)(?=\n\s*WHY:|$)/i);
+      const whyM = body.match(/WHY:\s*(.+)/i);
+      if (!isNaN(num) && afterM && afterM[1].trim()) {
+        modMap.set(num, { after: afterM[1].trim(), why: whyM ? whyM[1].trim() : '' });
+      }
+    }
+  }
+  modMap.forEach((val, num) => {
+    const block = originalBlocks[num - 1];
+    if (!block) return;
+    block.dataset.after = val.after;
+    if (val.why) block.dataset.why = val.why;
+    const afterTextEl = block.querySelector('.le-after-text');
+    if (afterTextEl) afterTextEl.innerHTML = wordDiff(block.dataset.before, val.after);
+    const whyEl = block.querySelector('.edit-row-why');
+    if (whyEl && val.why) whyEl.textContent = '\u{1F4A1} ' + val.why;
+    block.style.borderLeft = '3px solid #7c3aed';
+    block.style.background = '#faf5ff';
+    if (!block.querySelector('.le-from-chat-badge')) {
+      const header = block.querySelector('.edit-block-header > div');
+      if (header) header.insertAdjacentHTML('beforeend', '<span class="le-from-chat-badge" style="display:inline-block;padding:0.15rem 0.55rem;background:#7c3aed;border-radius:3px;font-size:0.68rem;font-weight:600;color:#fff;letter-spacing:0.02em;">From Chat</span>');
+    }
+  });
+
+  const delMatch = deltaText.match(/DELETE:\s*(.+)/i);
+  const delNums = new Set();
+  if (delMatch && !/^\s*none\s*$/i.test(delMatch[1].trim())) {
+    delMatch[1].split(',').forEach(s => { const n = parseInt(s.trim(), 10); if (!isNaN(n)) delNums.add(n); });
+  }
+  delNums.forEach(num => { const block = originalBlocks[num - 1]; if (block) block.remove(); });
+
+  const addMatch = deltaText.match(/ADD:\s*([\s\S]*)$/i);
+  let addedCount = 0;
+  if (addMatch && !/^\s*none\s*$/i.test(addMatch[1].trim())) {
+    addedCount = appendNewLeEditBlocks(addMatch[1], container);
+  }
+
+  renumberLeEditBlocks(container);
+  return { deletedCount: delNums.size, modifiedCount: modMap.size, addedCount: addedCount };
+}
+
+// Parses new SECTION/CONTEXT/BEFORE/AFTER/TYPE/SCORE_IMPACT/WHY blocks and appends them to the
+// existing container (never replaces it) — a deliberate duplicate of renderEditBlocks's own field
+// parsing rather than a shared refactor, so the working fresh-generation path stays untouched.
+function appendNewLeEditBlocks(rawAddText, container) {
+  function extractField(text, fieldName, nextFields) {
+    const marker = fieldName + ':';
+    const lineStart = text.search(new RegExp('(^|\\n)' + fieldName + ':', ''));
+    const start = lineStart < 0 ? -1 : text.indexOf(marker, lineStart);
+    if (start < 0) return '';
+    let end = text.length;
+    for (const next of nextFields) {
+      const ni = text.search(new RegExp('(^|\\n)' + next + ':', ''));
+      if (ni > start && ni < end) end = ni;
+    }
+    return text.substring(start + marker.length, end).trim().replace(/^`+|`+$/g, '').trim();
+  }
+
+  const lines = rawAddText.split('\n');
+  let blocks = [];
+  let currentBlock = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('SECTION:') && currentBlock.length > 0) {
+      if (currentBlock.some(l => l.trim().startsWith('BEFORE:'))) blocks.push(currentBlock.join('\n'));
+      currentBlock = [line];
+    } else {
+      currentBlock.push(line);
+    }
+  }
+  if (currentBlock.some(l => l.trim().startsWith('BEFORE:'))) blocks.push(currentBlock.join('\n'));
+
+  const startIdx = container.querySelectorAll('.edit-block').length;
+  let added = 0;
+  blocks.forEach((block) => {
+    const section     = extractField(block, 'SECTION',      ['CONTEXT','BEFORE','AFTER','TYPE','SCORE_IMPACT','WHY']);
+    const context     = extractField(block, 'CONTEXT',      ['BEFORE','AFTER','TYPE','SCORE_IMPACT','WHY','SECTION']);
+    const before      = extractField(block, 'BEFORE',       ['AFTER','TYPE','SCORE_IMPACT','WHY','SECTION','CONTEXT']);
+    const after       = extractField(block, 'AFTER',        ['TYPE','SCORE_IMPACT','WHY','SECTION','BEFORE','CONTEXT']);
+    const type        = extractField(block, 'TYPE',         ['SCORE_IMPACT','WHY','SECTION','BEFORE','AFTER','CONTEXT']);
+    const scoreImpact = extractField(block, 'SCORE_IMPACT', ['WHY','SECTION','BEFORE','AFTER','TYPE','CONTEXT']);
+    const why         = extractField(block, 'WHY',          ['SECTION','BEFORE','AFTER','TYPE','SCORE_IMPACT','CONTEXT']);
+    if (!before && !after) return;
+
+    const impact = parseInt(scoreImpact) || 0;
+    const idx = startIdx + added;
+    const isInsert = before === 'INSERT' || (type || '').toLowerCase() === 'insert';
+    const editId = 'edit-block-' + idx;
+    const html = `<div class="edit-block" id="${editId}" data-impact="${impact}" data-checked="false" data-section="${escHtml(section)}" data-before="${escHtml(before)}" data-after="${escHtml(after)}" data-isinsert="${isInsert}" data-why="${escHtml(why)}" style="border-left:3px solid #7c3aed;background:#faf5ff;">
+   <div class="edit-block-header">
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;margin:0;">
+            <input type="checkbox" style="width:15px;height:15px;cursor:pointer;accent-color:#1e6b35;" onchange="updateLeScoreTracker(this,${idx})">
+            <strong>Edit ${idx + 1}</strong>
+          </label>
+          <span class="le-from-chat-badge" style="display:inline-block;padding:0.15rem 0.55rem;background:#7c3aed;border-radius:3px;font-size:0.68rem;font-weight:600;color:#fff;letter-spacing:0.02em;">From Chat</span>
+          ${section ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#1a1a1a;border-radius:3px;font-size:0.68rem;font-weight:600;color:#fff;letter-spacing:0.02em;">${escHtml(section)}</span>` : ''}
+          ${type ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:${isInsert ? '#fff3e0' : '#e8f0fe'};border:1px solid ${isInsert ? '#f0c080' : '#c5d4f5'};border-radius:3px;font-size:0.68rem;font-weight:600;color:${isInsert ? '#a05000' : '#2a4db5'};letter-spacing:0.02em;">${escHtml(type)}</span>` : ''}
+          ${impact > 0 ? `<span style="display:inline-block;padding:0.15rem 0.55rem;background:#eaf7ee;border:1px solid #b2dfc0;border-radius:3px;font-size:0.68rem;font-weight:700;color:#1e6b35;">+${impact} pts</span>` : ''}
+        </div>
+      </div>
+      ${isInsert ? `<div class="edit-row-before" style="background:#fff8ee;border-color:#f0c080;"><span class="edit-label" style="color:#a05000;">Insert new</span>${escHtml(after)}</div>` : `<div class="edit-row-before"><span class="edit-label">Remove</span>${escHtml(before)}</div>`}
+      ${context ? `<div style="font-size:0.75rem;color:#888;font-style:italic;padding:0.35rem 0.75rem;background:#f9f9f9;border-left:3px solid #ddd;margin:0 0 0.25rem;line-height:1.5;"><span style="font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:#aaa;display:block;margin-bottom:0.2rem;">Surrounding context</span>${escHtml(context)}</div>` : ''}
+      ${!isInsert ? `<div class="edit-row-after" id="after-${idx}"><span class="edit-label">Replace with</span><span class="after-text le-after-text">${wordDiff(before, after)}</span><button class="copy-btn" style="float:right;margin-left:0.5rem;padding:0.2rem 0.6rem;font-size:0.7rem;" onclick="var t=this.previousElementSibling.textContent;navigator.clipboard.writeText(t).then(function(){},function(){});this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy'},2000)">Copy</button></div>` : ''}
+      ${why ? `<div class="edit-row-why">\u{1F4A1} ${escHtml(why)}</div>` : ''}
+    </div>`;
+    container.insertAdjacentHTML('beforeend', html);
+    added++;
+  });
+  return added;
+}
+
+// Keeps block ids, visible "Edit N" labels, and checkbox index wiring in sync after a merge adds,
+// modifies, or removes blocks — otherwise updateLeScoreTracker's index lookups drift out of sync.
+function renumberLeEditBlocks(container) {
+  Array.from(container.querySelectorAll('.edit-block')).forEach((block, i) => {
+    block.id = 'edit-block-' + i;
+    const label = block.querySelector('.edit-block-header strong');
+    if (label) label.textContent = 'Edit ' + (i + 1);
+    const cb = block.querySelector('input[type="checkbox"]');
+    if (cb) cb.setAttribute('onchange', 'updateLeScoreTracker(this,' + i + ')');
+    const afterRow = block.querySelector('.edit-row-after');
+    if (afterRow) afterRow.id = 'after-' + i;
+  });
+}
+
+// Recomputes total/checked counts after a merge without resetting checked state to 0 the way a
+// fresh generation does — existing selections on untouched edits must survive a merge.
+function refreshLeScoreTrackerCounts() {
+  const blocks = document.querySelectorAll('#le-output .edit-block');
+  const totalEl = document.getElementById('le-total-count');
+  if (totalEl) totalEl.textContent = blocks.length;
+  const checkedEl = document.getElementById('le-checked-count');
+  if (checkedEl) checkedEl.textContent = document.querySelectorAll('#le-output .edit-block input[type="checkbox"]:checked').length;
+  const tracker = document.getElementById('le-score-tracker');
+  if (tracker && blocks.length > 0) tracker.style.display = 'flex';
+  const selBtns = document.getElementById('le-sel-btns');
+  if (selBtns && blocks.length > 0) selBtns.style.display = 'flex';
+}
+
+function updateLeSummaryBar(container) {
+  const numEl = container.querySelector('.edits-summary-bar .summary-num');
+  if (numEl) numEl.textContent = container.querySelectorAll('.edit-block').length;
 }
 
 function renderEditBlocks(rawText, container) {
@@ -7635,6 +7916,7 @@ async function generateResumeFromEdits(btn) {
     window._grResumeText = finalResume;
     window._grResumeKey = selectedLeResume;
     window._leHasGeneratedResume = true;
+    window._leRoundClosed = true;
     persistLeRoundState();
     const rcTa = document.getElementById('updated-resume-text');
     if (rcTa) rcTa.value = finalResume;
@@ -7734,6 +8016,7 @@ async function generateResumeFromEdits(btn) {
     window._grResumeText = finalResume;
     window._grResumeKey = selectedLeResume;
     window._leHasGeneratedResume = true;
+    window._leRoundClosed = true;
     // Track chat note boundary \u2014 only notes after this point are new
     window._leChatIndexAtLastResumeGenerate = leHistory.length;
     persistLeRoundState();
