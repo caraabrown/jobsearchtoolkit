@@ -1852,7 +1852,7 @@
         <div style="flex:1;min-width:0;">
           <label>Updated Resume Text *</label>
           <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.4rem;">
-            <button class="btn btn-ghost" style="font-size:0.72rem;padding:0.3rem 0.75rem;" onclick="(function(){if(!window._grResumeText||!window._grResumeText.trim()){alert('No generated resume found. Generate a resume on the Line-by-Line Edits page first.');return;}const ta=document.getElementById('updated-resume-text');if(ta){ta.value=window._grResumeText;}})()">← Load from Line Edits</button>
+            <button class="btn btn-ghost" style="font-size:0.72rem;padding:0.3rem 0.75rem;" onclick="(function(){if(!window._grResumeText||!window._grResumeText.trim()){alert('No generated resume found. Generate a resume on the Line-by-Line Edits page first.');return;}const ta=document.getElementById('updated-resume-text');if(ta){ta.value=window._grResumeText;window._leLastAutoSyncedResume=window._grResumeText;}})()">← Load from Line Edits</button>
           </div>
           <textarea id="updated-resume-text" placeholder="Paste your updated resume text here…" rows="14"></textarea>
           <div style="display:flex;gap:0.5rem;margin-top:0.5rem;margin-bottom:0.75rem;flex-wrap:wrap;align-items:center;">
@@ -3523,8 +3523,13 @@ document.getElementById('recheck-btn').addEventListener('click', async () => {
   // (and later editing) whatever stale/original text happens to be there.
   if (rcTaEl && !rcTaEl.value.trim() && window._grResumeText && window._grResumeText.trim()) {
     rcTaEl.value = window._grResumeText;
+    window._leLastAutoSyncedResume = window._grResumeText;
   }
   const updatedResume = rcTaEl.value.trim();
+  // This box is candidate-editable and authoritative once touched (see syncRcTextarea) — a check
+  // always runs against exactly what's in it, and that becomes the app's current resume state so
+  // manual edits here are reflected everywhere else (round N+1 base, cover letter, tracker, etc.).
+  if (updatedResume) { window._grResumeText = updatedResume; window._leLastAutoSyncedResume = updatedResume; }
   if (!jd) { showError('recheck-error', 'Please save a job description in Step 01 first.'); return; }
   if (!updatedResume) { showError('recheck-error', 'Please paste your updated resume text, or generate one on 06 Line-by-Line Edits first.'); return; }
 
@@ -3759,6 +3764,7 @@ const um2 = `You are given a resume, a job description, and a set of recommendat
         await callClaude(sp2, um2, (text) => { fullLe = text; leOutput.textContent = text; });
         renderEditBlocks(fullLe, leOutput);
         leHistory = [];
+        leAssemblyNotes = [];
         window._leChatIndexAtLastResumeGenerate = 0;
         window._leRoundClosed = false;
         markNavDone('line-edits');
@@ -3951,6 +3957,10 @@ async function callClaudeChat(systemPrompt,messages,onChunk){
 var whyHistory=[];
 var qaHistory=[];
 var leHistory=[];
+// Assembly/system notes posted to the Line Edits chat thread (skipped/blocked edit warnings, etc.)
+// are otherwise DOM-only — invisible to the chat's own context. Tracked here so buildLeSysPrompt
+// can surface them; reset everywhere leHistory resets (New Application, each new round).
+var leAssemblyNotes=[];
 var whySysPrompt='';
 var qaSysPrompt='';
 var leSysPrompt='You are a resume editor. Generate Line-by-Line Edits first — your full ATS results, resume, and job description will be loaded into context automatically so you can answer questions and revise specific edits.';
@@ -3994,6 +4004,8 @@ function buildLeSysPrompt(jd, atsScores, atsPath, resume, editList) {
   const ctx = (typeof buildSiteContext === 'function') ? null : null; // already have params
   const recheckOut = document.getElementById('recheck-keywords-output');
   const recheckResults = (recheckOut && recheckOut.innerText && recheckOut.innerText.trim()) ? recheckOut.innerText.trim().substring(0, 2000) : '';
+  const additionalExp = (document.getElementById('le-additional-exp')?.value || '').trim();
+  const assemblyNotesText = leAssemblyNotes.length ? leAssemblyNotes.map((n, i) => `[${i + 1}] ${n}`).join('\n') : '(none yet this round)';
   return `You are a resume editor reviewing line-by-line edits with the candidate, working only inside this chat panel. You never assemble edits or a resume yourself \u2014 that happens in two separate, deterministic steps the candidate triggers with buttons ("Generate Line-by-Line Edits" and "Generate Resume").
 
 HARD RULES \u2014 do not violate these, even if the candidate lists several specific new edits at once, and even though the CURRENT EDIT LIST below is shown to you in this format:
@@ -4032,10 +4044,19 @@ ${resume}
 CURRENT EDIT LIST:
 ${editList}
 
+SELECTED TONE: ${selectedLeTone}
+SELECTED FOCUS: ${selectedLeFocus}
+
+ADDITIONAL EXPERIENCE FIELD (candidate-entered, on this page):
+${additionalExp || '(empty)'}
+
+ASSEMBLY/SYSTEM NOTES POSTED IN THIS CHAT THIS ROUND (e.g. edits skipped, blocked, or unmatched during Generate Resume \u2014 these appear above in this same chat thread as "Assembly Note"):
+${assemblyNotesText}
+
 REVISED RESUME CHECK RESULTS (from page 07, if available):
 ${recheckResults}
 
-Never say you can't see the content \u2014 you have all of it above. Reference specific lines, sections, or scores when relevant, but stay within the 1-3 sentence limit from MODE 2 unless MODE 1 applies.`;
+Never say you can't see the content \u2014 you have all of it above, including every Assembly Note shown earlier in this chat thread. Reference specific lines, sections, edit numbers, or scores when relevant, but stay within the 1-3 sentence limit from MODE 2 unless MODE 1 applies.`;
 }
 
 function buildRecheckSysPrompt() {
@@ -5950,7 +5971,7 @@ document.getElementById('new-application-btn').addEventListener('click', () => {
   const leChatEl = document.getElementById('le-chat'); if (leChatEl) leChatEl.style.display = 'none';
   const leChatCol = document.getElementById('le-chat-column'); if (leChatCol) leChatCol.style.display = 'none';
   const leChatThread = document.getElementById('le-chat-thread'); if (leChatThread) leChatThread.innerHTML = '';
-  leHistory = []; leSysPrompt = '';
+  leHistory = []; leSysPrompt = ''; leAssemblyNotes = [];
   const leResult = document.getElementById('le-result'); if (leResult) leResult.classList.remove('visible');
   const leTracker = document.getElementById('le-score-tracker'); if (leTracker) leTracker.style.display = 'none';
   const selBtns = document.getElementById('le-sel-btns'); if (selBtns) selBtns.style.display = 'none';
@@ -5966,6 +5987,7 @@ document.getElementById('new-application-btn').addEventListener('click', () => {
   window._rcGapsRaw = null;
   window._rcFullText = null;
   leEditNumberOffset = 0;
+  window._leLastAutoSyncedResume = null;
   try { localStorage.removeItem('cara_sess_le_round'); } catch (e) {}
 
   // ── Cover Letter ───────────────────────────────────────────────────────────
@@ -6041,6 +6063,7 @@ function setLeResume(newKey) {
     window._rcGapsRaw = null;
     window._rcFullText = null;
     leEditNumberOffset = 0;
+    window._leLastAutoSyncedResume = null;
     try { localStorage.removeItem('cara_sess_le_round'); } catch (e) {}
   }
   selectedLeResume = newKey;
@@ -6061,7 +6084,8 @@ function persistLeRoundState() {
       hasGenerated: !!window._leHasGeneratedResume,
       rcGapsRaw: window._rcGapsRaw || '',
       rcFullText: window._rcFullText || '',
-      editNumberOffset: leEditNumberOffset || 0
+      editNumberOffset: leEditNumberOffset || 0,
+      leLastAutoSyncedResume: window._leLastAutoSyncedResume || ''
     }));
   } catch (e) {}
 }
@@ -6251,6 +6275,7 @@ Output nothing else except the EDIT_SUMMARY line, the edit blocks, and any GAP_N
     window._leBaseResumeText = baseResumeText;
     // Show chat + init history
     leHistory = [{role:'user',content:userMsg},{role:'assistant',content:fullText}];
+    leAssemblyNotes = [];
     window._leChatIndexAtLastResumeGenerate = leHistory.length;
     window._leRoundClosed = false;
     const _leJD = savedJD || document.getElementById('jd-text')?.value?.trim() || '';
@@ -7909,12 +7934,31 @@ function matchCrossesEntryBoundary(matchedText) {
 }
 
 function postLeChatNote(text) {
+  leAssemblyNotes.push(text);
+  if (leAssemblyNotes.length > 10) leAssemblyNotes.shift(); // cap growth across a long round
   const col = document.getElementById('le-chat-column');
   if (col) col.style.display = 'block';
   const thread = document.getElementById('le-chat-thread');
   if (!thread) return;
   thread.insertAdjacentHTML('beforeend', '<div style="margin-bottom:0.5rem;padding:0.4rem 0.7rem;border-left:3px solid var(--amber);font-size:0.83rem;background:#fdf9ef;"><div style="font-family:\'Raleway\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--amber);margin-bottom:0.15rem;">Assembly Note</div><div style="white-space:pre-wrap;">' + escHtml(text) + '</div></div>');
   thread.scrollTop = thread.scrollHeight;
+}
+
+// Page 07's resume textarea is candidate-editable and must behave like a document, not a
+// live-bound display: once the candidate types something of their own into it, a fresh
+// "Generate Resume" run on page 06 must never silently overwrite it. Only refresh it when it's
+// empty or still holds exactly what we ourselves last wrote there (i.e. untouched since then).
+function syncRcTextarea(newText) {
+  const rcTa = document.getElementById('updated-resume-text');
+  if (!rcTa) return;
+  const current = rcTa.value.trim();
+  const lastSynced = (window._leLastAutoSyncedResume || '').trim();
+  if (!current || current === lastSynced) {
+    rcTa.value = newText;
+    window._leLastAutoSyncedResume = newText;
+  } else {
+    postLeChatNote('Your manual edits in the Revised Resume Check box were kept \u2014 a freshly generated resume from this round is ready but wasn\'t auto-loaded there so your edits wouldn\'t be overwritten. Click "\u2190 Load from Line Edits" on that page if you want to replace your edits with it instead.');
+  }
 }
 
 async function generateResumeFromEdits(btn) {
@@ -7976,8 +8020,7 @@ async function generateResumeFromEdits(btn) {
     window._leHasGeneratedResume = true;
     window._leRoundClosed = true;
     persistLeRoundState();
-    const rcTa = document.getElementById('updated-resume-text');
-    if (rcTa) rcTa.value = finalResume;
+    syncRcTextarea(finalResume);
     document.getElementById('gr-output').innerHTML = renderResumePreview(finalResume);
     document.getElementById('gr-result').style.display = 'block';
     return;
@@ -8090,9 +8133,8 @@ async function generateResumeFromEdits(btn) {
     window._leChatIndexAtLastResumeGenerate = leHistory.length;
     persistLeRoundState();
 
-    // Populate page 07 textarea
-    const rcTa = document.getElementById('updated-resume-text');
-    if (rcTa) rcTa.value = finalResume;
+    // Populate page 07 textarea (unless the candidate has manually edited it since we last did)
+    syncRcTextarea(finalResume);
 
     // Render the full resume
     document.getElementById('gr-output').innerHTML = renderResumePreview(finalResume);
@@ -8124,8 +8166,7 @@ async function generateResumeFromEdits(btn) {
     window._grResumeKey = selectedLeResume;
     window._leHasGeneratedResume = true;
     persistLeRoundState();
-    const rcTa = document.getElementById('updated-resume-text');
-    if (rcTa) rcTa.value = baseResume;
+    syncRcTextarea(baseResume);
     document.getElementById('gr-output').innerHTML = renderResumePreview(baseResume);
     document.getElementById('gr-result').style.display = 'block';
   } finally {
@@ -9545,6 +9586,7 @@ function restoreLeRoundState() {
     window._rcGapsRaw = saved.rcGapsRaw || null;
     window._rcFullText = saved.rcFullText || null;
     leEditNumberOffset = saved.editNumberOffset || 0;
+    window._leLastAutoSyncedResume = saved.leLastAutoSyncedResume || '';
     document.querySelectorAll('#le-resume-pills .pill').forEach(p => {
       p.classList.toggle('selected', p.dataset.resume === saved.resumeKey);
     });
