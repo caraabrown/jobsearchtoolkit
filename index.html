@@ -3792,13 +3792,22 @@ document.getElementById('gen-cl-btn').addEventListener('click', async () => {
   const companyName = savedRoleName ? savedRoleName.replace(/^.+?(?:at|@|,)\s*/i, '').trim() || savedRoleName : 'the company';
   const greeting = recipientName ? 'Dear ' + recipientName + ',' : 'Dear Hiring Team at ' + companyName + ',';
   const toneMap = {
-strategic: 'strategic, precise, and confident. Shows systems-level thinking and enterprise impact in plain, conversational sentences, the way a senior practitioner talks to a peer.',
+    strategic: 'strategic, precise, and confident. Shows systems-level thinking and enterprise impact in plain, conversational sentences, the way a senior practitioner talks to a peer.',
     warm: 'warm, personal, and human. Sounds like Cara telling a colleague a true story about her work, with genuine interest in the company and no performed enthusiasm.',
     executive: 'executive-level confidence. Direct and plainspoken, stating results as facts without dramatic emphasis, slogans, or punchy one-line conclusions.'
   };
   showLoading('cl-loading'); hideError('cl-error');
   document.getElementById('cl-result').classList.remove('visible');
   const systemPrompt = `You are an expert cover letter writer for senior design strategy professionals. Every sentence is specific and grounded in actual accomplishments.
+
+VOICE RULES (these override any tone instruction):
+- Write the way Cara would speak in a thoughtful conversation: first person, plain verbs, varied sentence length, ideas connected with ordinary transitions
+- Tell short stories about real work: the situation, what Cara did, and what changed. Let the facts carry the weight
+- NEVER use negative parallelism or contrastive framing: no "This isn't X; it's Y", "not X but Y", "X, not just Y", "less about X, more about Y", "These weren't X. They were Y."
+- NEVER end a paragraph or sentence on a rhetorical kicker: no short dramatic fragments, no repeated-phrase flourishes like "mine to frame and mine to own", no one-line mic-drop sentences
+- NEVER use an em dash or colon to set up a reveal or twist
+- NEVER open with a statement about the company's founding story, mission, or beliefs. If referencing the company, connect one specific fact about their work to one specific thing Cara has done
+- No slogans, aphorisms, or summary-of-my-philosophy lines. If a sentence could appear in anyone's cover letter, rewrite it with a concrete detail from Cara's resume
 
 CRITICAL FORMATTING RULES:
 - NEVER use asterisks (**) anywhere in the letter — not in the greeting, not in the closing, not in the body
@@ -3816,8 +3825,7 @@ Respectfully,
 - Do NOT include contact info in the sign-off — it will appear in the footer
 - Do not use [Date] or any placeholder — use the actual date provided`;
   const anecdoteBlock = anecdote ? '\n\nPERSONAL CONTEXT TO FOLD IN NATURALLY:\n' + anecdote + '\n(Weave this into the letter where it fits — do not quote it verbatim)' : '';
-  
-const userMsg = `Write a clear, personal cover letter for Cara Brown in her natural speaking voice.
+  const userMsg = `Write a clear, personal cover letter for Cara Brown in her natural speaking voice.
 
 JOB DESCRIPTION:
 ${jd}
@@ -3843,7 +3851,8 @@ REQUIREMENTS:
 - Insert the pipe-format skills alignment table between the body paragraphs and closing paragraph
 - Mention caraabrown.com naturally in the body
 - Do NOT use clichés like "I am excited to apply" or "I am a perfect fit"
-- Follow the VOICE RULES exactly: no "isn't X, it's Y" constructions, no dramatic kicker sentences, no em-dash reveals, no company-founding-story openers- Do NOT use asterisks anywhere — not in greeting, not in closing, not around names
+- Follow the VOICE RULES exactly: no "isn't X, it's Y" constructions, no dramatic kicker sentences, no em-dash reveals, no company-founding-story openers
+- Do NOT use asterisks anywhere — not in greeting, not in closing, not around names
 - Length: 3-4 tight paragraphs + table + closing`;
   try {
     const output = document.getElementById('cl-output');
@@ -4147,16 +4156,7 @@ document.getElementById('gen-why-btn').addEventListener('click', async () => {
   hideError('why-error');
   document.getElementById('why-result').classList.remove('visible');
 
- const systemPrompt = `You are an expert cover letter writer for senior design strategy professionals. Every sentence is specific and grounded in actual accomplishments.
-
-VOICE RULES (these override any tone instruction):
-- Write the way Cara would speak in a thoughtful conversation: first person, plain verbs, varied sentence length, ideas connected with ordinary transitions
-- Tell short stories about real work: the situation, what Cara did, and what changed. Let the facts carry the weight
-- NEVER use negative parallelism or contrastive framing: no "This isn't X; it's Y", "not X but Y", "X, not just Y", "less about X, more about Y", "These weren't X. They were Y."
-- NEVER end a paragraph or sentence on a rhetorical kicker: no short dramatic fragments, no repeated-phrase flourishes like "mine to frame and mine to own", no one-line mic-drop sentences
-- NEVER use an em dash or colon to set up a reveal or twist
-- NEVER open with a statement about the company's founding story, mission, or beliefs. If referencing the company, connect one specific fact about their work to one specific thing Cara has done
-- No slogans, aphorisms, or summary-of-my-philosophy lines. If a sentence could appear in anyone's cover letter, rewrite it with a concrete detail from Cara's 
+  const systemPrompt = `You are an expert career coach helping senior professionals craft authentic, compelling answers to application essay questions. Your answers are specific, grounded in real experience, and never generic.`;
 
   const userMsg = `Help Cara Brown answer two questions for this job application:
 
