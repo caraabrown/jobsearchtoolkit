@@ -8710,13 +8710,91 @@ Rules:
 - GardaWorld: in Additional Experience, no dates
 - No graduation years in Education
 - Characters NEVER allowed in body text: → (use "to"), typed — as bullet character (CSS only), #CloseTheGap (use CloseTheGap)
+- NO DASHES in the synopsis or in any bullet: hyphens (-), en dashes (–), and em dashes (—) are banned in that text. The only permitted hyphenated term is "end-to-end". Write compound modifiers as open or closed words (cross functional, data driven, multichannel), write ranges with "to" (20 to 30%), and use a comma or a period wherever a dash would join clauses. Rewrite any hyphenated term carried over from the source resume the same way. The synopsis closing credential uses a comma in place of its dash: MBA, Design Strategy, California College of the Arts, ranked #2 graduate design program globally. The CSS ::before bullet marker stays as defined.
 ${STRUCTURE}`;
 
   let html = '';
   await callClaude(sysPrompt, `Role label: ${label}\n\nCSS to embed in <style> tag:\n${CSS}\n\n---\n\nPlain-text resume to format:\n${text}\n\nProduce the complete HTML file.`, (t) => { html = t; });
   html = html.replace(/^```html\n?|^```\n?|```$/gm, '').trim();
+  html = _jstkStripResumeDashes(html);
   html = await rebalanceResumeHTML(html);
   return html;
+
+  // Deterministic backstop for the NO DASHES rule. Removes hyphens, en dashes and
+  // em dashes from .synopsis and .bullets li text; "end-to-end" is the only
+  // hyphenated term kept. Runs before the rebalancer so page fitting measures
+  // the final text. The CSS ::before bullet marker lives in the stylesheet and
+  // is untouched.
+  function _jstkStripResumeDashes(srcHtml) {
+    try {
+      const doc = new DOMParser().parseFromString(srcHtml, 'text/html');
+      const targets = doc.querySelectorAll('.synopsis, .bullets li');
+      if (!targets.length) return srcHtml;
+      const D = '\\-\\u2010\\u2011\\u2012\\u2013\\u2014\\u2015\\u2212';
+      const KEEP = '';
+      const W = 'A-Za-z0-9\\u00C0-\\u024F';
+      const rules = [
+        [new RegExp('\\b(end)[' + D + '](to)[' + D + '](end)\\b', 'gi'), m => m[1] + KEEP + m[2] + KEEP + m[3]],
+        [new RegExp('(\\d[%kKmMbBxX+]?)\\s*[' + D + ']+\\s*(?=\\$?\\d|Q[1-4]\\b)', 'g'), m => m[1] + ' to '],
+        [/\s*(?:[–—―]|-{2,})\s*/g, () => ', '],
+        [/\s+[\-‐‑‒−]\s+/g, () => ', '],
+        [/^\s*,\s*/g, () => ''],
+        [/\s*,\s*$/g, () => ''],
+        [/,\s*([,.;:!?)\]])/g, m => m[1]],
+        [/([:;])\s*,\s*/g, m => m[1] + ' '],
+        [/\(\s*,\s*/g, () => '('],
+        [new RegExp('\\b(e)[' + D + '](mail|commerce)', 'gi'), m => m[1] + m[2]],
+        [new RegExp('\\b(co)[' + D + '](found|creat|design|author)', 'gi'), m => m[1] + m[2]],
+        [new RegExp('\\b(re|pre|multi|non|omni|sub|inter)[' + D + '](?=[A-Za-z])', 'gi'), m => m[1]],
+        [new RegExp('([' + W + '])[' + D + ']+(?=[' + W + '])', 'g'), m => m[1] + ' '],
+        [new RegExp('[' + D + ']+', 'g'), () => ''],
+        [/ {2,}/g, () => ' '],
+        [new RegExp(KEEP, 'g'), () => '-']
+      ];
+      let changed = false;
+      targets.forEach(el => {
+        const walker = doc.createTreeWalker(el, 4);
+        const nodes = [];
+        for (let n = walker.nextNode(); n; n = walker.nextNode()) nodes.push(n);
+        if (!nodes.length) return;
+        rules.forEach(([re, fn]) => {
+          const full = nodes.map(n => n.nodeValue).join('');
+          const hits = [...full.matchAll(re)];
+          if (!hits.length) return;
+          const starts = [];
+          let acc = 0;
+          nodes.forEach(n => { starts.push(acc); acc += n.nodeValue.length; });
+          const locate = (pos) => {
+            for (let i = nodes.length - 1; i >= 0; i--) if (starts[i] <= pos) return i;
+            return 0;
+          };
+          for (let h = hits.length - 1; h >= 0; h--) {
+            const m = hits[h];
+            const s = m.index, e = s + m[0].length;
+            if (e <= s) continue;
+            const repl = fn(m);
+            if (repl === m[0]) continue;
+            const a = locate(s), b = locate(e - 1);
+            const aOff = s - starts[a], bOff = e - starts[b];
+            if (a === b) {
+              const v = nodes[a].nodeValue;
+              nodes[a].nodeValue = v.slice(0, aOff) + repl + v.slice(bOff);
+            } else {
+              nodes[a].nodeValue = nodes[a].nodeValue.slice(0, aOff) + repl;
+              for (let k = a + 1; k < b; k++) nodes[k].nodeValue = '';
+              nodes[b].nodeValue = nodes[b].nodeValue.slice(bOff);
+            }
+            changed = true;
+          }
+        });
+      });
+      if (!changed) return srcHtml;
+      const dt = /^\s*<!doctype/i.test(srcHtml) ? '<!DOCTYPE html>\n' : '';
+      return dt + doc.documentElement.outerHTML;
+    } catch (e) {
+      return srcHtml;
+    }
+  }
 }
 
 async function downloadGrAsHTML(btn) {
